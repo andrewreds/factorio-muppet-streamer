@@ -308,6 +308,33 @@ PlayerDropInventory.PlayerDropItems_Scheduled = function(event)
     end
 end
 
+--- Converts an item stack into a table that can be placed on the ground with surface.spill_item_stack
+---@param itemStackToDropFrom itemStack
+local function itemStackToDroppableItemTable(itemStackToDropFrom)
+    -- CODE NOTE: ItemStacks are grouped by Factorio in to full health or damaged (health averaged across all items in itemStack).
+    -- CODE NOTE: ItemStacks have a single durability and ammo stat which effectively is for the first item in the itemStack, with the other items in the itemStack all being full.
+    -- CODE NOTE: when the itemStack's count is reduced by 1 the itemStack's durability and ammo fields are reset to full. As the first item is considered to be the partially used items.
+    itemToDrop = {
+        name = itemStackToDropFrom.name,
+        health = itemStackToDropFrom.health,
+        quality = itemStackToDropFrom.quality,
+        spoil_percent = itemStackToDropFrom.spoil_percent,
+        count = 1,
+    }
+
+    if itemStackToDropFrom.is_tool then
+        itemToDrop.durability = itemStackToDropFrom.durability
+    end
+    if itemStackToDropFrom.is_ammo then
+        itemToDrop.ammo = itemStackToDropFrom.ammo
+    end
+    if itemStackToDropFrom.is_item_with_tags then
+        itemToDrop.tags = itemStackToDropFrom.tags
+    end
+
+    return itemToDrop
+end
+
 --- Drops some of the items from the player inventories based on command settings.
 ---
 --- There's a lot of duplication between DropSomeItemsFromInventories() and DropAllItemsFromInventories() as they loop a lot internally and so functioning everything would be excessive. Just check both when making any structural changes or bug fixes.
@@ -329,7 +356,7 @@ PlayerDropInventory.DropSomeItemsFromInventories = function(player, data, itemCo
     local density = (10 - data.density) + 0.075
 
     -- Standard position and drop on ground tables that I just update rather than create. Should save UPS and LuaGarbage collection.
-    local position, itemToDrop = {}, { count = 1 }
+    local position = {}
     -- Standard variables used in the loop per item being dropped.
     local itemStackToDropFrom, itemStackToDropFrom_count, itemToPlaceOnGround, angle, radius
     local math_pi_x2 = math_pi * 2
@@ -426,6 +453,7 @@ PlayerDropInventory.DropSomeItemsFromInventories = function(player, data, itemCo
                 itemCountedUpTo = itemCountedUpTo + itemCount
                 itemIndex, itemStack = next(inventoryContents, itemIndex)
                 itemNameToDrop = itemStack.name
+                itemQualityToDrop = itemStack.quality
                 itemCount = itemStack.count
                 if itemNameToDrop == nil then
                     -- Run out of items in this this inventory to iterate through, ERROR.
@@ -450,7 +478,7 @@ PlayerDropInventory.DropSomeItemsFromInventories = function(player, data, itemCo
                 itemStackToDropFrom = player.cursor_stack ---@cast itemStackToDropFrom -nil # We know the cursor_stack is populated if its gone down this logic path.
             else
                 -- Standard case for all other inventories.
-                itemStackToDropFrom = inventory.find_item_stack(itemNameToDrop)
+                itemStackToDropFrom = inventory.find_item_stack({ name = itemNameToDrop, quality = itemQualityToDrop })
                 if itemStackToDropFrom == nil then
                     CommandsUtils.LogPrintError(CommandName, nil, "didn't find item stack for item '" .. itemNameToDrop .. "' in " .. player.name .. "'s inventory id " .. inventoryNameOfItemNumberToDrop, nil)
                     return
@@ -465,26 +493,7 @@ PlayerDropInventory.DropSomeItemsFromInventories = function(player, data, itemCo
             itemToPlaceOnGround = itemStackToDropFrom
         elseif itemStackToDropFrom_UpdatedForThisItem then
             -- Multiple items in the itemStack so can just drop 1 copy of the itemStack details and remove 1 from count.
-            -- CODE NOTE: ItemStacks are grouped by Factorio in to full health or damaged (health averaged across all items in itemStack).
-            -- CODE NOTE: ItemStacks have a single durability and ammo stat which effectively is for the first item in the itemStack, with the other items in the itemStack all being full.
-            -- CODE NOTE: when the itemStack's count is reduced by 1 the itemStack's durability and ammo fields are reset to full. As the first item is considered to be the partially used items.
-            itemToDrop.name = itemStackToDropFrom.name
-            itemToDrop.health = itemStackToDropFrom.health
-            if itemStackToDropFrom.type == "tool" then
-                itemToDrop.durability = itemStackToDropFrom.durability
-            end
-            if itemStackToDropFrom.type == "ammo" then
-                itemToDrop.ammo = itemStackToDropFrom.ammo
-            else
-                itemToDrop.ammo = nil
-            end
-            if itemStackToDropFrom.is_item_with_tags then
-                itemToDrop.tags = itemStackToDropFrom.tags
-            else
-                itemToDrop.tags = nil
-            end
-            itemToPlaceOnGround = itemToDrop
-
+            itemToPlaceOnGround = itemStackToDroppableItemTable(itemStackToDropFrom)
             itemStackToDropFrom_UpdatedForThisItem = false
         end
 
@@ -523,7 +532,7 @@ PlayerDropInventory.DropAllItemsFromInventories = function(player, data, itemCou
     local density = (10 - data.density) + 0.075
 
     -- Standard position and drop on ground tables that I just update rather than create. Should save UPS and LuaGarbage collection.
-    local position, itemToDrop = {}, { count = 1 }
+    local position = {}
     -- Standard variables used in the loop per item being dropped.
     local itemStackToDropFrom, itemStackToDropFrom_count, angle, radius, inventory
     local math_pi_x2 = math_pi * 2
@@ -550,22 +559,7 @@ PlayerDropInventory.DropAllItemsFromInventories = function(player, data, itemCou
                     surface.spill_item_stack { position = position, stack = itemStackToDropFrom, enable_looted = dropAsLoot, force = markForDeconstructionForce, allow_belts = dropOnBelts }
                 else
                     -- Multiple items in the itemStack so can create 1 item to drop object and just drop it repeatedly for the whole count.
-                    -- CODE NOTE: ItemStacks are grouped by Factorio in to full health or damaged (health averaged across all items in itemStack).
-                    -- CODE NOTE: ItemStacks have a single durability and ammo stat which effectively is for the first item in the itemStack, with the other items in the itemStack all being full.
-                    -- CODE NOTE: when the itemStack's count is reduced by 1 the itemStack's durability and ammo fields are reset to full. As the first item is considered to be the partially used items.
-                    itemToDrop.name = itemStackToDropFrom.name
-                    itemToDrop.health = itemStackToDropFrom.health
-                    itemToDrop.durability = itemStackToDropFrom.durability
-                    if itemStackToDropFrom.type == "ammo" then
-                        itemToDrop.ammo = itemStackToDropFrom.ammo
-                    else
-                        itemToDrop.ammo = nil
-                    end
-                    if itemStackToDropFrom.is_item_with_tags then
-                        itemToDrop.tags = itemStackToDropFrom.tags
-                    else
-                        itemToDrop.tags = nil
-                    end
+                    local itemToDrop = itemStackToDroppableItemTable(itemStackToDropFrom)
 
                     -- Drop the first item on the ground as this can need the extra attributes setting.
                     angle = math_pi_x2 * math_random()
@@ -611,23 +605,7 @@ PlayerDropInventory.DropAllItemsFromInventories = function(player, data, itemCou
                             surface.spill_item_stack { position = position, stack = itemStackToDropFrom, enable_looted = dropAsLoot, force = markForDeconstructionForce, allow_belts = dropOnBelts }
                         else
                             -- Multiple items in the itemStack so can create 1 item to drop object and just drop it repeatedly for the whole count.
-                            -- CODE NOTE: ItemStacks are grouped by Factorio in to full health or damaged (health averaged across all items in itemStack).
-                            -- CODE NOTE: ItemStacks have a single durability and ammo stat which effectively is for the first item in the itemStack, with the other items in the itemStack all being full.
-                            itemToDrop.name = itemStackToDropFrom.name
-                            itemToDrop.health = itemStackToDropFrom.health
-                            if itemStackToDropFrom.type == 'tool' then
-                                itemToDrop.durability = itemStackToDropFrom.durability
-                            end
-                            if itemStackToDropFrom.type == "ammo" then
-                                itemToDrop.ammo = itemStackToDropFrom.ammo
-                            else
-                                itemToDrop.ammo = nil
-                            end
-                            if itemStackToDropFrom.is_item_with_tags then
-                                itemToDrop.tags = itemStackToDropFrom.tags
-                            else
-                                itemToDrop.tags = nil
-                            end
+                            local itemToDrop = itemStackToDroppableItemTable(itemStackToDropFrom)
 
                             -- Drop the first item on the ground as this can need the extra attributes setting.
                             angle = math_pi_x2 * math_random()
