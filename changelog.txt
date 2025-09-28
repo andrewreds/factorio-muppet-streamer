@@ -1,0 +1,518 @@
+---------------------------------------------------------------------------------------------------
+Version: 21.0.2
+Date: 2025-09-27
+  Bugfixes:
+    - Some fixes for malfunctioning_weapon, ammo category had changed
+---------------------------------------------------------------------------------------------------
+Version: 21.0.1
+Date: 2025-09-27
+  Bugfixes:
+    - Some fixes for inventory shuffle and partial inventory drops
+---------------------------------------------------------------------------------------------------
+Version: 21.0.0
+Date: 2025-09-27
+  Changes:
+    - Works (sort of) with Factorio 2.0
+    - Avoid using trees
+---------------------------------------------------------------------------------------------------
+Version: 20.2.0
+Date: 2023-12-27
+  Features:
+  Changes:
+    - Delayed Lua - add_delayed_lua now uses a string of the Lua code to run, rather than a bytecode dump. See the wiki section on Delayed Lua for updated usage examples. It is a trivial change to the code sent in the remote interface call to the mod by your streamer integration tool.
+    - Delayed Lua - remove_delayed_lua now returns as the response if a delayed Lua function was removed with the given scheduleId or not. It no longer prints to screen if the requested scheduleId wasn't found to exist. The calling code can use the response success status to do any alerting if it happens to be desired. This enables a looser/speculative tidy up logic to be used than before.
+    - Delayed Lua - set_delayed_lua_data now returns as the response if a delayed Lua function was updated with the given scheduleId or not. It no longer prints to screen if the requested scheduleId wasn't found to exist. The calling code can use the response success status to do any alerting if it happens to be desired. This enables a more looser/speculative logic to be used than before.
+  Bugfixes:
+    - Delayed Lua - add_delayed_lua in previous mod versions errored from Factorio version 1.1.101 and above. The changes to the feature and its usage included in this mod version resolve this.
+  Info:
+    - Delayed Lua - If a legacy Delayed Lua function is scheduled then on mod upgrade an intentional error will be raised. As we can't migrate the old Lua function. The users options are to either continue the save on the old mod & Factorio version until the scheduled functions have completed, or to cleanse the save of the old Lua functions and accept that whatever was scheduled won't happen. This is a hyper defensive protection mechanism and isn't expected to ever be triggered.
+    - Due to the Delayed Lua changes this version is considered a significant change and so the 2nd version number has ben incremented. As the first version number relates to the Factorio version this is considered as a major version change.
+---------------------------------------------------------------------------------------------------
+Version: 20.1.41
+Date: 2023-11-25
+  Features:
+  Changes:
+  Bugfixes:
+    - Fix typo added in last version that broke new games and save loading.
+  Info:
+---------------------------------------------------------------------------------------------------
+Version: 20.1.40
+Date: 2023-11-25
+  Features:
+  Changes:
+  Bugfixes:
+    - Fix error when another mod added a tree that was autoplaced evenly in the map (sea block mod).
+    - Added missing localisation names for the blocker entities.
+    - Added blocker entities to the Wiki.
+  Info:
+---------------------------------------------------------------------------------------------------
+Version: 20.1.39
+Date: 2023-11-18
+  Features:
+    - Added some invisible blocking entities of various sizes. For adhoc usage in features/maps.
+  Changes:
+  Bugfixes:
+  Info:
+---------------------------------------------------------------------------------------------------
+Version: 20.1.38
+Date: 2022-12-09
+  Features:
+    - Added mod startup setting to make all units be able to open friendly gates. Defaults to no change from default values. Useful when adding friendly biters to the player's team as by default biters can't open friendly gates.
+  Changes:
+    - Explosive Delivery - `smallSpit`, `mediumSpit` and `largeSpit` are now special modified biter spit and ground fire prototypes to ensure the spit hitting the ground sound is played. They are otherwise still copies of `spitter-small`, `worm-medium` and `worm-behemoth` correspondingly. This does not affect the vanilla versions of these prototypes.
+  Bugfixes:
+  Info:
+---------------------------------------------------------------------------------------------------
+Version: 20.1.37
+Date: 2022-10-17
+  Features:
+    - Spawn Around Player - when called via the remote interface and a 0 `delay` it returns an array of the created entities. These can then be used by the calling Lua code. Included example of setting enemy worms health post creation.
+  Changes:
+  Bugfixes:
+  Info:
+    - Effects with a 0 delay run fully when called now (synchronously), whereas before they ran later in the same tick (asynchronously).
+---------------------------------------------------------------------------------------------------
+Version: 20.1.36
+Date: 2022-10-16
+  Features:
+    - Delayed Lua helper function - added functions to schedule Lua code to be run at a later date. Also includes functions to cancel a scheduled lua code and to get & set its scheduled persisted data. See the wiki for details as its a technical code helper function: https://github.com/muppet9010/factorio-muppet-streamer/wiki/Delayed-Lua
+    - Spawn Around Player - added `targetPosition` and `targetOffset` options.
+  Changes:
+  Bugfixes:
+  Info:
+---------------------------------------------------------------------------------------------------
+Version: 20.1.35
+Date: 2022-10-13
+  Features:
+    - Call For Help - any teleported players on foot will try and be placed in to the requesting player's vehicle/train first. With any that don't fit being placed on the ground as per normal. Any players in a teleportable vehicle will still come with their vehicle and stay in it.
+  Changes:
+    - Aggressive Driver - any vehicle that is not operable and not destructible is also viewed as being unsuitable for the feature. Train carriages can be marked with these 2 options. To enhance compatibility with the Stasis Weapons mod.
+    - Aggressive Driver - when the spider or player on foot gets stuck against something and they are on `random` `control` they will try a new random direction, rather than remaining there for the duration of the short direction movement.
+  Bugfixes:
+    - 2 features previously shared a global name space due to a typo. However there was no impactful overlap between Call For help and Aggressive Driver in state data field names; so this shouldn't have caused any issues. It will be resolved in new games, however, existing games will continue with this shared global name space.
+    - Fix loading save that used to have the mod, it was then removed and now its back again.
+    - Aggressive Driver - set player to stop walking at end of effect. In testing this fix wasn't needed, but reported from user so added to be safe.
+  Info:
+---------------------------------------------------------------------------------------------------
+Version: 20.1.34
+Date: 2022-10-06
+  Features:
+  Changes:
+    - Aggressive Driver - any vehicle that is disabled (active == false) is viewed as being unsuitable for the feature. However, train carriages can't be marked as disabled, so this has limited validity. To enhance compatibility with the Stasis Weapons mod.
+  Bugfixes:
+    - Aggressive Driver - fix crash that could occur in some cases when the player was teleported out of their vehicle mid aggressive drive and the aggressive walk fallback option was enabled.
+  Info:
+    - Moved to Github Wiki from single giant information file.
+---------------------------------------------------------------------------------------------------
+Version: 20.1.33
+Date: 2022-10-02
+  Features:
+  Changes:
+  Bugfixes:
+    - Aggressive Driver - fix crash when a player's character died while under the effect and having been in a vehicle.
+  Info:
+    - Multiple features - remove redundant state checks and added some small caching. Should have 0 real impact, but makes code a bit cleaner to read.
+---------------------------------------------------------------------------------------------------
+Version: 20.1.32
+Date: 2022-10-01
+  Features:
+    - Aggressive Driver - added `commandeerVehicle` option that when enabled (default) makes the target player more assertive in getting a vehicle to drive. When not enabled the effect is quite passive in getting a vehicle to drive.
+    - Aggressive Driver - all train carriages are now valid targets for being teleported too. However, non-locomotive train carriages are lower priority than powered vehicle types.
+    - Aggressive Driver - added `teleportWhitelistTypes` and `teleportWhitelistNames` options to allow filtering of which vehicle types the player can be teleported too.
+    - Aggressive Driver - added `aggressiveWalking` options that makes the player walk like the spidertron does. Includes various options to control the timing of the effect. Defaults to always do it as a backup when no vehicle during the effect.
+  Changes:
+    - Aggressive Driver - changed default control to `random` from `full`. As this is the intended experience really and was the single example command.
+    - Aggressive Driver - if the player is already in a vehicle and it is lacking fuel, it will be treated as an unsuitable vehicle and the player will be teleported to a new suitable vehicle if options allow.
+    - Aggressive Driver - train carriages are now validated on the train's ability to move (not lacking fuel), rather than the specific carriages fuel state.
+    - Aggressive Driver - feature's behavior standardised. Affects previous variations in handling of driver vs passenger seat of a vehicle, plus locomotive vs other train carriage types. Description in readme clarified around these areas. The option `commandeerVehicle` was added to allow control over some of these changes.
+  Bugfixes:
+  Info:
+    - Aggressive Driver - in past versions the feature was still largely in its initial Proof Of Concept code state, with some bug fixes and added features. This version has included a large refactor to the code logic, hence the large number of small changes in addition to the added features. The expectation is previous edge cases should no longer have inconsistent behavior.
+---------------------------------------------------------------------------------------------------
+Version: 20.1.31
+Date: 2022-09-23
+  Features:
+    - Player Drop Inventory - UPS improvements make this feature viable for all sizes of inventory drops now, including dropping entire inventories in 1 go. Readme updated to reflect this.
+    - Player Drop Inventory - add option to `markForDeconstruction`. If enabled then items dropped are marked for deconstruction for the owners force. Defaults to false.
+    - Player Drop Inventory - add option to `dropAsLoot`. If enabled then items dropped are marked as loot, meaning any near by player automatically picks them up. Defaults to false.
+    - Player Drop Inventory - added `includeArmor` and `includeWeapons` as separate options to replace the single `includeEquipment` option. Both still default to true as per the old option.
+  Changes:
+    - Player Drop Inventory - removed `includeEquipment` option as added `includeArmor` and `includeWeapons`.
+    - Pants On Fire - players are ejected from vehicles for the duration of the effect, rather than taking damage inside a vehicle. As taking damage can be confusing and not scale as intended, especially in multiplayer with lag.
+  Bugfixes:
+  Info:
+    - Player Drop Inventory - UPS improvements for very large (but non full inventory) drop counts. Will have negligible UPS impact on small drop amounts.
+    - Player Drop Inventory - UPS improvements for when specifically full inventories are dropped. This occurs when either a static or dynamic drop count is equal or greater than the total items the player has.
+---------------------------------------------------------------------------------------------------
+Version: 20.1.30
+Date: 2022-09-16
+  Features:
+    - Explosive Delivery - added `salvoFollowPlayer` option for each salvo to re-target on the player's current position. Defaults to target the initial position (as per old behavior).
+    - Inventory Shuffle - added `includeArmor` and `includeWeapons` as separate options to replace the single `includeEquipment` option. Both still default to true as per the old option.
+    - Inventory Shuffle - added `extractArmorEquipment` option that removes equipment from armor and shuffles them between players. Defaults to false.
+    - Player Drop Inventory - items dropped are now spread out in a visually pleasing manner a few tiles away from the player, rather than a solid block of items at the players feet. Added `density` option to allow controlling how spread out the dropped items are. Defaults to most dense distribution around the player.
+  Changes:
+    - Inventory Shuffle - removed `includeEquipment` option as added `includeArmor` and `includeWeapons`.
+    - Player Drop Inventory - introduction of `density` option and using a pretty circular distribution means that items are never dropped in the most concentrated grid possible any more. This was not a design feature before, but default behavior due to lack of a proper distribution feature.
+  Bugfixes:
+    - Pants On Fire - no message locale for when used on a dead person, so it showed the message name.
+    - All Features - don't error if a tiny delay is provided that gets rounded to 0 ticks.
+    - Aggressive Driver - vehicles that don't require fuel (spidertron) are now valid teleport targets.
+    - Spawn Around Player - if there is an ammo name provided, but no `ammoCount` value is given it won't error any more. It won't warn about this either, it will just insert 0 ammo for no effect.
+  Info:
+    - Correct some spelling mistakes in locale strings.
+    - Player Drop Inventory - More UPS efficient: both Lua code improvements and for larger quantities the distributed item dropping logic is much more efficient than the old way of dropping everything at the players feet. As the game doesn't have to keep on looking for a near by location to place each spilled item from the center heading outwards. The mileage on this UPS saving will vary based on densities being dropped and how crowded the area is (best UPS in open areas).
+---------------------------------------------------------------------------------------------------
+Version: 20.1.29
+Date: 2022-08-09
+  Features:
+    - Various Commands - all commands that have text announcements now have an option to suppress these text messages, `suppressMessages`. This only suppresses expected player messages (start/stop/not suitable) and not error or warning messages. Useful if a command is being applied to many players via a remote interface or you want to broadcast specific themed messages yourself.
+    - Spawn Around Player - created entities will have a random direction set where possible.
+    - Spawn Around Player - putting ammo in an `artillery-turret` type entity now supported. Same as putting ammo in a `gun-turret` already was.
+    - Spawn Around Player - creating `fluid-turret` with a fluid "ammo" is supported.
+    - Spawn Around Player - options to automatically remove the created entities between a min and max time.
+  Changes:
+    - Pants On Fire - capped the max `flameCount` to 250 as above this Factorio behaves oddly. Raised as bug: https://forums.factorio.com/viewtopic.php?f=7&t=103227
+    - Spawn Around Player - for an entity of type `fire` capped the max `ammoCount` setting to 250, as a flame count above this makes Factorio behave oddly. Raised as bug: https://forums.factorio.com/viewtopic.php?f=7&t=103227
+    - Various commands - any command that affects a player for a duration will now show a clear message if a second effect is requested by command and discarded. Previously the command silently ignored the repeat activation.
+  Bugfixes:
+    - Spawn Around Player - previously it stored functions in Factorio storage. If a save/load was done between the command being called and the action occurring (delay setting) the command then it would error. This could cause server or per player script errors, and possibly desynchronisations ? (hypothetically).
+  Info:
+    - Various commands - tweaked some error messages so it should be slightly clearer.
+    - Pants On Fire and Player Inventory Drop now labelled in Mod Description as being Time Duration events. They were coded as such previously, but not described as such. Description of Time Duration events updated to say they may interrupt other Time Duration events, it all depends upon what each event does and requires.
+    - Make sure no events are active/scheduled during an upgrade to/through this version as that will likely cause errors. See advice in Mod's description on upgrading.
+---------------------------------------------------------------------------------------------------
+Version: 20.1.28
+Date: 2022-08-19
+  Features:
+  Changes:
+    - Spawn Around Player - providing a minimum radius above the maximum radius will now be blocked, as it's a bad request. Previously it did work for some usage situations and not others.
+    - Pants On Fire - default flame count upped from 20 to 30 to make sure they safely all ways trees on fire.
+  Bugfixes:
+    - Spawn Around Player - didn't raise the built event so other mods weren't notified about what it created.
+    - Pants On Fire - didn't raise the built event so other mods weren't notified about the fire entities it created.
+    - Explosive Delivery - didn't raise the built event so other mods weren't notified about the projectiles and stream entities it created.
+    - Explosive Delivery - Fixed the position type arguments had stopped accepting array syntax data since v20.1.24.
+  Info:
+---------------------------------------------------------------------------------------------------
+Version: 20.1.27
+Date: 2022-08-13
+  Features:
+  Changes:
+  Bugfixes:
+    - Explosive Delivery - fix the built-in artillery shell option and any custom "artillery-projectile" from being rejected as incompatible when it shouldn't.
+  Info:
+---------------------------------------------------------------------------------------------------
+Version: 20.1.26
+Date: 2022-07-31
+  Features:
+    - Malfunctioning Weapon - supports custom weapon and ammo names as options for modded play throughs.
+    - Malfunctioning Weapon - added reloadTime to set delay between firing each magazine.
+    - Pants On Fire - added support for custom fire entity types.
+    - Schedule Explosive Delivery - added support for custom projectile/stream types.
+    - Spawn Around Player - added support for custom entity types.
+  Changes:
+    - Leaky Flamethrower - feature renamed to Malfunctioning Weapon as it supports a much wider weapon range now. Command name changed with this to `muppet_streamer_v2_malfunctioning_weapon`.
+    - Pants On Fire - fireGaps and fireHeadStarts is now where the player was X time ago, before the furthest bad position it tracked was when the last fire entity was created. This should make the effect follow a player's previous path more accurately, rather than just being "somewhere" behind them. Only really apparent with high fireGaps values.
+    - Spawn Around Player - the default for fire type entities will now be the `muppet_streamer_v2_enemy` which is hostile to every force. This means custom fire entities will hurt biters.
+    - Spawn Around Player - a force set for a type of tree, rock or fire is now honoured and not forced to be `neutral`. It is still the default for trees and rocks if the name of a force isn't explicitly set however. Fire defaults to `muppet_streamer_v2_enemy`.
+  Bugfixes:
+    - Various extreme edge case handling across features identified by improved development tools.
+    - All features should be compatible/safe with mods that change base game things now. They will safely warn if the thing doesn't exist rather than error.
+    - Pants On Fire - doesn't error on a fireHeadStart or 0 or 1 any more.
+  Info:
+---------------------------------------------------------------------------------------------------
+Version: 20.1.25
+Date: 2022-07-26
+  Features:
+  Changes:
+  Bugfixes:
+    - Enable Dead Building Ghosts - Fix crash when setting was enabled on loading a map.
+    - Library files - Fixed a few code places where non-existant functions where called, unknown if these were used in mod's features.
+  Info:
+---------------------------------------------------------------------------------------------------
+Version: 20.1.24
+Date: 2022-07-24
+  Features:
+    - Any unsupported option/setting provided when a command is run will raise a warning on screen. This is to aid user recognition of any mistakes in their command's options/settings.
+    - Added remote interface for features in addition to their commands. This is documented at the end of the mod description/readme. This should provide full flexibility for all viewer integration methods. Also allows for multiple features to be triggered simultaneously as separate RCON commands will always have a tiny delay between them.
+  Changes:
+    - All feature's commands are now tighter on enforcing option's value types to what the readme says, so incorrect typed values will be rejected, i.e. passing in a decimal point number to an Integer (whole number) setting, or entering a number as a string (number in double quotes). If you previously passed in the correct value types this will have no impact on you. In the past "some" commands would convert "some" incorrect setting values to "some" degree, i.e. a decimal number "might" be rounded either up/down to an integer number.
+    - No command will silently be ignored if provided a nonsensical low value to some mandatory settings any more. Previously some commands had this feature on some settings. Now all commands will raise an on screen error for excessively low values, i.e. trying to create 0 explosives.
+    - Player Drop Inventory - gap (seconds) setting must be a value that ends up at 1 tick or more (1/60 or 0.0167 of a second).
+    - Give Weapon & Ammo - if an ammo type is given for the gun it will be forced to be equipped now, before it was only equipped if the player didn't have any ammo in that existing weapon.
+    - Player Inventory Shuffle - when all players on a force are included the force is listed and not the players of it. Any additional individual players on other non-included forces will still be named individually.
+    - Pants on Fire - FlameCount setting is now limited to 255 (Factorio limit). Previously values above this would have caused an error if tried.
+  Bugfixes:
+    - Leaky Flamethrower - no longer errors in edge case when the flamethrower is forced in to a players weapons inventory. Case was with a filtered weapon slot, non filtered ammo slot, both weapon and ammo slot were empty of an actual item.
+    - Leaky Flamethrower - if there isn't any flamer ammo when the weapon is given for some weird reason the effect will be stopped and a warning given. Before this errored as it's an unexpected and unhandled state. Shouldn't occur, but thought this before.
+    - Many feature's settings now have better max/min input protection to restrict excessive values. This should avoid crashes in these unknown situations.
+    - Many feature's settings now have better data type input protection to restrict bad values, i.e. passing in 5.5 to a setting expecting only whole numbers that didn't correct this before. This should avoid crashes in these unknown situations.
+    - Player Inventory Shuffle - won't double include players when they are included by force and named.
+    - Aggressive Driver - previously it would disregard a vehicle that's currently burning fuel, but has none in the fuel inventory, as being unsuitable for a player to teleport too. Now these valid vehicles will be utilised.
+    - Teleport & Call For Help - The previous fix to align vehicles to a cardinal (4) direction actually did it it to the 8 main directions and so sometimes vehicles still overlapped things. Now it is actually the 4 cardinal directions that the mod can find a clear space for.
+  Info:
+    - The tightening of setting types means options either now explicitly enforce the value type listed in the readme; or when the code allows a wider range of values than the README indicated, the README now matches the wider allowed value type range. Any intentionally tightened restrictions on a command's expected value type from this review of code and the readme will be listed as a change separately. If an old commands setting is now rejected please check that it wasn't an unintentional change as the way setting values are handled was fully re-done.
+    - The tightening on value types and removal of type conversions when they were present is due to its past erratic inclusion and issues with documenting and users utilising these conversations when they differed between each usage case, i.e. some rounded up, some down, some not at all (errored). So the new setup is explicit and removes the greyness, plus makes the code easier to maintain and document.
+    - Updated to the latest Muppet Utility library. Many code changes (hopefully non functional changing) across all of the features in the mod. This is done to enable more modern development tools and to utilise more advanced shared code functionality. Both of which should reduce bugs and make future additions quicker.
+---------------------------------------------------------------------------------------------------
+Version: 20.0.23
+Date: 2022-07-05
+  Features:
+    - Added mod setting to enable ghosts on building death for all forces. Useful if chat is blowing up your base often prior to having researched construction bot tech.
+    - Inventory Shuffle feature - Added option to NOT cancel players hand crafting queues.
+    - Explosive Delivery - Added option for target offset {x,y}. Allows a static offset to be applied to a target position (player or static) before the random accuracy is calculated per explosive delivered.
+  Changes:
+    - Teleport - arrivalRadius setting now defaults to 10 as readme said and was intended.
+    - Call For Help - arrivalRadius setting now optional, with a default of 10 as per readme. In most use cases this will be fine and so no need to force a streamer to provide standard settings.
+  Bugfixes:
+    - Leaky Flamethrower - Error when ammo count was non integer value between >0 and <1. It's now just rounded up as non-integers aren't supported and so shouldn't really be given.
+    - Leaky flamethrower - Fix cause of player ending up with a fraction of flamethrower ammo at end of effect. If a player was shooting another weapon when the leaky flamethrower started then their existing weapon cooldown would delay firing the flamethrower and mess up the timing on the first burst. Thus the first ammo item was never fully fired in the expected time and at the end of the effect they were left with a small amount of ammo. Mod tracks ammo usage to detect this non firing and hopefully other ammo gain/loss scenarios in a non buggy way, but does have to make assumptions about ammo changes.
+    - Explosive Delivery - Target surface now stays the same for all salvos in an effect, same as the position does. Before the surface would follow the target player, but the position wouldn't, which made no real sense.
+    - Explosive Delivery - Target surface deletion mid salvo will no longer cause errors. The undelivered salvos to that surface will just be ignored.
+    - Teleport & Call For Help - When the reachableOnly feature was in use previously a player's state (alive, force, vehicle and surface) could change while waiting for a path check to complete. The mod wouldn't react to this and this could lead to players being placed inside moved entities, on wrong surfaces, with wrong vehicles or placement checks, etc. Now these changes will be detected and the teleport process re-run to ensure a clean and accurate target location is found.
+    - Teleport & Call For Help - Now checks that a vehicle can be placed with its current direction at the selected teleport location. Previously it was (inadvertently) assumed vehicles were all direction 0. This does mean vehicles when teleported will now be snapped to a cardinal (4) direction until a Factorio modding API request can be done.
+    - Teleport - arrivalRadius setting now defaults to 10 as readme said and was intended. Before it was defaulting to 0.
+  Info:
+    - Teleport and Call For Help moved to centralised player teleport library. Should reduce future duplicate bugs and variation risks. But does mean a lot of code changes in this version for these 2 features.
+---------------------------------------------------------------------------------------------------
+Version: 20.0.22
+Date: 2022-06-17
+  Features:
+    - Inventory Shuffle feature - Added option to include all players on a list of force(s).
+  Changes:
+    - Any command that fails validation will print the full command text they received. Helps to debug integration tool issues.
+    - Inventory Shuffle feature - Player list to target setting name changed from `targets` to `includedPlayers`.
+  Bugfixes:
+    - Teleport and Call For Help features - both previously wouldn't teleport a spider-vehicle when they should have. Also both previously only recognised base Factorio car and tank, now they recognise all car (and tank) type vehicles in addition to all spider-vehicle type vehicles.
+  Info:
+---------------------------------------------------------------------------------------------------
+Version: 20.0.21
+Date: 2022-05-15
+  Features:
+    - Aggressive Driver feature - now supports spider vehicles. They will either force a forwards walking with player directional input or wander around randomly based on settings.
+  Changes:
+    - Inventory Shuffle feature - cancels any crafting by the included players and distributes their ingredient items. Limit to 1,000 inventory slots per player for cancelled crafting ingredients to go in before they spill at that player's feet.
+  Bugfixes:
+    - Inventory Shuffle feature - player source count correctly handles the same item from multiple source inventories of the same player.
+    - Inventory Shuffle feature - player source count for each item is now respected. Previous bug led to all items following the first item's source count.
+    - Inventory Shuffle feature - error if no players had any items at all fixed.
+    - Leaky Flamethrower - at the end of the effect the last used weapon would be fired once. if the weapon required an active target this wasn't noticeable, but if it was an atomic rocket it was bad.
+  Info:
+---------------------------------------------------------------------------------------------------
+Version: 20.0.20
+Date: 2022-05-07
+  Features:
+  Changes:
+    - Call For Help feature - added option to only call players on the same force, defaults to true. Previously any player on the server could be called.
+    - Teleport feature - optimised to handle large numbers of biter nests (spawners) being on a non-enemy force and thus ignored. General optimisations to UPS usage across biter nest searching.
+    - Leaky flamethrower feature - if weapon/ammo items and/or filters were removed to equip the player with a flamethrower then these are restored upon the effect completing or the player dying.
+    - Leaky flamethrower feature - random aiming across a larger distribution area.
+    - Leaky flamethrower feature - after effect ends the player's active weapon is returned to what it was before the effect started, rather than being left on whichever weapon slot the flamethrower was put in.
+    - Pants On Fire - if you stay in a vehicle you will take exponential damage until you get out. This will scale quickly to handle players from no armor up to heavily shielded players.
+  Bugfixes:
+    - Give Weapon & Ammo feature - when forceWeaponToSlot set to True it will force the weapon into a filtered gun slot if needed.
+    - Leaky flamethrower feature - handles if all slots are full/filtered by clearing one for the flamethrower.
+    - Aggressive Driver feature - if the player was in a train, but not a locomotive carriage then the code wouldn't have run correctly and could lead to partial or no control exerted over the train.
+  Info:
+    - Readme / mod portal description argument types clarified with more specific examples and data types.
+---------------------------------------------------------------------------------------------------
+Version: 20.0.19
+Date: 2022-04-11
+  Features:
+    - Add Player Drop Inventory feature.
+    - Add Player Inventory Shuffle feature.
+  Changes:
+  Bugfixes:
+  Info:
+---------------------------------------------------------------------------------------------------
+Version: 20.0.18
+Date: 2022-04-01
+  Features:
+  Changes:
+  Bugfixes:
+    - Removed work around introduced in previous mod version to mitigate core Factorio bug present only in 1.1.56.
+  Info:
+---------------------------------------------------------------------------------------------------
+Version: 20.0.17
+Date: 2022-03-12
+  Features:
+  Changes:
+  Bugfixes:
+    - Added work around for API bug introduced in Factorio 1.1.56. The work around fixes base game trees, but alien biomes will probably error and is untested. Utilising temporary hard coded values obtained in 1.1.54. https://forums.factorio.com/viewtopic.php?f=7&t=101833
+  Info:
+---------------------------------------------------------------------------------------------------
+Version: 20.0.16
+Date: 2022-03-04
+  Features:
+    - Pants On Fire - Added optional Flame Count option that affects how much damage and the burn time of each fire entity. Defaults to 20 which is the minimum for a tree to catch on fire.
+    - Call For Help - Added optional Same Surface Only option to allow calling players from other surfaces. Useful for some scenarios. Defaults to true (as per old behavior).
+    - Call For Help - Added optional blacklisted and whitelisted player name lists to refine which players can be teleported to help.
+  Changes:
+    - Call For Help - Changed callRadius is now optional and if left undefined will call players from an unlimited distance away. Saves having to provide a very large number for these scenarios and is the default.
+  Bugfixes:
+    - Creating random trees on tiles without specific climate data no longer errors. If the player can walk on the tile they get a random tree, if they can't it gets no tree.
+    - Call For Help intermittent error fixed when multiple players try to be teleported into a difficult to place situation. Bug reports indicated this was related to being in trains, but not the case.
+  Info:
+    - Readme text for Teleport and Call For Help clarified in places. No functional changes, but additional pre-existing exceptions are now listed.
+---------------------------------------------------------------------------------------------------
+Version: 20.0.15
+Date: 2022-01-19
+  Features:
+    - Added salvo option to explosive delivery feature - courtesy of Omnituens.
+  Changes:
+  Bugfixes:
+  Info:
+---------------------------------------------------------------------------------------------------
+Version: 20.0.14
+Date: 2021-12-29
+  Features:
+    - Added pants on fire feature - courtesy of Andrewreds and inspired by Comfy.
+  Changes:
+  Bugfixes:
+  Info:
+---------------------------------------------------------------------------------------------------
+Version: 20.0.13
+Date: 2021-06-19
+  Features:
+  Changes:
+  Bugfixes:
+    - Fix teleport tracking biter nests to handle surfaces created ad hoc during play.
+  Info:
+---------------------------------------------------------------------------------------------------
+Version: 20.0.12
+Date: 2020-12-14
+  Features:
+  Changes:
+  Bugfixes:
+    - Replace naughty function in mod global code, added in 20.0.10 and 20.0.11. Caused crashes on loading a save made after updating the mod.
+  Info:
+---------------------------------------------------------------------------------------------------
+Version: 20.0.11
+Date: 2020-12-13
+  Features:
+  Changes:
+  Bugfixes:
+    - Spawn Around Player - type tree - Fix crash when loading some old save games in some specific scenarios.
+  Info:
+---------------------------------------------------------------------------------------------------
+Version: 20.0.10
+Date: 2020-12-11
+  Features:
+    - Spawn Around Player - type tree - Full support for Alien Biomes added. Excessive dead trees should only be seen for Ice and hottest volcanic tiles.
+  Changes:
+  Bugfixes:
+    - Spawn Around Player - type tree - Fix crash with any tree autoplace that was missing water ranges (Alien Biomes modded snow type trees).
+  Info:
+---------------------------------------------------------------------------------------------------
+Version: 20.0.9
+Date: 2020-11-27
+  Features:
+    - Updated to Factorio 1.1.
+  Changes:
+    - Removed the mod setting that disabled tracking launched items in the rocket silo as that Freeplay scenario feature was removed from Factorio in 1.1.
+  Bugfixes:
+    - Fixed team member limit style error.
+    - Aggressive Driver - Fix loss of steering in car/tank introduced in previous version.
+    - Aggressive Driver - Fix loss of steering in train, in previous version it was flagged as a loss of functionality.
+    - Teleport & Call For Help - Fix being in a train would prevent teleporting.
+  Info:
+    - Aggressive Driver - updated readme to state that `full` control applies to cars/tanks & trains again, reverting last updates readme change.
+---------------------------------------------------------------------------------------------------
+Version: 19.0.8
+Date: 2020-11-22
+  Features:
+  Changes:
+    - Aggressive Driver - `random` control train will alternate between directions continuously, cars/tanks will continue to turn for a short period.
+  Bugfixes:
+    - Call For Help - fix crash if optional activePercentage argument is not supplied.
+  Info:
+    - Aggressive Driver - updated readme to state that `full` control only applies to cars/tanks. Trains will go straight in this mode. I can't find a way to allow user input when in a train and still force acceleration.
+---------------------------------------------------------------------------------------------------
+Version: 19.0.7
+Date: 2020-11-11
+  Features:
+    - Add targetPosition option to the Explosive Delivery so you can target set locations on the map if desired.
+  Changes:
+    - Teleport & Call For Help uses the player character and not the vehicle for pathfinding requests. Still uses the player vehicle for placement finding.
+  Bugfixes:
+    - Leaky Flamethrower - If the gun is lost (via script) then the effect stops. Before when you picked up another gun it would start firing that.
+    - Leaky Flamethrower - If the gun is lost (via script) then the weapon and ammo is recovered from the players inventory or items on the group.
+  Info:
+---------------------------------------------------------------------------------------------------
+Version: 19.0.6
+Date: 2020-10-30
+  Features:
+    - Add Aggressive Driver feature to drive a vehicle forwards aggressively.
+    - Add Call For Help feature to teleport other players around the specific player.
+    - Add Teleport feature to take the player near a range of possible targets, including backup teleport actions.
+    - Combat robots created by the Spawn Around Player feature have the option to follow the player or not. Any robots which can't follow will just be created loose on the map.
+    - Add landmine option to the spawn around player feature.
+    - Add force option to the spawn around player feature.
+  Changes:
+    - Different types of time duration features will interrupt each other. Same types currently don't stack.
+    - Alert in chat when a targeted player isn't in a state to have an effect applied to them.
+  Bugfixes:
+    - Fix combat robots commands from erroring.
+    - When you die (stop leaky flamethrower) any unused ammo you were given is removed.
+  Info:
+    - Updated Muppet Utility library, includes many minor fixes, some will fix un-reported issues in this mod.
+---------------------------------------------------------------------------------------------------
+Version: 18.0.5
+Date: 2020-05-04
+  Features:
+  Changes:
+  Bugfixes:
+    - Make all commands be admin only.
+    - Make all commands not error if no data is passed to them.
+  Info:
+---------------------------------------------------------------------------------------------------
+Version: 18.0.4
+Date: 2020-05-02
+  Features:
+  Changes:
+  Bugfixes:
+    - When giving weapons and ammo if the items spilled on the floor it errored. No longer happens.
+  Info:
+---------------------------------------------------------------------------------------------------
+Version: 18.0.3
+Date: 2020-04-01
+  Features:
+  Changes:
+  Bugfixes:
+    - Leaky flamethrower fix crash when player is dead or has no body.
+    - Added some checks to other places character inventory is used to make sure a character exists (not nil).
+    - Fix destroyer capsule typo in spawn around player.
+    - Stop spawn_around_player type of "fire" having an ammoCount above 250 as it crashes the game
+  Info:
+    - Many small readme fixes and clarifications added.
+---------------------------------------------------------------------------------------------------
+Version: 18.0.2
+Date: 2020-02-28
+  Features:
+    - Explosive Delivery added new types: slowdown capsule, poison capsule, explosive rocket, small spit, medium spit, large spit
+    - Added the Leaky Flamethrower feature.
+    - Added the Give Weapon And Ammo feature.
+    - Added the Spawn Around Player feature.
+    - Added a game starting map reveal setting.
+  Changes:
+  Bugfixes:
+    - fix scheduled delivery delay to apply.
+  Info:
+    - remove hard coded surface, so will use the players current surface
+---------------------------------------------------------------------------------------------------
+Version: 18.0.1
+Date: 2020-02-27
+  Features:
+  Changes:
+    - Make Workforce feature entirely disable-able.
+  Bugfixes:
+  Info:
+---------------------------------------------------------------------------------------------------
+Version: 18.0.0
+Date: 2020-02-16
+  Features:
+    - Initial Release
+  Changes:
+  Bugfixes:
+  Info:
