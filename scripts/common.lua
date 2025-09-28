@@ -65,16 +65,16 @@ end
 
 ---@enum Common_CommandNames
 Common.CommandNames = {
-    muppet_streamer_aggressive_driver = "muppet_streamer_aggressive_driver",
-    muppet_streamer_call_for_help = "muppet_streamer_call_for_help",
-    muppet_streamer_schedule_explosive_delivery = "muppet_streamer_schedule_explosive_delivery",
-    muppet_streamer_give_player_weapon_ammo = "muppet_streamer_give_player_weapon_ammo",
-    muppet_streamer_malfunctioning_weapon = "muppet_streamer_malfunctioning_weapon",
-    muppet_streamer_pants_on_fire = "muppet_streamer_pants_on_fire",
-    muppet_streamer_player_drop_inventory = "muppet_streamer_player_drop_inventory",
-    muppet_streamer_player_inventory_shuffle = "muppet_streamer_player_inventory_shuffle",
-    muppet_streamer_spawn_around_player = "muppet_streamer_spawn_around_player",
-    muppet_streamer_teleport = "muppet_streamer_teleport"
+    muppet_streamer_v2_aggressive_driver = "muppet_streamer_v2_aggressive_driver",
+    muppet_streamer_v2_call_for_help = "muppet_streamer_v2_call_for_help",
+    muppet_streamer_v2_schedule_explosive_delivery = "muppet_streamer_v2_schedule_explosive_delivery",
+    muppet_streamer_v2_give_player_weapon_ammo = "muppet_streamer_v2_give_player_weapon_ammo",
+    muppet_streamer_v2_malfunctioning_weapon = "muppet_streamer_v2_malfunctioning_weapon",
+    muppet_streamer_v2_pants_on_fire = "muppet_streamer_v2_pants_on_fire",
+    muppet_streamer_v2_player_drop_inventory = "muppet_streamer_v2_player_drop_inventory",
+    muppet_streamer_v2_player_inventory_shuffle = "muppet_streamer_v2_player_inventory_shuffle",
+    muppet_streamer_v2_spawn_around_player = "muppet_streamer_v2_spawn_around_player",
+    muppet_streamer_v2_teleport = "muppet_streamer_v2_teleport"
 }
 
 --- Allows calling a command via a remote interface.
@@ -100,7 +100,7 @@ Common.CallCommandFromRemote = function(commandName, options)
         commandString = options
     elseif type(options) == "table" then
         -- Options should be a table of settings, so convert it to JSOn and just pass it through.
-        commandString = game.table_to_json(options)
+        commandString = helpers.table_to_json(options)
     else
         CommandsUtils.LogPrintError("Remote Interface", commandName, "received unexpected option data type: " .. type(options), TableUtils.TableContentsToJSON(options, nil, true))
         return nil
@@ -116,25 +116,25 @@ Common.CallCommandFromRemote = function(commandName, options)
     }
 
     -- Call the correct features command with the details.
-    if commandName == Common.CommandNames.muppet_streamer_aggressive_driver then
+    if commandName == Common.CommandNames.muppet_streamer_v2_aggressive_driver then
         return MOD.Interfaces.Commands.AggressiveDriver(commandData)
-    elseif commandName == Common.CommandNames.muppet_streamer_call_for_help then
+    elseif commandName == Common.CommandNames.muppet_streamer_v2_call_for_help then
         return MOD.Interfaces.Commands.CallForHelp(commandData)
-    elseif commandName == Common.CommandNames.muppet_streamer_schedule_explosive_delivery then
+    elseif commandName == Common.CommandNames.muppet_streamer_v2_schedule_explosive_delivery then
         return MOD.Interfaces.Commands.ExplosiveDelivery(commandData)
-    elseif commandName == Common.CommandNames.muppet_streamer_give_player_weapon_ammo then
+    elseif commandName == Common.CommandNames.muppet_streamer_v2_give_player_weapon_ammo then
         return MOD.Interfaces.Commands.GiveItems(commandData)
-    elseif commandName == Common.CommandNames.muppet_streamer_malfunctioning_weapon then
+    elseif commandName == Common.CommandNames.muppet_streamer_v2_malfunctioning_weapon then
         return MOD.Interfaces.Commands.MalfunctioningWeapon(commandData)
-    elseif commandName == Common.CommandNames.muppet_streamer_pants_on_fire then
+    elseif commandName == Common.CommandNames.muppet_streamer_v2_pants_on_fire then
         return MOD.Interfaces.Commands.PantsOnFire(commandData)
-    elseif commandName == Common.CommandNames.muppet_streamer_player_drop_inventory then
+    elseif commandName == Common.CommandNames.muppet_streamer_v2_player_drop_inventory then
         return MOD.Interfaces.Commands.PlayerDropInventory(commandData)
-    elseif commandName == Common.CommandNames.muppet_streamer_player_inventory_shuffle then
+    elseif commandName == Common.CommandNames.muppet_streamer_v2_player_inventory_shuffle then
         return MOD.Interfaces.Commands.PlayerInventoryShuffle(commandData)
-    elseif commandName == Common.CommandNames.muppet_streamer_spawn_around_player then
+    elseif commandName == Common.CommandNames.muppet_streamer_v2_spawn_around_player then
         return MOD.Interfaces.Commands.SpawnAroundPlayer(commandData)
-    elseif commandName == Common.CommandNames.muppet_streamer_teleport then
+    elseif commandName == Common.CommandNames.muppet_streamer_v2_teleport then
         return MOD.Interfaces.Commands.Teleport(commandData)
     end
 end
@@ -154,7 +154,7 @@ Common.GetItemPrototypeFromCommandArgument = function(itemName, itemType, mandat
     end
     local itemPrototype ---@type LuaItemPrototype|nil
     if itemName ~= nil and itemName ~= "" then
-        itemPrototype = game.item_prototypes[itemName]
+        itemPrototype = prototypes.item[itemName]
         if itemPrototype == nil or itemPrototype.type ~= itemType then
             CommandsUtils.LogPrintError(commandName, argumentName, "isn't a valid " .. itemType .. " type: " .. tostring(itemName), commandString)
             return nil, false
@@ -178,7 +178,7 @@ Common.GetEntityPrototypeFromCommandArgument = function(entityName, entityType, 
     end
     local entityPrototype ---@type LuaEntityPrototype|nil
     if entityName ~= nil and entityName ~= "" then
-        entityPrototype = game.entity_prototypes[entityName]
+        entityPrototype = prototypes.entity[entityName]
         if entityPrototype == nil or entityPrototype.type ~= entityType then
             CommandsUtils.LogPrintError(commandName, argumentName, "isn't a valid " .. entityType .. " type: " .. tostring(entityName), commandString)
             return nil, false
@@ -194,7 +194,7 @@ end
 ---@param commandString? string|nil # Used for error messages.
 ---@return LuaEntityPrototype|nil entityPrototype # nil return means its invalid.
 Common.GetBaseGameEntityByName = function(entityName, expectedEntityType, commandName, commandString)
-    local entityPrototype = game.entity_prototypes[entityName]
+    local entityPrototype = prototypes.entity[entityName]
     if entityPrototype == nil then
         CommandsUtils.LogPrintError(commandName, nil, "tried to use base game '" .. entityName .. "' entity, but it doesn't exist in this save.", commandString)
         return nil
@@ -232,7 +232,7 @@ end
 ---@param commandString? string|nil # Used for error messages.
 ---@return LuaItemPrototype|nil itemPrototype # nil return means its invalid.
 Common.GetBaseGameItemByName = function(itemName, expectedItemType, commandName, commandString)
-    local itemPrototype = game.item_prototypes[itemName]
+    local itemPrototype = prototypes.item[itemName]
     if itemPrototype == nil then
         CommandsUtils.LogPrintError(commandName, nil, "tried to use base game '" .. itemName .. "' item, but it doesn't exist in this save.", commandString)
         return nil
@@ -269,7 +269,7 @@ end
 ---@param commandString? string|nil # Used for error messages.
 ---@return LuaFluidPrototype|nil fluidPrototype # nil return means its invalid.
 Common.GetBaseGameFluidByName = function(fluidName, commandName, commandString)
-    local fluidPrototype = game.fluid_prototypes[fluidName]
+    local fluidPrototype = prototypes.fluid[fluidName]
     if fluidPrototype == nil then
         CommandsUtils.LogPrintError(commandName, nil, "tried to use base game '" .. fluidName .. "' fluid, but it doesn't exist in this save.", commandString)
         return nil

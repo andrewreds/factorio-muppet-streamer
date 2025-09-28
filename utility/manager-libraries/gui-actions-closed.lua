@@ -39,9 +39,9 @@ GuiActionsClosed.RegisterActionNameForGuiTypeClosed = function(guiType, actionNa
         error("GuiActions.RegisterActionNameForGuiTypeClosed called with missing arguments")
     end
     data = data or {}
-    global.UTILITYGUIACTIONSGUITYPECLOSED = global.UTILITYGUIACTIONSGUITYPECLOSED or {} ---@type table<defines.gui_type|'all', table<string, table|nil>>
-    global.UTILITYGUIACTIONSGUITYPECLOSED[guiType] = global.UTILITYGUIACTIONSGUITYPECLOSED[guiType] or {}
-    global.UTILITYGUIACTIONSGUITYPECLOSED[guiType][actionName] = data
+    storage.UTILITYGUIACTIONSGUITYPECLOSED = storage.UTILITYGUIACTIONSGUITYPECLOSED or {} ---@type table<defines.gui_type|'all', table<string, table|nil>>
+    storage.UTILITYGUIACTIONSGUITYPECLOSED[guiType] = storage.UTILITYGUIACTIONSGUITYPECLOSED[guiType] or {}
+    storage.UTILITYGUIACTIONSGUITYPECLOSED[guiType][actionName] = data
 end
 
 --- Called when desired to remove a specific GUI type closing from triggering its action.
@@ -53,10 +53,10 @@ GuiActionsClosed.RemoveActionNameForGuiTypeClosed = function(guiType, actionName
     if guiType == nil or actionName == nil then
         error("GuiActions.RemoveActionNameForGuiTypeClosed called with missing arguments")
     end
-    if global.UTILITYGUIACTIONSGUITYPECLOSED == nil or global.UTILITYGUIACTIONSGUITYPECLOSED[guiType] == nil then
+    if storage.UTILITYGUIACTIONSGUITYPECLOSED == nil or storage.UTILITYGUIACTIONSGUITYPECLOSED[guiType] == nil then
         return
     end
-    global.UTILITYGUIACTIONSGUITYPECLOSED[guiType][actionName] = nil
+    storage.UTILITYGUIACTIONSGUITYPECLOSED[guiType][actionName] = nil
 end
 
 --------------------------------------------------------------------------------------------
@@ -68,10 +68,10 @@ end
 GuiActionsClosed._HandleGuiClosedAction = function(rawFactorioEventData)
     local guiType = rawFactorioEventData.gui_type
 
-    if global.UTILITYGUIACTIONSGUITYPECLOSED ~= nil and guiType ~= nil then
+    if storage.UTILITYGUIACTIONSGUITYPECLOSED ~= nil and guiType ~= nil then
         for _, guiTypeHandled in pairs({ guiType, "all" }) do
-            if global.UTILITYGUIACTIONSGUITYPECLOSED[guiTypeHandled] ~= nil then
-                for actionName, data in pairs(global.UTILITYGUIACTIONSGUITYPECLOSED[guiTypeHandled]) do
+            if storage.UTILITYGUIACTIONSGUITYPECLOSED[guiTypeHandled] ~= nil then
+                for actionName, data in pairs(storage.UTILITYGUIACTIONSGUITYPECLOSED[guiTypeHandled]) do
                     local actionFunction = MOD.guiClosedActions[actionName]
                     local actionData = { actionName = actionName, playerIndex = rawFactorioEventData.player_index, guiType = guiTypeHandled, data = data, eventData = rawFactorioEventData }
                     if actionFunction == nil then

@@ -29,7 +29,7 @@ Note: all examples target the player named `muppet9010`, you will need to replac
 <details><summary>show details</summary>
 <p>
 
-Remote Interface Syntax: `/sc remote.call('muppet_streamer', 'run_command', 'muppet_streamer_give_player_weapon_ammo', [OPTIONS TABLE])`
+Remote Interface Syntax: `/sc remote.call('muppet_streamer_v2', 'run_command', 'muppet_streamer_v2_give_player_weapon_ammo', [OPTIONS TABLE])`
 
 The options must be provided as a Lua table.
 
@@ -37,7 +37,7 @@ Examples:
 
 | Example | Code |
 | --- | --- |
-| shotgun and ammo | `/sc remote.call('muppet_streamer', 'run_command', 'muppet_streamer_give_player_weapon_ammo', {target="muppet9010", weaponType="combat-shotgun", forceWeaponToSlot=true, ammoType="piercing-shotgun-shell", ammoCount=30})` |
+| shotgun and ammo | `/sc remote.call('muppet_streamer_v2', 'run_command', 'muppet_streamer_v2_give_player_weapon_ammo', {target="muppet9010", weaponType="combat-shotgun", forceWeaponToSlot=true, ammoType="piercing-shotgun-shell", ammoCount=30})` |
 
 
 Further details and more advanced usage of using Remote Interfaces can be found here on the [Streamer Effect Options Syntax Wiki page](https://github.com/muppet9010/factorio-muppet-streamer/wiki/Streamer-Effect-Options-Syntax).
@@ -52,7 +52,7 @@ Further details and more advanced usage of using Remote Interfaces can be found 
 <details><summary>show details</summary>
 <p>
 
-Command Syntax: `/muppet_streamer_give_player_weapon_ammo [OPTIONS TABLE AS JSON STRING]`
+Command Syntax: `/muppet_streamer_v2_give_player_weapon_ammo [OPTIONS TABLE AS JSON STRING]`
 
 The effect's options must be provided as a JSON string of a table.
 
@@ -60,7 +60,7 @@ Examples:
 
 | Example | Code |
 | --- | --- |
-| shotgun and ammo | `/muppet_streamer_give_player_weapon_ammo {"target":"muppet9010", "weaponType":"combat-shotgun", "forceWeaponToSlot":true, "ammoType":"piercing-shotgun-shell", "ammoCount":30}` |
+| shotgun and ammo | `/muppet_streamer_v2_give_player_weapon_ammo {"target":"muppet9010", "weaponType":"combat-shotgun", "forceWeaponToSlot":true, "ammoType":"piercing-shotgun-shell", "ammoCount":30}` |
 
 </p>
 </details>

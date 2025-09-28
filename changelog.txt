@@ -1,4 +1,20 @@
 ---------------------------------------------------------------------------------------------------
+Version: 21.0.2
+Date: 2025-09-27
+  Bugfixes:
+    - Some fixes for malfunctioning_weapon, ammo category had changed
+---------------------------------------------------------------------------------------------------
+Version: 21.0.1
+Date: 2025-09-27
+  Bugfixes:
+    - Some fixes for inventory shuffle and partial inventory drops
+---------------------------------------------------------------------------------------------------
+Version: 21.0.0
+Date: 2025-09-27
+  Changes:
+    - Works (sort of) with Factorio 2.0
+    - Avoid using trees
+---------------------------------------------------------------------------------------------------
 Version: 20.2.0
 Date: 2023-12-27
   Features:
@@ -160,7 +176,7 @@ Date: 2022-08-09
     - Spawn Around Player - for an entity of type `fire` capped the max `ammoCount` setting to 250, as a flame count above this makes Factorio behave oddly. Raised as bug: https://forums.factorio.com/viewtopic.php?f=7&t=103227
     - Various commands - any command that affects a player for a duration will now show a clear message if a second effect is requested by command and discarded. Previously the command silently ignored the repeat activation.
   Bugfixes:
-    - Spawn Around Player - previously it stored functions in Factorio global. If a save/load was done between the command being called and the action occurring (delay setting) the command then it would error. This could cause server or per player script errors, and possibly desynchronisations ? (hypothetically).
+    - Spawn Around Player - previously it stored functions in Factorio storage. If a save/load was done between the command being called and the action occurring (delay setting) the command then it would error. This could cause server or per player script errors, and possibly desynchronisations ? (hypothetically).
   Info:
     - Various commands - tweaked some error messages so it should be slightly clearer.
     - Pants On Fire and Player Inventory Drop now labelled in Mod Description as being Time Duration events. They were coded as such previously, but not described as such. Description of Time Duration events updated to say they may interrupt other Time Duration events, it all depends upon what each event does and requires.
@@ -196,10 +212,10 @@ Date: 2022-07-31
     - Schedule Explosive Delivery - added support for custom projectile/stream types.
     - Spawn Around Player - added support for custom entity types.
   Changes:
-    - Leaky Flamethrower - feature renamed to Malfunctioning Weapon as it supports a much wider weapon range now. Command name changed with this to `muppet_streamer_malfunctioning_weapon`.
+    - Leaky Flamethrower - feature renamed to Malfunctioning Weapon as it supports a much wider weapon range now. Command name changed with this to `muppet_streamer_v2_malfunctioning_weapon`.
     - Pants On Fire - fireGaps and fireHeadStarts is now where the player was X time ago, before the furthest bad position it tracked was when the last fire entity was created. This should make the effect follow a player's previous path more accurately, rather than just being "somewhere" behind them. Only really apparent with high fireGaps values.
-    - Spawn Around Player - the default for fire type entities will now be the `muppet_streamer_enemy` which is hostile to every force. This means custom fire entities will hurt biters.
-    - Spawn Around Player - a force set for a type of tree, rock or fire is now honoured and not forced to be `neutral`. It is still the default for trees and rocks if the name of a force isn't explicitly set however. Fire defaults to `muppet_streamer_enemy`.
+    - Spawn Around Player - the default for fire type entities will now be the `muppet_streamer_v2_enemy` which is hostile to every force. This means custom fire entities will hurt biters.
+    - Spawn Around Player - a force set for a type of tree, rock or fire is now honoured and not forced to be `neutral`. It is still the default for trees and rocks if the name of a force isn't explicitly set however. Fire defaults to `muppet_streamer_v2_enemy`.
   Bugfixes:
     - Various extreme edge case handling across features identified by improved development tools.
     - All features should be compatible/safe with mods that change base game things now. They will safely warn if the thing doesn't exist rather than error.

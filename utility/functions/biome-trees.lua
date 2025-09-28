@@ -94,13 +94,13 @@ local TileType = {
 --- Called from Factorio script.on_init and script.on_configuration_changed events to parse over the tile and trees and make the lookup tables we'll need at run time.
 BiomeTrees.OnStartup = function()
     -- Always recreate on game startup/config changed to handle any mod changed trees, tiles, etc.
-    global.UTILITYBIOMETREES = {}
-    global.UTILITYBIOMETREES.environmentData = BiomeTrees._GetEnvironmentData() ---@type UtilityBiomeTrees_EnvironmentData
-    global.UTILITYBIOMETREES.tileData = global.UTILITYBIOMETREES.environmentData.tileData ---@type UtilityBiomeTrees_TilesDetails
-    global.UTILITYBIOMETREES.treeData = BiomeTrees._GetTreeData() ---@type UtilityBiomeTrees_TreeDetails[]
+    storage.UTILITYBIOMETREES = {}
+    storage.UTILITYBIOMETREES.environmentData = BiomeTrees._GetEnvironmentData() ---@type UtilityBiomeTrees_EnvironmentData
+    storage.UTILITYBIOMETREES.tileData = storage.UTILITYBIOMETREES.environmentData.tileData ---@type UtilityBiomeTrees_TilesDetails
+    storage.UTILITYBIOMETREES.treeData = BiomeTrees._GetTreeData() ---@type UtilityBiomeTrees_TreeDetails[]
     if LogData then
-        LoggingUtils.ModLog(serpent.block(global.UTILITYBIOMETREES.treeData), false)
-        LoggingUtils.ModLog(serpent.block(global.UTILITYBIOMETREES.tileData), false)
+        LoggingUtils.ModLog(serpent.block(storage.UTILITYBIOMETREES.treeData), false)
+        LoggingUtils.ModLog(serpent.block(storage.UTILITYBIOMETREES.tileData), false)
     end
 end
 
@@ -111,11 +111,11 @@ end
 BiomeTrees.GetBiomeTreeName = function(surface, position)
     -- Returns the tree name or nil if tile isn't land type
     local tile = surface.get_tile(position --[[@as TilePosition # handled equally by Factorio in this API function.]])
-    local tileData = global.UTILITYBIOMETREES.tileData[tile.name]
+    local tileData = storage.UTILITYBIOMETREES.tileData[tile.name]
     if tileData == nil then
         local tileName = tile.hidden_tile
         if tileName ~= nil then
-            tileData = global.UTILITYBIOMETREES.tileData[tileName]
+            tileData = storage.UTILITYBIOMETREES.tileData[tileName]
         end
         if tileData == nil then
             LoggingUtils.ModLog("Failed to get tile data for '" .. tostring(tile.name) .. "' and hidden tile '" .. tostring(tileName) .. "'", true, LogNonPositives)
@@ -186,11 +186,11 @@ end
 ---@param tile LuaTile
 ---@return string|nil deadTreeName
 BiomeTrees.GetRandomDeadTree = function(tile)
-    if tile ~= nil and tile.collides_with("player-layer") then
+    if tile ~= nil and tile.collides_with("player") then
         -- Is a non-land tile
         return nil
     else
-        return global.UTILITYBIOMETREES.environmentData.deadTreeNames[math.random(#global.UTILITYBIOMETREES.environmentData.deadTreeNames)]
+        return storage.UTILITYBIOMETREES.environmentData.deadTreeNames[math.random(#storage.UTILITYBIOMETREES.environmentData.deadTreeNames)]
     end
 end
 
@@ -198,11 +198,11 @@ end
 ---@param tile LuaTile
 ---@return string|nil treeName
 BiomeTrees.GetTrulyRandomTree = function(tile)
-    if tile ~= nil and tile.collides_with("player-layer") then
+    if tile ~= nil and tile.collides_with("player") then
         -- Is a non-land tile
         return nil
     else
-        return global.UTILITYBIOMETREES.treeData[math.random(#global.UTILITYBIOMETREES.treeData)].name
+        return storage.UTILITYBIOMETREES.treeData[math.random(#storage.UTILITYBIOMETREES.treeData)].name
     end
 end
 
@@ -211,9 +211,9 @@ end
 ---@return string|nil treeName
 BiomeTrees.GetRandomTreeLastResort = function(tile)
     -- Gets the a tree from the list of last resort based on the mod active.
-    if global.UTILITYBIOMETREES.environmentData.randomTreeLastResort == "GetTrulyRandomTree" then
+    if storage.UTILITYBIOMETREES.environmentData.randomTreeLastResort == "GetTrulyRandomTree" then
         return BiomeTrees.GetTrulyRandomTree(tile)
-    elseif global.UTILITYBIOMETREES.environmentData.randomTreeLastResort == "GetRandomDeadTree" then
+    elseif storage.UTILITYBIOMETREES.environmentData.randomTreeLastResort == "GetRandomDeadTree" then
         return BiomeTrees.GetRandomDeadTree(tile)
     end
 end
@@ -232,7 +232,7 @@ BiomeTrees._SearchForSuitableTrees = function(tileData, tileTemp, tileMoisture)
     local currentChance = 0
     -- Try to ensure we find a tree vaguely accurate. Start as accurate as possible and then become less precise.
     for accuracy = 1, 1.5, 0.1 do
-        for _, tree in pairs(global.UTILITYBIOMETREES.treeData) do
+        for _, tree in pairs(storage.UTILITYBIOMETREES.treeData) do
             if tileTemp >= tree.tempRange[1] / accuracy and tileTemp <= tree.tempRange[2] * accuracy and tileMoisture >= tree.moistureRange[1] / accuracy and tileMoisture <= tree.moistureRange[2] * accuracy then
                 local include = false
                 if not TableUtils.IsTableEmpty(tree.exclusivelyOnNamedTiles) then
@@ -286,7 +286,7 @@ end
 BiomeTrees._GetEnvironmentData = function()
     -- Used to handle the differing tree to tile value relationships of mods vs base game. This assumes that either or is in use as I believe the 2 are incompatible in map generation.
     local environmentData = {} ---@type UtilityBiomeTrees_EnvironmentData
-    if game.active_mods["alien-biomes"] then
+    if script.active_mods["alien-biomes"] then
         environmentData.moistureRangeAttributeNames = { optimal = "water_optimal", range = "water_max_range" }
         environmentData.tileTemperatureCalculationSettings = {
             -- on scale of -0.5 to 1.5 = -50 to 150. -15 is lowest temp tree +125 is highest temp tree.
@@ -329,9 +329,9 @@ end
 BiomeTrees._GetTreeData = function()
     local treeDataArray = {}
     local treeData
-    local environmentData = global.UTILITYBIOMETREES.environmentData
-    local moistureRangeAttributeNames = global.UTILITYBIOMETREES.environmentData.moistureRangeAttributeNames
-    local treeEntities = game.get_filtered_entity_prototypes({ { filter = "type", type = "tree" }, { mode = "and", filter = "autoplace" } })
+    local environmentData = storage.UTILITYBIOMETREES.environmentData
+    local moistureRangeAttributeNames = storage.UTILITYBIOMETREES.environmentData.moistureRangeAttributeNames
+    local treeEntities = prototypes.get_entity_filtered({ { filter = "type", type = "tree" }, { mode = "and", filter = "autoplace" } })
 
     for _, prototype in pairs(treeEntities) do
         if LogData then
@@ -409,7 +409,7 @@ end
 ---@param tileTemperature double
 ---@return double environmentScaledTileTemperature
 BiomeTrees._CalculateTileTemperature = function(tileTemperature)
-    local tileTemperatureCalculationSettings = global.UTILITYBIOMETREES.environmentData.tileTemperatureCalculationSettings
+    local tileTemperatureCalculationSettings = storage.UTILITYBIOMETREES.environmentData.tileTemperatureCalculationSettings
     if tileTemperatureCalculationSettings.scaleMultiplier ~= nil then
         tileTemperature = tileTemperature * tileTemperatureCalculationSettings.scaleMultiplier
     end

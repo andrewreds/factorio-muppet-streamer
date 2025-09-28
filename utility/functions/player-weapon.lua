@@ -161,7 +161,8 @@ PlayerWeapon.EnsureHasWeapon = function(player, weaponName, forceWeaponToWeaponI
 
             -- Clear the current ammo stack ready for the the planned ammo if not compatible with the gun.
             local ammoType = ammoItemStack.prototype.get_ammo_type("player") ---@cast ammoType -nil
-            local ammoIsCompatibleWithGun = PlayerWeapon.IsAmmoCompatibleWithWeapon(ammoType, game.item_prototypes[weaponName])
+            local ammoCategory = ammoItemStack.prototype.ammo_category.name
+            local ammoIsCompatibleWithGun = PlayerWeapon.IsAmmoCompatibleWithWeapon(ammoCategory, prototypes.item[weaponName])
             if not ammoIsCompatibleWithGun then
                 -- Move it to the players inventory, or the floor.
                 local currentAmmoName, currentAmmoCount = ammoItemStack.name, ammoItemStack.count
@@ -274,15 +275,13 @@ end
 --- Checks if an ammo type can be used with a weapon type.
 ---
 --- When getting the AmmoType of the ammo LuaItemPrototype with get_ammo_type() he API will automatically return the 'default' source_type if there isn't one defined for the specific type we ask for. So generally you always want to be specific.
----@param ammoType AmmoType
 ---@param weaponItemPrototype LuaItemPrototype
 ---@return boolean compatible
-PlayerWeapon.IsAmmoCompatibleWithWeapon = function(ammoType, weaponItemPrototype)
-    local currentAmmoType_category = ammoType.category
+PlayerWeapon.IsAmmoCompatibleWithWeapon = function(ammoCategory, weaponItemPrototype)
     local newWeaponType_categories = weaponItemPrototype.attack_parameters.ammo_categories
 
     for _, newWeaponType_category in pairs(newWeaponType_categories) do
-        if currentAmmoType_category == newWeaponType_category then
+        if ammoCategory == newWeaponType_category then
             return true
         end
     end

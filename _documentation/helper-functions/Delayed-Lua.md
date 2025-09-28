@@ -9,8 +9,8 @@ local warnPlayerFunctionString = [==[ function(delayedData)
 end ]==]
 local player = game.connected_players[1]
 local delaySeconds = math.random(6, 10)
-remote.call('muppet_streamer', 'run_command', 'muppet_streamer_schedule_explosive_delivery', {delay=delaySeconds, explosiveCount=10, explosiveType="artilleryShell", target=player.name, accuracyRadiusMax=10})
-remote.call("muppet_streamer", "add_delayed_lua", (delaySeconds-3)*60, warnPlayerFunctionString, {player=player})
+remote.call('muppet_streamer_v2', 'run_command', 'muppet_streamer_v2_schedule_explosive_delivery', {delay=delaySeconds, explosiveCount=10, explosiveType="artilleryShell", target=player.name, accuracyRadiusMax=10})
+remote.call("muppet_streamer_v2", "add_delayed_lua", (delaySeconds-3)*60, warnPlayerFunctionString, {player=player})
 ```
 
 -------------------------
@@ -36,7 +36,7 @@ This remote interface is the way to schedule a Lua code function to be run at a 
 #### Syntax
 
 ```
-remote.call("muppet_streamer", "add_delayed_lua", [DELAY], [FUNCTION_STRING], [DATA])
+remote.call("muppet_streamer_v2", "add_delayed_lua", [DELAY], [FUNCTION_STRING], [DATA])
 ```
 
 #### Arguments
@@ -75,7 +75,7 @@ end ]==]
 
 local outerData = {name = "me"}
 
-remote.call("muppet_streamer", "add_delayed_lua", 60, testFunctionString, outerData)
+remote.call("muppet_streamer_v2", "add_delayed_lua", 60, testFunctionString, outerData)
 game.print(game.tick .. " - queued time")
 ```
 
@@ -98,7 +98,7 @@ end ]==]
 local outerData = {player = game.connected_players[1]}
 
 for i=0, 30 do
-    remote.call("muppet_streamer", "add_delayed_lua", i*60, damageVehicleFunctionString, outerData)
+    remote.call("muppet_streamer_v2", "add_delayed_lua", i*60, damageVehicleFunctionString, outerData)
 end
 ```
 
@@ -118,12 +118,12 @@ local damagePlayerFunctionString = [==[ function(delayedData)
     delayedData.player.character.damage(50, delayedData.player.force, "acid")
     delayedData.cycles = delayedData.cycles + 1
     game.print(delayedData.player.name .. " damaged " .. delayedData.cycles .. " times")
-    remote.call("muppet_streamer", "add_delayed_lua", 60, delayedData.damagePlayerFunctionString, delayedData)
+    remote.call("muppet_streamer_v2", "add_delayed_lua", 60, delayedData.damagePlayerFunctionString, delayedData)
 end ]==]
 
 local outerData = {player = game.connected_players[1], damagePlayerFunctionString = damagePlayerFunctionString, cycles = 0}
 
-remote.call("muppet_streamer", "add_delayed_lua", 60, damagePlayerFunctionString, outerData)
+remote.call("muppet_streamer_v2", "add_delayed_lua", 60, damagePlayerFunctionString, outerData)
 ```
 
 #### Example - Bad data passing
@@ -147,7 +147,7 @@ local testFunctionString = [==[ function(delayedData)
     game.print(delayedData.name .. " logged as an " .. _goodCommonVariableName)
 end ]==]
 
-remote.call("muppet_streamer", "add_delayed_lua", 60, testFunctionString, goodDataPassedIn)
+remote.call("muppet_streamer_v2", "add_delayed_lua", 60, testFunctionString, goodDataPassedIn)
 ```
 
 -------------------------
@@ -161,7 +161,7 @@ This remote interface is the way to remove a previously scheduled Lua code funct
 #### Syntax
 
 ```
-remote.call("muppet_streamer", "remove_delayed_lua", [SCHEDULE_ID])
+remote.call("muppet_streamer_v2", "remove_delayed_lua", [SCHEDULE_ID])
 ```
 
 #### Arguments
@@ -192,13 +192,13 @@ local printRunFunctionString = [==[ function(delayedData)
     game.print("run: " .. delayedData.name .. " at: " .. game.tick)
 end ]==]
 
-remote.call("muppet_streamer", "add_delayed_lua", 60, printRunFunctionString, {name = "first"})
-local secondScheduledId = remote.call("muppet_streamer", "add_delayed_lua", 120, printRunFunctionString, {name = "second"})
-remote.call("muppet_streamer", "add_delayed_lua", 180, printRunFunctionString, {name = "third"})
+remote.call("muppet_streamer_v2", "add_delayed_lua", 60, printRunFunctionString, {name = "first"})
+local secondScheduledId = remote.call("muppet_streamer_v2", "add_delayed_lua", 120, printRunFunctionString, {name = "second"})
+remote.call("muppet_streamer_v2", "add_delayed_lua", 180, printRunFunctionString, {name = "third"})
 
 game.print("queued time: " .. game.tick)
 
-remote.call("muppet_streamer", "remove_delayed_lua", secondScheduledId)
+remote.call("muppet_streamer_v2", "remove_delayed_lua", secondScheduledId)
 ```
 
 #### Example - Cancel later scheduled functions
@@ -221,7 +221,7 @@ local playerDiedFunctionString = [==[ function(delayedData)
             surface.create_entity({name="behemoth-worm-turret", position=wormPosition, force="enemy"})
         end
         for _, scheduleId in pairs(delayedData.laterScheduleIds) do
-            remote.call("muppet_streamer", "remove_delayed_lua", scheduleId)
+            remote.call("muppet_streamer_v2", "remove_delayed_lua", scheduleId)
         end
     end
 end ]==]
@@ -229,7 +229,7 @@ end ]==]
 local outerData = {player = game.connected_players[1], laterScheduleIds = {}}
 
 for i=30, 0, -1 do
-    local scheduleId = remote.call("muppet_streamer", "add_delayed_lua", i*60, playerDiedFunctionString, outerData)
+    local scheduleId = remote.call("muppet_streamer_v2", "add_delayed_lua", i*60, playerDiedFunctionString, outerData)
     outerData.laterScheduleIds[#outerData.laterScheduleIds+1] = scheduleId
 end
 ```
@@ -245,7 +245,7 @@ This remote interface is the way to get the `data` Lua table of a previously sch
 #### Syntax
 
 ```
-remote.call("muppet_streamer", "get_delayed_lua_data", [SCHEDULE_ID])
+remote.call("muppet_streamer_v2", "get_delayed_lua_data", [SCHEDULE_ID])
 ```
 
 #### Arguments
@@ -274,9 +274,9 @@ end ]==]
 
 local outerData = {name = "me"}
 
-local scheduleId = remote.call("muppet_streamer", "add_delayed_lua", 60, testFunctionString, outerData)
+local scheduleId = remote.call("muppet_streamer_v2", "add_delayed_lua", 60, testFunctionString, outerData)
 
-local delayedData = remote.call("muppet_streamer", "get_delayed_lua_data", scheduleId)
+local delayedData = remote.call("muppet_streamer_v2", "get_delayed_lua_data", scheduleId)
 game.print("future scheduled - name: " .. delayedData.name)
 ```
 
@@ -291,7 +291,7 @@ This remote interface is the way to set the `data` Lua table of a previously sch
 #### Syntax
 
 ```
-remote.call("muppet_streamer", "set_delayed_lua_data", [SCHEDULE_ID], [DATA])
+remote.call("muppet_streamer_v2", "set_delayed_lua_data", [SCHEDULE_ID], [DATA])
 ```
 
 #### Arguments
@@ -321,12 +321,12 @@ end ]==]
 
 local outerData = {name = "me"}
 
-local scheduleId = remote.call("muppet_streamer", "add_delayed_lua", 60, testFunctionString, outerData)
+local scheduleId = remote.call("muppet_streamer_v2", "add_delayed_lua", 60, testFunctionString, outerData)
 game.print("original - name: " .. outerData.name)
 
-local obtainedDelayedData = remote.call("muppet_streamer", "get_delayed_lua_data", scheduleId)
+local obtainedDelayedData = remote.call("muppet_streamer_v2", "get_delayed_lua_data", scheduleId)
 obtainedDelayedData.name = obtainedDelayedData.name .. "UPDATED"
-remote.call("muppet_streamer", "set_delayed_lua_data", scheduleId, obtainedDelayedData)
+remote.call("muppet_streamer_v2", "set_delayed_lua_data", scheduleId, obtainedDelayedData)
 ```
 
 #### Example - Updating a delayed function's data.
@@ -349,20 +349,20 @@ local rewardPlayerFunctionString = [==[ function(delayedData)
     end
 
     if delayedData.nextScheduledId ~= nil then
-        local nextDelayedData = remote.call("muppet_streamer", "get_delayed_lua_data", delayedData.nextScheduledId)
+        local nextDelayedData = remote.call("muppet_streamer_v2", "get_delayed_lua_data", delayedData.nextScheduledId)
         nextDelayedData.hadVehicle = nextDelayedData.player.driving
-        remote.call("muppet_streamer", "set_delayed_lua_data", delayedData.nextScheduledId, nextDelayedData)
+        remote.call("muppet_streamer_v2", "set_delayed_lua_data", delayedData.nextScheduledId, nextDelayedData)
     end
 end ]==]
 
 local player = game.connected_players[1]
 local playerHasVehicle = player.driving
 
-local firstScheduledId = remote.call("muppet_streamer", "add_delayed_lua", 300, rewardPlayerFunctionString, nil)
-local secondScheduledId = remote.call("muppet_streamer", "add_delayed_lua", 600, rewardPlayerFunctionString, {player = player})
+local firstScheduledId = remote.call("muppet_streamer_v2", "add_delayed_lua", 300, rewardPlayerFunctionString, nil)
+local secondScheduledId = remote.call("muppet_streamer_v2", "add_delayed_lua", 600, rewardPlayerFunctionString, {player = player})
 
 local firstScheduledData = {player = player, nextScheduledId = secondScheduledId, hadVehicle = playerHasVehicle}
-remote.call("muppet_streamer", "set_delayed_lua_data", firstScheduledId, firstScheduledData)
+remote.call("muppet_streamer_v2", "set_delayed_lua_data", firstScheduledId, firstScheduledData)
 ```
 
 -------------------------

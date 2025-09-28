@@ -53,12 +53,12 @@ PlayerAlerts.AddCustomAlertToForce = function(force, alertId, alertEntity, alert
 
     -- Get an alertId if one not provided
     if alertId == nil then
-        alertId = "auto_" .. global.UTILITYPLAYERALERTS.forceAlertsNextAutoId
-        global.UTILITYPLAYERALERTS.forceAlertsNextAutoId = global.UTILITYPLAYERALERTS.forceAlertsNextAutoId + 1
+        alertId = "auto_" .. storage.UTILITYPLAYERALERTS.forceAlertsNextAutoId
+        storage.UTILITYPLAYERALERTS.forceAlertsNextAutoId = storage.UTILITYPLAYERALERTS.forceAlertsNextAutoId + 1
     end
 
     -- Can't have duplicate alertId's across forces as if we ever need to merge forces it would break.
-    if global.UTILITYPLAYERALERTS.forceAlertsByAlert[alertId] ~= nil then
+    if storage.UTILITYPLAYERALERTS.forceAlertsByAlert[alertId] ~= nil then
         error("duplicate force alert Id added: " .. alertId)
     end
 
@@ -79,7 +79,7 @@ PlayerAlerts.AddCustomAlertToForce = function(force, alertId, alertEntity, alert
         showOnMap = showOnMap
     }
     forceAlerts[alertId] = newForceAlert
-    global.UTILITYPLAYERALERTS.forceAlertsByAlert[alertId] = newForceAlert
+    storage.UTILITYPLAYERALERTS.forceAlertsByAlert[alertId] = newForceAlert
 
     return alertId
 end
@@ -105,8 +105,8 @@ PlayerAlerts.RemoveCustomAlertFromForce = function(force, alertId)
     end
 
     -- Remove the alert from the force's global object.
-    global.UTILITYPLAYERALERTS.forceAlertsByForce[forceIndex][alertId] = nil
-    global.UTILITYPLAYERALERTS.forceAlertsByAlert[alertId] = nil
+    storage.UTILITYPLAYERALERTS.forceAlertsByForce[forceIndex][alertId] = nil
+    storage.UTILITYPLAYERALERTS.forceAlertsByAlert[alertId] = nil
 end
 
 --- Removes ALL custom alerts this mod created from this force.
@@ -138,7 +138,7 @@ PlayerAlerts._RemoveAlertFromPlayer = function(forceAlert, player)
         }
     else
         player.remove_alert {
-            prototype = forceAlert.alertPrototypeName --[[@as LuaEntityPrototype]] , -- Force typed work around for bug: https://forums.factorio.com/viewtopic.php?f=7&t=102860 -- TODO: this should be the prototype not the name now as per 1.1.62. Although name seems to still work (undocumented legacy reasons?) Need to test before updating to use the prototype though and check the prototype is still valid before use.
+            prototype = forceAlert.alertPrototypeName --[[@as LuaEntityPrototype]], -- Force typed work around for bug: https://forums.factorio.com/viewtopic.php?f=7&t=102860 -- TODO: this should be the prototype not the name now as per 1.1.62. Although name seems to still work (undocumented legacy reasons?) Need to test before updating to use the prototype though and check the prototype is still valid before use.
             position = forceAlert.alertPosition,
             surface = forceAlert.alertSurface,
             type = defines.alert_type.custom,
@@ -152,25 +152,25 @@ end
 ---@param forceIndex uint # the index of the LuaForce.
 ---@return table<UtilityPlayerAlerts_AlertId, UtilityPlayerAlerts_ForceAlertObject> forceAlerts
 PlayerAlerts._GetCreateForceAlertsGlobalObject = function(forceIndex)
-    if global.UTILITYPLAYERALERTS == nil then
-        global.UTILITYPLAYERALERTS = {}
+    if storage.UTILITYPLAYERALERTS == nil then
+        storage.UTILITYPLAYERALERTS = {}
     end
 
-    if global.UTILITYPLAYERALERTS.forceAlertsByForce == nil then
-        global.UTILITYPLAYERALERTS.forceAlertsByForce = {} ---@type table<uint, table<UtilityPlayerAlerts_AlertId, UtilityPlayerAlerts_ForceAlertObject>>
+    if storage.UTILITYPLAYERALERTS.forceAlertsByForce == nil then
+        storage.UTILITYPLAYERALERTS.forceAlertsByForce = {} ---@type table<uint, table<UtilityPlayerAlerts_AlertId, UtilityPlayerAlerts_ForceAlertObject>>
     end
-    local forceAlerts = global.UTILITYPLAYERALERTS.forceAlertsByForce[forceIndex]
+    local forceAlerts = storage.UTILITYPLAYERALERTS.forceAlertsByForce[forceIndex]
     if forceAlerts == nil then
-        global.UTILITYPLAYERALERTS.forceAlertsByForce[forceIndex] = global.UTILITYPLAYERALERTS.forceAlertsByForce[forceIndex] or {}
-        forceAlerts = global.UTILITYPLAYERALERTS.forceAlertsByForce[forceIndex]
+        storage.UTILITYPLAYERALERTS.forceAlertsByForce[forceIndex] = storage.UTILITYPLAYERALERTS.forceAlertsByForce[forceIndex] or {}
+        forceAlerts = storage.UTILITYPLAYERALERTS.forceAlertsByForce[forceIndex]
     end
 
-    if global.UTILITYPLAYERALERTS.forceAlertsNextAutoId == nil then
-        global.UTILITYPLAYERALERTS.forceAlertsNextAutoId = 1
+    if storage.UTILITYPLAYERALERTS.forceAlertsNextAutoId == nil then
+        storage.UTILITYPLAYERALERTS.forceAlertsNextAutoId = 1
     end
 
-    if global.UTILITYPLAYERALERTS.forceAlertsByAlert == nil then
-        global.UTILITYPLAYERALERTS.forceAlertsByAlert = {} ---@type table<UtilityPlayerAlerts_AlertId, UtilityPlayerAlerts_ForceAlertObject>
+    if storage.UTILITYPLAYERALERTS.forceAlertsByAlert == nil then
+        storage.UTILITYPLAYERALERTS.forceAlertsByAlert = {} ---@type table<UtilityPlayerAlerts_AlertId, UtilityPlayerAlerts_ForceAlertObject>
     end
 
     return forceAlerts
@@ -180,10 +180,10 @@ end
 ---@param forceIndex uint # the index of the LuaForce.
 ---@return table<uint, UtilityPlayerAlerts_ForceAlertObject>|nil forceAlerts # nil if no alerts for this force.
 PlayerAlerts._GetForceAlerts = function(forceIndex)
-    if global.UTILITYPLAYERALERTS == nil or global.UTILITYPLAYERALERTS.forceAlertsByForce == nil then
+    if storage.UTILITYPLAYERALERTS == nil or storage.UTILITYPLAYERALERTS.forceAlertsByForce == nil then
         return nil
     else
-        return global.UTILITYPLAYERALERTS.forceAlertsByForce[forceIndex]
+        return storage.UTILITYPLAYERALERTS.forceAlertsByForce[forceIndex]
     end
 end
 
@@ -191,10 +191,10 @@ end
 ---@param alertId UtilityPlayerAlerts_AlertId
 ---@return UtilityPlayerAlerts_ForceAlertObject|nil forceAlert
 PlayerAlerts._GetForceAlert = function(alertId)
-    if global.UTILITYPLAYERALERTS == nil or global.UTILITYPLAYERALERTS.forceAlertsByAlert == nil then
+    if storage.UTILITYPLAYERALERTS == nil or storage.UTILITYPLAYERALERTS.forceAlertsByAlert == nil then
         return nil
     else
-        return global.UTILITYPLAYERALERTS.forceAlertsByAlert[alertId]
+        return storage.UTILITYPLAYERALERTS.forceAlertsByAlert[alertId]
     end
 end
 
@@ -270,7 +270,7 @@ PlayerAlerts._OnForcesMerging = function(event)
         end
 
         -- Remove the old global for the force. The alert globals can remain unchanged.
-        global.UTILITYPLAYERALERTS.forceAlertsByForce[removedForce_index] = nil
+        storage.UTILITYPLAYERALERTS.forceAlertsByForce[removedForce_index] = nil
     end
 end
 

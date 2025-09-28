@@ -4,7 +4,7 @@ local EventScheduler = require("utility.manager-libraries.event-scheduler")
 -- The user will have to manually deal with this to be able to continue. Unexpected to ever be an issue.
 -- The technical details are all lifted from the delayed-lua.lua file.
 -- Have to do this raw due to bugs in EventScheduler utility, but they can't be fixed without updating the whole library which includes break changes. So just do it raw for now.
-local scheduledEventTicks = global.UTILITYSCHEDULEDFUNCTIONS
+local scheduledEventTicks = storage.UTILITYSCHEDULEDFUNCTIONS
 if scheduledEventTicks ~= nil then
     for _, scheduledEventTypes in pairs(scheduledEventTicks) do
         for scheduledEventTypeName, scheduledEvents in pairs(scheduledEventTypes) do

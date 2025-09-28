@@ -34,10 +34,10 @@ local BiterSelection = {} ---@class Utility_BiterSelection
 ---@return string
 BiterSelection.GetBiterType = function(probabilityGlobalName, spawnerType, evolution)
     -- probabilityGlobalName option is a name for tracking this biter evolution probability line. Use unique names if different evolutions are being tracked.
-    global.UTILITYBITERSELECTION = global.UTILITYBITERSELECTION or {}
-    global.UTILITYBITERSELECTION.BiterCacheName = global.UTILITYBITERSELECTION.BiterCacheName or {} ---@type table<string, UtilityBiterSelection_BiterSpawnerTypeCaches> # Key'd by the biter cache name.
-    global.UTILITYBITERSELECTION.BiterCacheName[probabilityGlobalName] = global.UTILITYBITERSELECTION.BiterCacheName[probabilityGlobalName] or {} ---@type UtilityBiterSelection_BiterSpawnerTypeCaches
-    local modEnemyProbabilities = global.UTILITYBITERSELECTION.BiterCacheName[probabilityGlobalName]
+    storage.UTILITYBITERSELECTION = storage.UTILITYBITERSELECTION or {}
+    storage.UTILITYBITERSELECTION.BiterCacheName = storage.UTILITYBITERSELECTION.BiterCacheName or {} ---@type table<string, UtilityBiterSelection_BiterSpawnerTypeCaches> # Key'd by the biter cache name.
+    storage.UTILITYBITERSELECTION.BiterCacheName[probabilityGlobalName] = storage.UTILITYBITERSELECTION.BiterCacheName[probabilityGlobalName] or {} ---@type UtilityBiterSelection_BiterSpawnerTypeCaches
+    local modEnemyProbabilities = storage.UTILITYBITERSELECTION.BiterCacheName[probabilityGlobalName]
     if modEnemyProbabilities[spawnerType] == nil then
         modEnemyProbabilities[spawnerType] = {}
     end
@@ -55,10 +55,10 @@ end
 ---@param evolution double
 ---@return string wormEntityName
 BiterSelection.GetWormType = function(wormEvoGlobalName, evolution)
-    global.UTILITYBITERSELECTION = global.UTILITYBITERSELECTION or {}
-    global.UTILITYBITERSELECTION.WormCacheName = global.UTILITYBITERSELECTION.WormCacheName or {} ---@type table<string, UtilityBiterSelection_WormCacheEntry> # Key'd by the worm cache name.
-    global.UTILITYBITERSELECTION.WormCacheName[wormEvoGlobalName] = global.UTILITYBITERSELECTION.WormCacheName[wormEvoGlobalName] or {} ---@type UtilityBiterSelection_WormCacheEntry
-    local wormEvoType = global.UTILITYBITERSELECTION.WormCacheName[wormEvoGlobalName]
+    storage.UTILITYBITERSELECTION = storage.UTILITYBITERSELECTION or {}
+    storage.UTILITYBITERSELECTION.WormCacheName = storage.UTILITYBITERSELECTION.WormCacheName or {} ---@type table<string, UtilityBiterSelection_WormCacheEntry> # Key'd by the worm cache name.
+    storage.UTILITYBITERSELECTION.WormCacheName[wormEvoGlobalName] = storage.UTILITYBITERSELECTION.WormCacheName[wormEvoGlobalName] or {} ---@type UtilityBiterSelection_WormCacheEntry
+    local wormEvoType = storage.UTILITYBITERSELECTION.WormCacheName[wormEvoGlobalName]
     evolution = MathUtils.RoundNumberToDecimalPlaces(evolution, 2)
     if wormEvoType.calculatedEvolution == nil or wormEvoType.calculatedEvolution ~= evolution then
         wormEvoType.calculatedEvolution = evolution
@@ -76,7 +76,7 @@ end
 ---@param currentEvolution double
 ---@return UtilityBiterSelection_UnitChanceEntry[]
 BiterSelection._CalculateSpecificBiterSelectionProbabilities = function(spawnerType, currentEvolution)
-    local rawUnitProbabilities = game.entity_prototypes[spawnerType].result_units
+    local rawUnitProbabilities = prototypes.entity[spawnerType].result_units
     local currentEvolutionProbabilities = {} ---@type UtilityBiterSelection_UnitChanceEntry[]
     for _, possibility in pairs(rawUnitProbabilities) do
         local startSpawnPointIndex ---@type int
@@ -114,7 +114,7 @@ end
 ---@param evolution double # The evolution the worm turret must be below.
 ---@return string|nil wormTurret
 BiterSelection._CalculateSpecificWormForEvolution = function(evolution)
-    local turrets = game.get_filtered_entity_prototypes({ { filter = "turret" }, { mode = "and", filter = "build-base-evolution-requirement", comparison = "≤", value = evolution }, { mode = "and", filter = "flag", flag = "placeable-enemy" }, { mode = "and", filter = "flag", flag = "player-creation", invert = true } })
+    local turrets = prototypes.get_entity_filtered({ { filter = "turret" }, { mode = "and", filter = "build-base-evolution-requirement", comparison = "≤", value = evolution }, { mode = "and", filter = "flag", flag = "placeable-enemy" }, { mode = "and", filter = "flag", flag = "player-creation", invert = true } })
     if #turrets == 0 then
         return nil
     end

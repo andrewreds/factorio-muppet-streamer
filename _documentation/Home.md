@@ -1,6 +1,6 @@
 Features that a streamer can let chat activate to make their games more dynamic and interactive. These features are more complicated than can be achieved via simple Lua scripting and are highly customisable within the command/remote interface calls.
 
-Mod Portal Entry: https://mods.factorio.com/mod/muppet_streamer
+Mod Portal Entry: https://mods.factorio.com/mod/muppet_streamer_v2
 
 Github Wiki: https://github.com/muppet9010/factorio-muppet-streamer/wiki/Home
 

@@ -106,7 +106,7 @@ GuiUtil.AddElement = function(elementDetails)
     local attributes, returnElement, storeName, styling, registerClick, registerCheckedStateChange, children = elementDetails.attributes, elementDetails.returnElement, elementDetails.storeName, elementDetails.styling, elementDetails.registerClick, elementDetails.registerCheckedStateChange, elementDetails.children
     elementDetails.attributes, elementDetails.returnElement, elementDetails.storeName, elementDetails.styling, elementDetails.registerClick, elementDetails.registerCheckedStateChange, elementDetails.children = nil, nil, nil, nil, nil, nil, nil
 
-    local element = elementDetails.parent.add(elementDetails--[[@as LuaGuiElement.add_param]] )
+    local element = elementDetails.parent.add(elementDetails --[[@as LuaGuiElement.add_param]])
 
     local returnElements = {} ---@type table<string, LuaGuiElement>
     if returnElement then
@@ -176,7 +176,7 @@ end
 ---@param element LuaGuiElement
 GuiUtil.AddElementToPlayersReferenceStorage = function(playerIndex, storeName, guiElementName, element)
     GuiUtil._CreatePlayersElementReferenceStorage(playerIndex, storeName)
-    global.GUIUtilPlayerElementReferenceStorage[playerIndex][storeName][guiElementName] = element
+    storage.GUIUtilPlayerElementReferenceStorage[playerIndex][storeName][guiElementName] = element
 end
 
 --- Get a LuaGuiElement from a player's reference storage.
@@ -187,7 +187,7 @@ end
 ---@return LuaGuiElement
 GuiUtil.GetElementFromPlayersReferenceStorage = function(playerIndex, storeName, elementName, elementType)
     GuiUtil._CreatePlayersElementReferenceStorage(playerIndex, storeName)
-    return global.GUIUtilPlayerElementReferenceStorage[playerIndex][storeName][GuiUtil.GenerateGuiElementName(elementName, elementType)]
+    return storage.GUIUtilPlayerElementReferenceStorage[playerIndex][storeName][GuiUtil.GenerateGuiElementName(elementName, elementType)]
 end
 
 --- Apply updated attributes to an existing GuiElement found in the player's reference storage. Supports changing appropriate ElementDetail attributes and some Factorio attributes as per UtilityGuiUtil_ElementDetails_Update.
@@ -271,11 +271,11 @@ end
 ---@param elementType string
 GuiUtil.DestroyElementInPlayersReferenceStorage = function(playerIndex, storeName, elementName, elementType)
     local guiElementName = GuiUtil.GenerateGuiElementName(elementName, elementType)
-    if global.GUIUtilPlayerElementReferenceStorage ~= nil and global.GUIUtilPlayerElementReferenceStorage[playerIndex] ~= nil and global.GUIUtilPlayerElementReferenceStorage[playerIndex][storeName] ~= nil and global.GUIUtilPlayerElementReferenceStorage[playerIndex][storeName][guiElementName] ~= nil then
-        if global.GUIUtilPlayerElementReferenceStorage[playerIndex][storeName][guiElementName].valid then
-            global.GUIUtilPlayerElementReferenceStorage[playerIndex][storeName][guiElementName].destroy()
+    if storage.GUIUtilPlayerElementReferenceStorage ~= nil and storage.GUIUtilPlayerElementReferenceStorage[playerIndex] ~= nil and storage.GUIUtilPlayerElementReferenceStorage[playerIndex][storeName] ~= nil and storage.GUIUtilPlayerElementReferenceStorage[playerIndex][storeName][guiElementName] ~= nil then
+        if storage.GUIUtilPlayerElementReferenceStorage[playerIndex][storeName][guiElementName].valid then
+            storage.GUIUtilPlayerElementReferenceStorage[playerIndex][storeName][guiElementName].destroy()
         end
-        global.GUIUtilPlayerElementReferenceStorage[playerIndex][storeName][guiElementName] = nil
+        storage.GUIUtilPlayerElementReferenceStorage[playerIndex][storeName][guiElementName] = nil
     end
 end
 
@@ -283,28 +283,28 @@ end
 ---@param playerIndex uint
 ---@param storeName? UtilityGuiUtil_StoreName|nil # If provided filters the removal to that storeName, otherwise does all storeNames for this player.
 GuiUtil.DestroyPlayersReferenceStorage = function(playerIndex, storeName)
-    if global.GUIUtilPlayerElementReferenceStorage == nil or global.GUIUtilPlayerElementReferenceStorage[playerIndex] == nil then
+    if storage.GUIUtilPlayerElementReferenceStorage == nil or storage.GUIUtilPlayerElementReferenceStorage[playerIndex] == nil then
         return
     end
     if storeName == nil then
-        for _, store in pairs(global.GUIUtilPlayerElementReferenceStorage[playerIndex]) do
+        for _, store in pairs(storage.GUIUtilPlayerElementReferenceStorage[playerIndex]) do
             for _, element in pairs(store) do
                 if element.valid then
                     element.destroy()
                 end
             end
         end
-        global.GUIUtilPlayerElementReferenceStorage[playerIndex] = nil
+        storage.GUIUtilPlayerElementReferenceStorage[playerIndex] = nil
     else
-        if global.GUIUtilPlayerElementReferenceStorage[playerIndex][storeName] == nil then
+        if storage.GUIUtilPlayerElementReferenceStorage[playerIndex][storeName] == nil then
             return
         end
-        for _, element in pairs(global.GUIUtilPlayerElementReferenceStorage[playerIndex][storeName]) do
+        for _, element in pairs(storage.GUIUtilPlayerElementReferenceStorage[playerIndex][storeName]) do
             if element.valid then
                 element.destroy()
             end
         end
-        global.GUIUtilPlayerElementReferenceStorage[playerIndex][storeName] = nil
+        storage.GUIUtilPlayerElementReferenceStorage[playerIndex][storeName] = nil
     end
 end
 
@@ -329,9 +329,9 @@ end
 ---@param playerIndex uint
 ---@param storeName UtilityGuiUtil_StoreName
 GuiUtil._CreatePlayersElementReferenceStorage = function(playerIndex, storeName)
-    global.GUIUtilPlayerElementReferenceStorage = global.GUIUtilPlayerElementReferenceStorage or {} ---@type UtilityGuiUtil_PlayerElementReferenceStorage_PlayerList
-    global.GUIUtilPlayerElementReferenceStorage[playerIndex] = global.GUIUtilPlayerElementReferenceStorage[playerIndex] or {} ---@type UtilityGuiUtil_PlayerElementReferenceStorage_StoreList
-    global.GUIUtilPlayerElementReferenceStorage[playerIndex][storeName] = global.GUIUtilPlayerElementReferenceStorage[playerIndex][storeName] or {} ---@type UtilityGuiUtil_PlayerElementReferenceStorage_GuiElementList
+    storage.GUIUtilPlayerElementReferenceStorage = storage.GUIUtilPlayerElementReferenceStorage or {} ---@type UtilityGuiUtil_PlayerElementReferenceStorage_PlayerList
+    storage.GUIUtilPlayerElementReferenceStorage[playerIndex] = storage.GUIUtilPlayerElementReferenceStorage[playerIndex] or {} ---@type UtilityGuiUtil_PlayerElementReferenceStorage_StoreList
+    storage.GUIUtilPlayerElementReferenceStorage[playerIndex][storeName] = storage.GUIUtilPlayerElementReferenceStorage[playerIndex][storeName] or {} ---@type UtilityGuiUtil_PlayerElementReferenceStorage_GuiElementList
 end
 
 --- Applies an array of styling options to an existing Gui element.

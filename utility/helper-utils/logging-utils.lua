@@ -111,7 +111,7 @@ LoggingUtils._RecordToModsLog = function(text)
         game.print("ERROR - No Constants.LogFileName set", Colors.errorMessage)
         log("ERROR - No Constants.LogFileName set")
     end
-    game.write_file(Constants.LogFileName, tostring(text) .. "\r\n", true)
+    helpers.write_file(Constants.LogFileName, tostring(text) .. "\r\n", true)
 end
 
 --- Runs the function in a wrapper that will log detailed information should an error occur. Will be slower than straight code running, so should be used with consideration and not just to avoid testing code.
@@ -267,9 +267,9 @@ end
 ---@param targetSurfaceIdentification SurfaceIdentification
 ---@param targetPosition LuaEntity|MapPosition
 LoggingUtils.WriteOutNumberedMarker = function(targetSurfaceIdentification, targetPosition)
-    global.UtilityLogging_NumberedCount = global.UtilityLogging_NumberedCount or 1 ---@type uint
+    storage.UtilityLogging_NumberedCount = storage.UtilityLogging_NumberedCount or 1 ---@type uint
     rendering.draw_text {
-        text = global.UtilityLogging_NumberedCount,
+        text = storage.UtilityLogging_NumberedCount,
         surface = targetSurfaceIdentification,
         target = targetPosition,
         color = { r = 1.0, g = 0.0, b = 0.0, a = 1.0 },
@@ -277,7 +277,7 @@ LoggingUtils.WriteOutNumberedMarker = function(targetSurfaceIdentification, targ
         alignment = "center",
         vertical_alignment = "bottom"
     }
-    global.UtilityLogging_NumberedCount = global.UtilityLogging_NumberedCount + 1
+    storage.UtilityLogging_NumberedCount = storage.UtilityLogging_NumberedCount + 1
 end
 
 --- Writes out sequential numbers at the SurfacePositionString. Used as a visual debugging tool.

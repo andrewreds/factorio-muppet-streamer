@@ -31,7 +31,7 @@ Note: all examples target the player named `muppet9010`, you will need to replac
 <details><summary>show details</summary>
 <p>
 
-Remote Interface Syntax: `/sc remote.call('muppet_streamer', 'run_command', 'muppet_streamer_malfunctioning_weapon', [OPTIONS TABLE])`
+Remote Interface Syntax: `/sc remote.call('muppet_streamer_v2', 'run_command', 'muppet_streamer_v2_malfunctioning_weapon', [OPTIONS TABLE])`
 
 The options must be provided as a Lua table.
 
@@ -39,10 +39,10 @@ Examples:
 
 | Example | Code |
 | --- | --- |
-| standard usage (leaky flamethrower) | `/sc remote.call('muppet_streamer', 'run_command', 'muppet_streamer_malfunctioning_weapon', {target="muppet9010", ammoCount=5})` |
-| shotgun | `/sc remote.call('muppet_streamer', 'run_command', 'muppet_streamer_malfunctioning_weapon', {target="muppet9010", ammoCount=3, weaponType="shotgun", ammoType="shotgun-shell"})` |
-| custom weapon (Cryogun from Space Exploration mod) | `/sc remote.call('muppet_streamer', 'run_command', 'muppet_streamer_malfunctioning_weapon', {target="muppet9010", ammoCount=5, weaponType="se-cryogun", ammoType="se-cryogun-ammo"})` |
-| atomic rocket launch | `/sc remote.call('muppet_streamer', 'run_command', 'muppet_streamer_malfunctioning_weapon', {target="muppet9010", ammoCount=1, weaponType="rocket-launcher", ammoType="atomic-bomb"})` |
+| standard usage (leaky flamethrower) | `/sc remote.call('muppet_streamer_v2', 'run_command', 'muppet_streamer_v2_malfunctioning_weapon', {target="muppet9010", ammoCount=5})` |
+| shotgun | `/sc remote.call('muppet_streamer_v2', 'run_command', 'muppet_streamer_v2_malfunctioning_weapon', {target="muppet9010", ammoCount=3, weaponType="shotgun", ammoType="shotgun-shell"})` |
+| custom weapon (Cryogun from Space Exploration mod) | `/sc remote.call('muppet_streamer_v2', 'run_command', 'muppet_streamer_v2_malfunctioning_weapon', {target="muppet9010", ammoCount=5, weaponType="se-cryogun", ammoType="se-cryogun-ammo"})` |
+| atomic rocket launch | `/sc remote.call('muppet_streamer_v2', 'run_command', 'muppet_streamer_v2_malfunctioning_weapon', {target="muppet9010", ammoCount=1, weaponType="rocket-launcher", ammoType="atomic-bomb"})` |
 
 
 Further details and more advanced usage of using Remote Interfaces can be found here on the [Streamer Effect Options Syntax Wiki page](https://github.com/muppet9010/factorio-muppet-streamer/wiki/Streamer-Effect-Options-Syntax).
@@ -57,7 +57,7 @@ Further details and more advanced usage of using Remote Interfaces can be found 
 <details><summary>show details</summary>
 <p>
 
-Command Syntax: `/muppet_streamer_malfunctioning_weapon [OPTIONS TABLE AS JSON STRING]`
+Command Syntax: `/muppet_streamer_v2_malfunctioning_weapon [OPTIONS TABLE AS JSON STRING]`
 
 The effect's options must be provided as a JSON string of a table.
 
@@ -65,10 +65,10 @@ Examples:
 
 | Example | Code |
 | --- | --- |
-| standard usage (leaky flamethrower) | `/muppet_streamer_malfunctioning_weapon {"target":"muppet9010", "ammoCount":5}` |
-| shotgun | `/muppet_streamer_malfunctioning_weapon {"target":"muppet9010", "ammoCount":3, "weaponType":"shotgun", "ammoType":"shotgun-shell"}` |
-| custom weapon (Cryogun from Space Exploration mod) | `/muppet_streamer_malfunctioning_weapon {"target":"muppet9010", "ammoCount":5, "weaponType":"se-cryogun", "ammoType":"se-cryogun-ammo"}` |
-| atomic rocket launch | `/muppet_streamer_malfunctioning_weapon {"target":"muppet9010", "ammoCount":1, "weaponType":"rocket-launcher", "ammoType":"atomic-bomb"}` |
+| standard usage (leaky flamethrower) | `/muppet_streamer_v2_malfunctioning_weapon {"target":"muppet9010", "ammoCount":5}` |
+| shotgun | `/muppet_streamer_v2_malfunctioning_weapon {"target":"muppet9010", "ammoCount":3, "weaponType":"shotgun", "ammoType":"shotgun-shell"}` |
+| custom weapon (Cryogun from Space Exploration mod) | `/muppet_streamer_v2_malfunctioning_weapon {"target":"muppet9010", "ammoCount":5, "weaponType":"se-cryogun", "ammoType":"se-cryogun-ammo"}` |
+| atomic rocket launch | `/muppet_streamer_v2_malfunctioning_weapon {"target":"muppet9010", "ammoCount":1, "weaponType":"rocket-launcher", "ammoType":"atomic-bomb"}` |
 
 </p>
 </details>

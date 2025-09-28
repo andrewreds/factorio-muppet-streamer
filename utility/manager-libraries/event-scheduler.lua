@@ -9,7 +9,7 @@ local EventScheduler = {} ---@class Utility_EventScheduler
 MOD = MOD or {} ---@class MOD
 ---@type table<string, function>
 MOD.scheduledEventNames =
-MOD.scheduledEventNames or
+    MOD.scheduledEventNames or
     {
         ["EventScheduler.GamePrint"] = function(event)
             -- Builtin game.print delayed function, needed for 0 tick logging (startup) writing to screen activities.
@@ -86,13 +86,13 @@ EventScheduler.ScheduleEventOnce = function(eventTick, eventName, instanceId, ev
     end ---@cast eventTick uint
     instanceId = instanceId or ""
     eventData = eventData or {}
-    global.UTILITYSCHEDULEDFUNCTIONS = global.UTILITYSCHEDULEDFUNCTIONS or {} ---@type UtilityScheduledEvent_ScheduledFunctionsTicks
-    global.UTILITYSCHEDULEDFUNCTIONS[eventTick] = global.UTILITYSCHEDULEDFUNCTIONS[eventTick] or {}
-    global.UTILITYSCHEDULEDFUNCTIONS[eventTick][eventName] = global.UTILITYSCHEDULEDFUNCTIONS[eventTick][eventName] or {}
-    if global.UTILITYSCHEDULEDFUNCTIONS[eventTick][eventName][instanceId] ~= nil then
+    storage.UTILITYSCHEDULEDFUNCTIONS = storage.UTILITYSCHEDULEDFUNCTIONS or {} ---@type UtilityScheduledEvent_ScheduledFunctionsTicks
+    storage.UTILITYSCHEDULEDFUNCTIONS[eventTick] = storage.UTILITYSCHEDULEDFUNCTIONS[eventTick] or {}
+    storage.UTILITYSCHEDULEDFUNCTIONS[eventTick][eventName] = storage.UTILITYSCHEDULEDFUNCTIONS[eventTick][eventName] or {}
+    if storage.UTILITYSCHEDULEDFUNCTIONS[eventTick][eventName][instanceId] ~= nil then
         error("EventScheduler.ScheduleEventOnce tried to override schedule event: '" .. eventName .. "' id: '" .. instanceId .. "' at tick: " .. eventTick)
     end
-    global.UTILITYSCHEDULEDFUNCTIONS[eventTick][eventName][instanceId] = eventData
+    storage.UTILITYSCHEDULEDFUNCTIONS[eventTick][eventName][instanceId] = eventData
 end
 
 --- Checks if an event name is scheduled as per other arguments.
@@ -161,12 +161,12 @@ EventScheduler.ScheduleEventEachTick = function(eventName, instanceId, eventData
     end
     instanceId = instanceId or ""
     eventData = eventData or {}
-    global.UTILITYSCHEDULEDFUNCTIONSPERTICK = global.UTILITYSCHEDULEDFUNCTIONSPERTICK or {} ---@type UtilityScheduledEvent_ScheduledFunctionsPerTickEventNames
-    global.UTILITYSCHEDULEDFUNCTIONSPERTICK[eventName] = global.UTILITYSCHEDULEDFUNCTIONSPERTICK[eventName] or {} ---@type UtilityScheduledEvent_ScheduledFunctionsPerTickEventNamesInstanceIds
-    if global.UTILITYSCHEDULEDFUNCTIONSPERTICK[eventName][instanceId] ~= nil then
+    storage.UTILITYSCHEDULEDFUNCTIONSPERTICK = storage.UTILITYSCHEDULEDFUNCTIONSPERTICK or {} ---@type UtilityScheduledEvent_ScheduledFunctionsPerTickEventNames
+    storage.UTILITYSCHEDULEDFUNCTIONSPERTICK[eventName] = storage.UTILITYSCHEDULEDFUNCTIONSPERTICK[eventName] or {} ---@type UtilityScheduledEvent_ScheduledFunctionsPerTickEventNamesInstanceIds
+    if storage.UTILITYSCHEDULEDFUNCTIONSPERTICK[eventName][instanceId] ~= nil then
         error("WARNING: Overridden schedule event per tick: '" .. eventName .. "' id: '" .. instanceId .. "'")
     end
-    global.UTILITYSCHEDULEDFUNCTIONSPERTICK[eventName][instanceId] = eventData
+    storage.UTILITYSCHEDULEDFUNCTIONSPERTICK[eventName][instanceId] = eventData
 end
 
 --- Checks if an event name is scheduled each tick as per other arguments.
@@ -220,8 +220,8 @@ end
 ---@param event on_tick
 EventScheduler._OnSchedulerCycle = function(event)
     local tick = event.tick
-    if global.UTILITYSCHEDULEDFUNCTIONS ~= nil and global.UTILITYSCHEDULEDFUNCTIONS[tick] ~= nil then
-        for eventName, instances in pairs(global.UTILITYSCHEDULEDFUNCTIONS[tick]) do
+    if storage.UTILITYSCHEDULEDFUNCTIONS ~= nil and storage.UTILITYSCHEDULEDFUNCTIONS[tick] ~= nil then
+        for eventName, instances in pairs(storage.UTILITYSCHEDULEDFUNCTIONS[tick]) do
             for instanceId, scheduledFunctionData in pairs(instances) do
                 local eventData = { tick = tick, name = eventName, instanceId = instanceId, data = scheduledFunctionData }
                 if MOD.scheduledEventNames[eventName] ~= nil then
@@ -231,13 +231,13 @@ EventScheduler._OnSchedulerCycle = function(event)
                 end
             end
         end
-        global.UTILITYSCHEDULEDFUNCTIONS[tick] = nil
+        storage.UTILITYSCHEDULEDFUNCTIONS[tick] = nil
     end
-    if global.UTILITYSCHEDULEDFUNCTIONSPERTICK ~= nil then
+    if storage.UTILITYSCHEDULEDFUNCTIONSPERTICK ~= nil then
         -- Prefetch the next table entry as we will likely remove the inner instance entry and its parent eventName while in the loop. Advised solution by Factorio discord.
-        local eventName, instances = next(global.UTILITYSCHEDULEDFUNCTIONSPERTICK)
+        local eventName, instances = next(storage.UTILITYSCHEDULEDFUNCTIONSPERTICK)
         while eventName do
-            local nextEventName, nextInstances = next(global.UTILITYSCHEDULEDFUNCTIONSPERTICK, eventName)
+            local nextEventName, nextInstances = next(storage.UTILITYSCHEDULEDFUNCTIONSPERTICK, eventName)
             for instanceId, scheduledFunctionData in pairs(instances) do
                 ---@type UtilityScheduledEvent_CallbackObject
                 local eventData = { tick = tick, name = eventName, instanceId = instanceId, data = scheduledFunctionData }
@@ -265,9 +265,9 @@ EventScheduler._ParseScheduledOnceEvents = function(targetEventName, targetInsta
     targetInstanceId = targetInstanceId or ""
     local result
     local results = {}
-    if global.UTILITYSCHEDULEDFUNCTIONS ~= nil then
+    if storage.UTILITYSCHEDULEDFUNCTIONS ~= nil then
         if targetTick == nil then
-            for tick, tickEvents in pairs(global.UTILITYSCHEDULEDFUNCTIONS) do
+            for tick, tickEvents in pairs(storage.UTILITYSCHEDULEDFUNCTIONS) do
                 local outcome = actionFunction(tickEvents, targetEventName, targetInstanceId, tick)
                 if outcome ~= nil then
                     result = outcome.result
@@ -280,7 +280,7 @@ EventScheduler._ParseScheduledOnceEvents = function(targetEventName, targetInsta
                 end
             end
         else
-            local tickEvents = global.UTILITYSCHEDULEDFUNCTIONS[targetTick]
+            local tickEvents = storage.UTILITYSCHEDULEDFUNCTIONS[targetTick]
             if tickEvents ~= nil then
                 local outcome = actionFunction(tickEvents, targetEventName, targetInstanceId, targetTick)
                 if outcome ~= nil then
@@ -326,7 +326,7 @@ EventScheduler._RemoveScheduledOnceEventsFromTickEntry = function(tickEvents, ta
 
                 -- If there aren't any events for this tick now remove the entry.
                 if next(tickEvents) == nil then
-                    global.UTILITYSCHEDULEDFUNCTIONS[tick] = nil
+                    storage.UTILITYSCHEDULEDFUNCTIONS[tick] = nil
                 end
             end
         end
@@ -364,8 +364,8 @@ EventScheduler._ParseScheduledEachTickEvents = function(targetEventName, targetI
     targetInstanceId = targetInstanceId or ""
     local result
     local results = {}
-    if global.UTILITYSCHEDULEDFUNCTIONSPERTICK ~= nil then
-        local outcome = actionFunction(global.UTILITYSCHEDULEDFUNCTIONSPERTICK, targetEventName, targetInstanceId)
+    if storage.UTILITYSCHEDULEDFUNCTIONSPERTICK ~= nil then
+        local outcome = actionFunction(storage.UTILITYSCHEDULEDFUNCTIONSPERTICK, targetEventName, targetInstanceId)
         if outcome ~= nil then
             result = outcome.result
             if outcome.results ~= nil then

@@ -73,19 +73,19 @@ local AggressiveWalkingTypes = {
 ---@alias AggressiveDriver_CheckedTrainFuelStates table<uint, boolean> # The trains fuel state when checked during this effect already.
 
 
-local CommandName = "muppet_streamer_aggressive_driver"
+local CommandName = "muppet_streamer_v2_aggressive_driver"
 local PrimaryVehicleTypes = { ["car"] = "car", ["locomotive"] = "locomotive", ["spider-vehicle"] = "spider-vehicle" }
 local SecondaryVehicleTypes = { ["cargo-wagon"] = "cargo-wagon", ["fluid-wagon"] = "fluid-wagon", ["artillery-wagon"] = "artillery-wagon" }
 local AllVehicleEntityTypes = { ["car"] = "car", ["locomotive"] = "locomotive", ["spider-vehicle"] = "spider-vehicle", ["cargo-wagon"] = "cargo-wagon", ["fluid-wagon"] = "fluid-wagon", ["artillery-wagon"] = "artillery-wagon" }
 
 AggressiveDriver.CreateGlobals = function()
-    global.aggressiveDriver = global.aggressiveDriver or {} ---@class AggressiveDriver_Global
-    global.aggressiveDriver.nextId = global.aggressiveDriver.nextId or 0 ---@type uint
-    global.aggressiveDriver.affectedPlayers = global.aggressiveDriver.affectedPlayers or {} ---@type table<uint, AggressiveDriver_AffectedPlayerDetails> # Key'd by player_index.
+    storage.aggressiveDriver = storage.aggressiveDriver or {} ---@class AggressiveDriver_Global
+    storage.aggressiveDriver.nextId = storage.aggressiveDriver.nextId or 0 ---@type uint
+    storage.aggressiveDriver.affectedPlayers = storage.aggressiveDriver.affectedPlayers or {} ---@type table<uint, AggressiveDriver_AffectedPlayerDetails> # Key'd by player_index.
 end
 
 AggressiveDriver.OnLoad = function()
-    CommandsUtils.Register("muppet_streamer_aggressive_driver", { "api-description.muppet_streamer_aggressive_driver" }, AggressiveDriver.AggressiveDriverCommand, true)
+    CommandsUtils.Register("muppet_streamer_v2_aggressive_driver", { "api-description.muppet_streamer_v2_aggressive_driver" }, AggressiveDriver.AggressiveDriverCommand, true)
     Events.RegisterHandlerEvent(defines.events.on_pre_player_died, "AggressiveDriver.OnPrePlayerDied", AggressiveDriver.OnPrePlayerDied)
     EventScheduler.RegisterScheduledEventType("AggressiveDriver.Drive", AggressiveDriver.Drive)
     EventScheduler.RegisterScheduledEventType("AggressiveDriver.ApplyToPlayer", AggressiveDriver.ApplyToPlayer)
@@ -98,7 +98,6 @@ end
 
 ---@param command CustomCommandData
 AggressiveDriver.AggressiveDriverCommand = function(command)
-
     local commandData = CommandsUtils.GetSettingsTableFromCommandParameterString(command.parameter, true, CommandName, { "delay", "target", "duration", "control", "aggressiveWalking", "commandeerVehicle", "teleportDistance", "teleportWhitelistTypes", "teleportWhitelistNames", "suppressMessages" })
     if commandData == nil then
         return
@@ -190,7 +189,7 @@ AggressiveDriver.AggressiveDriverCommand = function(command)
         local teleportWhitelistNames_raw = StringUtils.SplitStringOnCharactersToDictionary(teleportWhitelistNames_string, ",")
         teleportWhitelistNames = {}
         for entityName in pairs(teleportWhitelistNames_raw) do
-            if game.entity_prototypes[entityName] == nil then
+            if prototypes.entity[entityName] == nil then
                 CommandsUtils.LogPrintError(CommandName, "teleportWhitelistNames", "invalid vehicle entity name: '" .. entityName .. "'", command.parameter)
                 return
             end
@@ -212,14 +211,14 @@ AggressiveDriver.AggressiveDriverCommand = function(command)
         suppressMessages = false
     end
 
-    global.aggressiveDriver.nextId = global.aggressiveDriver.nextId + 1
+    storage.aggressiveDriver.nextId = storage.aggressiveDriver.nextId + 1
     ---@type AggressiveDriver_DelayedCommandDetails
     local delayedCommandDetails = { target = target, duration = duration, control = control, aggressiveWalkingNoStartingVehicle = aggressiveWalkingNoStartingVehicle, aggressiveWalkingOnVehicleDeath = aggressiveWalkingOnVehicleDeath, commandeerVehicle = commandeerVehicle, teleportDistance = teleportDistance, teleportWhitelistTypes = teleportWhitelistTypes, teleportWhitelistNames = teleportWhitelistNames, suppressMessages = suppressMessages }
     if scheduleTick ~= -1 then
-        EventScheduler.ScheduleEventOnce(scheduleTick, "AggressiveDriver.ApplyToPlayer", global.aggressiveDriver.nextId, delayedCommandDetails)
+        EventScheduler.ScheduleEventOnce(scheduleTick, "AggressiveDriver.ApplyToPlayer", storage.aggressiveDriver.nextId, delayedCommandDetails)
     else
         ---@type UtilityScheduledEvent_CallbackObject
-        local eventData = { tick = command.tick, name = "AggressiveDriver.ApplyToPlayer", instanceId = global.aggressiveDriver.nextId, data = delayedCommandDetails }
+        local eventData = { tick = command.tick, name = "AggressiveDriver.ApplyToPlayer", instanceId = storage.aggressiveDriver.nextId, data = delayedCommandDetails }
         AggressiveDriver.ApplyToPlayer(eventData)
     end
 end
@@ -236,13 +235,13 @@ AggressiveDriver.ApplyToPlayer = function(eventData)
     local targetPlayer_character = targetPlayer.character
     -- Check the player has a character they can control. The character may be inside the vehicle at present.
     if targetPlayer.controller_type ~= defines.controllers.character or targetPlayer_character == nil then
-        if not data.suppressMessages then game.print({ "message.muppet_streamer_aggressive_driver_not_character_controller", data.target }) end
+        if not data.suppressMessages then game.print({ "message.muppet_streamer_v2_aggressive_driver_not_character_controller", data.target }) end
         return
     end
 
-    if global.aggressiveDriver.affectedPlayers[targetPlayer.index] ~= nil then
+    if storage.aggressiveDriver.affectedPlayers[targetPlayer.index] ~= nil then
         -- Player already being affected by this effect so just silently ignore it.
-        if not data.suppressMessages then game.print({ "message.muppet_streamer_duplicate_command_ignored", "Aggressive Driver", data.target }) end
+        if not data.suppressMessages then game.print({ "message.muppet_streamer_v2_duplicate_command_ignored", "Aggressive Driver", data.target }) end
         return
     end
 
@@ -269,7 +268,7 @@ AggressiveDriver.ApplyToPlayer = function(eventData)
                     -- No current driver, so player must be in the passengers seat. We can always just move them across to the drivers seat.
                     inSuitableVehicle = true
                     playersVehicle.set_driver(targetPlayer)
-                    if not data.suppressMessages then game.print({ "message.muppet_streamer_aggressive_commandeer_vehicle", targetPlayer.name }) end
+                    if not data.suppressMessages then game.print({ "message.muppet_streamer_v2_aggressive_commandeer_vehicle", targetPlayer.name }) end
                 else
                     -- There's a driver of the vehicle.
                     if data.commandeerVehicle then
@@ -282,7 +281,7 @@ AggressiveDriver.ApplyToPlayer = function(eventData)
                             inSuitableVehicle = true
                             playersVehicle.set_passenger(driver)
                             playersVehicle.set_driver(targetPlayer)
-                            if not data.suppressMessages then game.print({ "message.muppet_streamer_aggressive_commandeer_vehicle_from_other", targetPlayer.name, AggressiveDriver.GetVehicleOccupierPlayer(driver).name }) end
+                            if not data.suppressMessages then game.print({ "message.muppet_streamer_v2_aggressive_commandeer_vehicle_from_other", targetPlayer.name, AggressiveDriver.GetVehicleOccupierPlayer(driver).name }) end
                         end
                     else
                         -- Respect vehicle drivers.
@@ -407,7 +406,7 @@ AggressiveDriver.ApplyToPlayer = function(eventData)
                 vehicleList[1].vehicle.set_driver(targetPlayer)
                 inSuitableVehicle = true
                 playersVehicle = vehicleList[1].vehicle
-                if not data.suppressMessages then game.print({ "message.muppet_streamer_aggressive_commandeer_vehicle", targetPlayer.name }) end
+                if not data.suppressMessages then game.print({ "message.muppet_streamer_v2_aggressive_commandeer_vehicle", targetPlayer.name }) end
                 break
             end
         end
@@ -426,7 +425,7 @@ AggressiveDriver.ApplyToPlayer = function(eventData)
                     vehicleList[1].vehicle.set_driver(targetPlayer)
                     inSuitableVehicle = true
                     playersVehicle = vehicleList[1].vehicle
-                    if not data.suppressMessages then game.print({ "message.muppet_streamer_aggressive_commandeer_vehicle_from_other", targetPlayer.name, AggressiveDriver.GetVehicleOccupierPlayer(oldDriver).name }) end
+                    if not data.suppressMessages then game.print({ "message.muppet_streamer_v2_aggressive_commandeer_vehicle_from_other", targetPlayer.name, AggressiveDriver.GetVehicleOccupierPlayer(oldDriver).name }) end
                     break
                 end
             end
@@ -445,7 +444,7 @@ AggressiveDriver.ApplyToPlayer = function(eventData)
                     vehicleList[1].vehicle.set_driver(targetPlayer)
                     inSuitableVehicle = true
                     playersVehicle = vehicleList[1].vehicle
-                    if not data.suppressMessages then game.print({ "message.muppet_streamer_aggressive_commandeer_vehicle_from_other", targetPlayer.name, AggressiveDriver.GetVehicleOccupierPlayer(oldDriver).name }) end
+                    if not data.suppressMessages then game.print({ "message.muppet_streamer_v2_aggressive_commandeer_vehicle_from_other", targetPlayer.name, AggressiveDriver.GetVehicleOccupierPlayer(oldDriver).name }) end
                     break
                 end
             end
@@ -454,7 +453,7 @@ AggressiveDriver.ApplyToPlayer = function(eventData)
     if not inSuitableVehicle then
         if not data.aggressiveWalkingNoStartingVehicle then
             -- No aggressive walking for lack of starting vehicle, so the effect has failed to start.
-            if not data.suppressMessages then game.print({ "message.muppet_streamer_aggressive_driver_no_vehicle", data.target }) end
+            if not data.suppressMessages then game.print({ "message.muppet_streamer_v2_aggressive_driver_no_vehicle", data.target }) end
             return
         end
 
@@ -465,12 +464,12 @@ AggressiveDriver.ApplyToPlayer = function(eventData)
     end
 
     -- Store the players current permission group. Left as the previously stored group if an effect was already being applied to the player, or captured if no present effect affects them.
-    global.originalPlayersPermissionGroup[targetPlayer.index] = global.originalPlayersPermissionGroup[targetPlayer.index] or targetPlayer.permission_group
+    storage.originalPlayersPermissionGroup[targetPlayer.index] = storage.originalPlayersPermissionGroup[targetPlayer.index] or targetPlayer.permission_group
 
     targetPlayer.permission_group = AggressiveDriver.GetOrCreatePermissionGroup()
-    global.aggressiveDriver.affectedPlayers[targetPlayer.index] = { suppressMessages = data.suppressMessages }
+    storage.aggressiveDriver.affectedPlayers[targetPlayer.index] = { suppressMessages = data.suppressMessages }
 
-    if not data.suppressMessages then game.print({ "message.muppet_streamer_aggressive_driver_start", targetPlayer.name }) end
+    if not data.suppressMessages then game.print({ "message.muppet_streamer_v2_aggressive_driver_start", targetPlayer.name }) end
     -- A train will continue moving in its current direction, effectively ignoring the accelerationState value at the start. But a car and tank will always start going forwards regardless of their previous movement, as they are much faster forwards than backwards.
 
     ---@type AggressiveDriver_DriveEachTickDetails
@@ -669,13 +668,13 @@ end
 ---@param player? LuaPlayer|nil # Obtains player if needed from playerIndex.
 ---@param status AggressiveDriver_EffectEndStatus
 AggressiveDriver.StopEffectOnPlayer = function(playerIndex, player, status)
-    local affectedPlayerDetails = global.aggressiveDriver.affectedPlayers[playerIndex]
+    local affectedPlayerDetails = storage.aggressiveDriver.affectedPlayers[playerIndex]
     if affectedPlayerDetails == nil then
         return
     end
 
     -- Remove the flag against this player as being currently affected by the malfunctioning weapon.
-    global.aggressiveDriver.affectedPlayers[playerIndex] = nil
+    storage.aggressiveDriver.affectedPlayers[playerIndex] = nil
 
     player = player or game.get_player(playerIndex)
     if player == nil then
@@ -686,8 +685,8 @@ AggressiveDriver.StopEffectOnPlayer = function(playerIndex, player, status)
     -- Return the player to their initial permission group.
     if player.permission_group.name == "AggressiveDriver" then
         -- If the permission group has been changed by something else don't set it back to the last non modded one.
-        player.permission_group = global.originalPlayersPermissionGroup[playerIndex]
-        global.originalPlayersPermissionGroup[playerIndex] = nil
+        player.permission_group = storage.originalPlayersPermissionGroup[playerIndex]
+        storage.originalPlayersPermissionGroup[playerIndex] = nil
     end
 
     -- Set the final state of the train to braking and straight as this ticks input. As soon as any player in the train tries to control it they will get control.
@@ -700,7 +699,7 @@ AggressiveDriver.StopEffectOnPlayer = function(playerIndex, player, status)
 
     -- Print a message based on ending status.
     if status == EffectEndStatus.completed then
-        if not affectedPlayerDetails.suppressMessages then game.print({ "message.muppet_streamer_aggressive_driver_stop", player.name }) end
+        if not affectedPlayerDetails.suppressMessages then game.print({ "message.muppet_streamer_v2_aggressive_driver_stop", player.name }) end
     end
 end
 

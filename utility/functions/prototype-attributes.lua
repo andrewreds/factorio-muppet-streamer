@@ -36,19 +36,19 @@ PrototypeAttributes.GetAttribute = function(prototypeType, prototypeName, attrib
     else
         local resultPrototype
         if prototypeType == PrototypeAttributes.PrototypeTypes.entity then
-            resultPrototype = game.entity_prototypes[prototypeName]
+            resultPrototype = prototypes.entity[prototypeName]
         elseif prototypeType == PrototypeAttributes.PrototypeTypes.item then
-            resultPrototype = game.item_prototypes[prototypeName]
+            resultPrototype = prototypes.item[prototypeName]
         elseif prototypeType == PrototypeAttributes.PrototypeTypes.fluid then
-            resultPrototype = game.fluid_prototypes[prototypeName]
+            resultPrototype = prototypes.fluid[prototypeName]
         elseif prototypeType == PrototypeAttributes.PrototypeTypes.tile then
-            resultPrototype = game.tile_prototypes[prototypeName]
+            resultPrototype = prototypes.tile[prototypeName]
         elseif prototypeType == PrototypeAttributes.PrototypeTypes.equipment then
-            resultPrototype = game.equipment_prototypes[prototypeName]
+            resultPrototype = prototypes.equipment[prototypeName]
         elseif prototypeType == PrototypeAttributes.PrototypeTypes.recipe then
-            resultPrototype = game.recipe_prototypes[prototypeName]
+            resultPrototype = prototypes.recipe[prototypeName]
         elseif prototypeType == PrototypeAttributes.PrototypeTypes.technology then
-            resultPrototype = game.technology_prototypes[prototypeName]
+            resultPrototype = prototypes.technology[prototypeName]
         end
         local resultValue = resultPrototype[attributeName] ---@type any
         prototypeCache[attributeName] = { value = resultValue }

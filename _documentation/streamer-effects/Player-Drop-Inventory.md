@@ -39,7 +39,7 @@ Note: all examples target the player named `muppet9010`, you will need to replac
 <details><summary>show details</summary>
 <p>
 
-Remote Interface Syntax: `/sc remote.call('muppet_streamer', 'run_command', 'muppet_streamer_player_drop_inventory', [OPTIONS TABLE])`
+Remote Interface Syntax: `/sc remote.call('muppet_streamer_v2', 'run_command', 'muppet_streamer_v2_player_drop_inventory', [OPTIONS TABLE])`
 
 The options must be provided as a Lua table.
 
@@ -47,9 +47,9 @@ Examples:
 
 | Example | Code |
 | --- | --- |
-| dropping 10% of starting inventory items 5 times | `/sc remote.call('muppet_streamer', 'run_command', 'muppet_streamer_player_drop_inventory', {target="muppet9010", quantityType="startingPercentage", quantityValue=10, gap=2, occurrences=5})` |
-| 10 drops of 5 items a time, allows dropping items on belts | `/sc remote.call('muppet_streamer', 'run_command', 'muppet_streamer_player_drop_inventory', {target="muppet9010", quantityType="constant", quantityValue=5, gap=2, occurrences=10, dropOnBelts=true})` |
-| dropping all of inventory in 1 go | `/sc remote.call('muppet_streamer', 'run_command', 'muppet_streamer_player_drop_inventory', {target="muppet9010", quantityType="startingPercentage", quantityValue=100, gap=1, occurrences=1})` |
+| dropping 10% of starting inventory items 5 times | `/sc remote.call('muppet_streamer_v2', 'run_command', 'muppet_streamer_v2_player_drop_inventory', {target="muppet9010", quantityType="startingPercentage", quantityValue=10, gap=2, occurrences=5})` |
+| 10 drops of 5 items a time, allows dropping items on belts | `/sc remote.call('muppet_streamer_v2', 'run_command', 'muppet_streamer_v2_player_drop_inventory', {target="muppet9010", quantityType="constant", quantityValue=5, gap=2, occurrences=10, dropOnBelts=true})` |
+| dropping all of inventory in 1 go | `/sc remote.call('muppet_streamer_v2', 'run_command', 'muppet_streamer_v2_player_drop_inventory', {target="muppet9010", quantityType="startingPercentage", quantityValue=100, gap=1, occurrences=1})` |
 
 
 Further details and more advanced usage of using Remote Interfaces can be found here on the [Streamer Effect Options Syntax Wiki page](https://github.com/muppet9010/factorio-muppet-streamer/wiki/Streamer-Effect-Options-Syntax).
@@ -64,7 +64,7 @@ Further details and more advanced usage of using Remote Interfaces can be found 
 <details><summary>show details</summary>
 <p>
 
-Command Syntax: `/muppet_streamer_player_drop_inventory [OPTIONS TABLE AS JSON STRING]`
+Command Syntax: `/muppet_streamer_v2_player_drop_inventory [OPTIONS TABLE AS JSON STRING]`
 
 The effect's options must be provided as a JSON string of a table.
 
@@ -72,9 +72,9 @@ Examples:
 
 | Example | Code |
 | --- | --- |
-| dropping 10% of starting inventory items 5 times | `/muppet_streamer_player_drop_inventory {"target":"muppet9010", "quantityType":"startingPercentage", "quantityValue":10, "gap":2, "occurrences":5}` |
-| 10 drops of 5 items a time, allows dropping items on belts | `/muppet_streamer_player_drop_inventory {"target":"muppet9010", "quantityType":"constant", "quantityValue":5, "gap":2, "occurrences":10, "dropOnBelts":true}` |
-| dropping all of inventory in 1 go | `/muppet_streamer_player_drop_inventory {"target":"muppet9010", "quantityType":"startingPercentage", "quantityValue":100, "gap":1, "occurrences":1}` |
+| dropping 10% of starting inventory items 5 times | `/muppet_streamer_v2_player_drop_inventory {"target":"muppet9010", "quantityType":"startingPercentage", "quantityValue":10, "gap":2, "occurrences":5}` |
+| 10 drops of 5 items a time, allows dropping items on belts | `/muppet_streamer_v2_player_drop_inventory {"target":"muppet9010", "quantityType":"constant", "quantityValue":5, "gap":2, "occurrences":10, "dropOnBelts":true}` |
+| dropping all of inventory in 1 go | `/muppet_streamer_v2_player_drop_inventory {"target":"muppet9010", "quantityType":"startingPercentage", "quantityValue":100, "gap":1, "occurrences":1}` |
 
 </p>
 </details>

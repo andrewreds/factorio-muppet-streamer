@@ -41,13 +41,13 @@ GuiActionsOpened.RegisterEntityForGuiOpenedAction = function(entity, actionName,
         error("GuiActions.RegisterEntityForGuiOpenedAction called with missing arguments")
     end
     data = data or {}
-    global.UTILITYGUIACTIONSENTITYGUIOPENED = global.UTILITYGUIACTIONSENTITYGUIOPENED or {} ---@type table<uint, table<string, table|nil>>
+    storage.UTILITYGUIACTIONSENTITYGUIOPENED = storage.UTILITYGUIACTIONSENTITYGUIOPENED or {} ---@type table<uint, table<string, table|nil>>
     local entity_unitNumber = entity.unit_number
     if entity_unitNumber == nil then
         error("GuiActionsOpened.RegisterEntityForGuiOpenedAction() only supports entities with populated unit_number field.")
     end
-    global.UTILITYGUIACTIONSENTITYGUIOPENED[entity_unitNumber] = global.UTILITYGUIACTIONSENTITYGUIOPENED[entity_unitNumber] or {}
-    global.UTILITYGUIACTIONSENTITYGUIOPENED[entity_unitNumber][actionName] = data
+    storage.UTILITYGUIACTIONSENTITYGUIOPENED[entity_unitNumber] = storage.UTILITYGUIACTIONSENTITYGUIOPENED[entity_unitNumber] or {}
+    storage.UTILITYGUIACTIONSENTITYGUIOPENED[entity_unitNumber][actionName] = data
 end
 
 --- Called when desired to remove a specific entities GUI being opened from triggering its action.
@@ -63,10 +63,10 @@ GuiActionsOpened.RemoveEntityForGuiOpenedAction = function(entity, actionName)
     if entity_unitNumber == nil then
         error("GuiActionsOpened.RemoveEntityForGuiOpenedAction() only supports entities with populated unit_number field.")
     end
-    if global.UTILITYGUIACTIONSENTITYGUIOPENED == nil or global.UTILITYGUIACTIONSENTITYGUIOPENED[entity_unitNumber] == nil then
+    if storage.UTILITYGUIACTIONSENTITYGUIOPENED == nil or storage.UTILITYGUIACTIONSENTITYGUIOPENED[entity_unitNumber] == nil then
         return
     end
-    global.UTILITYGUIACTIONSENTITYGUIOPENED[entity_unitNumber][actionName] = nil
+    storage.UTILITYGUIACTIONSENTITYGUIOPENED[entity_unitNumber][actionName] = nil
 end
 
 -- Called to register a specific GUI type being opened to a named action.
@@ -78,9 +78,9 @@ GuiActionsOpened.RegisterActionNameForGuiTypeOpened = function(guiType, actionNa
         error("GuiActions.RegisterActionNameForGuiTypeOpened called with missing arguments")
     end
     data = data or {}
-    global.UTILITYGUIACTIONSGUITYPEOPENED = global.UTILITYGUIACTIONSGUITYPEOPENED or {} ---@type table<defines.gui_type|'all', table<string, table|nil>>
-    global.UTILITYGUIACTIONSGUITYPEOPENED[guiType] = global.UTILITYGUIACTIONSGUITYPEOPENED[guiType] or {}
-    global.UTILITYGUIACTIONSGUITYPEOPENED[guiType][actionName] = data
+    storage.UTILITYGUIACTIONSGUITYPEOPENED = storage.UTILITYGUIACTIONSGUITYPEOPENED or {} ---@type table<defines.gui_type|'all', table<string, table|nil>>
+    storage.UTILITYGUIACTIONSGUITYPEOPENED[guiType] = storage.UTILITYGUIACTIONSGUITYPEOPENED[guiType] or {}
+    storage.UTILITYGUIACTIONSGUITYPEOPENED[guiType][actionName] = data
 end
 
 -- Called when desired to remove a specific GUI type opening from triggering its action.
@@ -92,10 +92,10 @@ GuiActionsOpened.RemoveActionNameForGuiTypeOpened = function(guiType, actionName
     if guiType == nil or actionName == nil then
         error("GuiActions.RemoveActionNameForGuiTypeOpened called with missing arguments")
     end
-    if global.UTILITYGUIACTIONSGUITYPEOPENED == nil or global.UTILITYGUIACTIONSGUITYPEOPENED[guiType] == nil then
+    if storage.UTILITYGUIACTIONSGUITYPEOPENED == nil or storage.UTILITYGUIACTIONSGUITYPEOPENED[guiType] == nil then
         return
     end
-    global.UTILITYGUIACTIONSGUITYPEOPENED[guiType][actionName] = nil
+    storage.UTILITYGUIACTIONSGUITYPEOPENED[guiType][actionName] = nil
 end
 
 --------------------------------------------------------------------------------------------
@@ -107,10 +107,10 @@ end
 GuiActionsOpened._HandleGuiOpenedAction = function(rawFactorioEventData)
     local guiType, entityOpened = rawFactorioEventData.gui_type, rawFactorioEventData.entity
 
-    if global.UTILITYGUIACTIONSGUITYPEOPENED ~= nil and guiType ~= nil then
+    if storage.UTILITYGUIACTIONSGUITYPEOPENED ~= nil and guiType ~= nil then
         for _, guiTypeHandled in pairs({ guiType, "all" }) do
-            if global.UTILITYGUIACTIONSGUITYPEOPENED[guiTypeHandled] ~= nil then
-                for actionName, data in pairs(global.UTILITYGUIACTIONSGUITYPEOPENED[guiTypeHandled]) do
+            if storage.UTILITYGUIACTIONSGUITYPEOPENED[guiTypeHandled] ~= nil then
+                for actionName, data in pairs(storage.UTILITYGUIACTIONSGUITYPEOPENED[guiTypeHandled]) do
                     local actionFunction = MOD.guiOpenedActions[actionName]
                     local actionData = { actionName = actionName, playerIndex = rawFactorioEventData.player_index, guiType = guiTypeHandled, data = data, eventData = rawFactorioEventData }
                     if actionFunction == nil then
@@ -122,11 +122,11 @@ GuiActionsOpened._HandleGuiOpenedAction = function(rawFactorioEventData)
         end
     end
 
-    if global.UTILITYGUIACTIONSENTITYGUIOPENED ~= nil and entityOpened ~= nil then
+    if storage.UTILITYGUIACTIONSENTITYGUIOPENED ~= nil and entityOpened ~= nil then
         local entityOpened_unitNumber = entityOpened.unit_number
         -- If the entity has a unit_number then we could have registered something for it, otherwise we couldn't have registered anything so no need to check.
-        if entityOpened_unitNumber ~= nil and global.UTILITYGUIACTIONSENTITYGUIOPENED[entityOpened_unitNumber] ~= nil then
-            for actionName, data in pairs(global.UTILITYGUIACTIONSENTITYGUIOPENED[entityOpened_unitNumber]) do
+        if entityOpened_unitNumber ~= nil and storage.UTILITYGUIACTIONSENTITYGUIOPENED[entityOpened_unitNumber] ~= nil then
+            for actionName, data in pairs(storage.UTILITYGUIACTIONSENTITYGUIOPENED[entityOpened_unitNumber]) do
                 local actionFunction = MOD.guiOpenedActions[actionName]
                 local actionData = { actionName = actionName, playerIndex = rawFactorioEventData.player_index, entity = entityOpened, data = data, eventData = rawFactorioEventData }
                 if actionFunction == nil then

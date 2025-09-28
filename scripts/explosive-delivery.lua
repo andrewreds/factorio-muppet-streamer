@@ -22,17 +22,17 @@ local MathUtils = require("utility.helper-utils.math-utils")
 ---@field targetPosition MapPosition
 ---@field targetSurface LuaSurface
 
-local CommandName = "muppet_streamer_schedule_explosive_delivery"
+local CommandName = "muppet_streamer_v2_schedule_explosive_delivery"
 
 ExplosiveDelivery.CreateGlobals = function()
-    global.explosiveDelivery = global.explosiveDelivery or {} ---@class ExplosiveDelivery_Global
-    global.explosiveDelivery.nextId = global.explosiveDelivery.nextId or 0 ---@type uint
-    global.explosiveDelivery.nextSalvoWaveId = global.explosiveDelivery.nextSalvoWaveId or 0 ---@type uint
-    global.explosiveDelivery.salvoWaveDetails = global.explosiveDelivery.salvoWaveDetails or {} ---@type table<int,ExplosiveDelivery_SalvoWaveDetails>
+    storage.explosiveDelivery = storage.explosiveDelivery or {} ---@class ExplosiveDelivery_Global
+    storage.explosiveDelivery.nextId = storage.explosiveDelivery.nextId or 0 ---@type uint
+    storage.explosiveDelivery.nextSalvoWaveId = storage.explosiveDelivery.nextSalvoWaveId or 0 ---@type uint
+    storage.explosiveDelivery.salvoWaveDetails = storage.explosiveDelivery.salvoWaveDetails or {} ---@type table<int,ExplosiveDelivery_SalvoWaveDetails>
 end
 
 ExplosiveDelivery.OnLoad = function()
-    CommandsUtils.Register("muppet_streamer_schedule_explosive_delivery", { "api-description.muppet_streamer_schedule_explosive_delivery" }, ExplosiveDelivery.ScheduleExplosiveDeliveryCommand, true)
+    CommandsUtils.Register("muppet_streamer_v2_schedule_explosive_delivery", { "api-description.muppet_streamer_v2_schedule_explosive_delivery" }, ExplosiveDelivery.ScheduleExplosiveDeliveryCommand, true)
     EventScheduler.RegisterScheduledEventType("ExplosiveDelivery.DeliverExplosives", ExplosiveDelivery.DeliverExplosives)
     MOD.Interfaces.Commands.ExplosiveDelivery = ExplosiveDelivery.ScheduleExplosiveDeliveryCommand
 end
@@ -84,7 +84,7 @@ ExplosiveDelivery.ScheduleExplosiveDeliveryCommand = function(command)
             CommandsUtils.LogPrintError(CommandName, "customExplosiveType", "customExplosiveType wasn't provided, but is required as the explosiveType is 'custom'.", command.parameter)
             return
         end
-        explosivePrototype = game.entity_prototypes[customExplosiveType_string]
+        explosivePrototype = prototypes.entity[customExplosiveType_string]
         if explosivePrototype == nil then
             CommandsUtils.LogPrintError(CommandName, "customExplosiveType", "entity '" .. customExplosiveType_string .. "' wasn't a valid entity name", command.parameter)
             return
@@ -205,8 +205,8 @@ ExplosiveDelivery.ScheduleExplosiveDeliveryCommand = function(command)
     local maxBatchNumber = 0 ---@type uint # Batch 0 is the first batch.
     local salvoWaveId ---@type uint|nil
     if explosiveCount > salvoSize then
-        global.explosiveDelivery.nextSalvoWaveId = global.explosiveDelivery.nextSalvoWaveId + 1
-        salvoWaveId = global.explosiveDelivery.nextSalvoWaveId
+        storage.explosiveDelivery.nextSalvoWaveId = storage.explosiveDelivery.nextSalvoWaveId + 1
+        salvoWaveId = storage.explosiveDelivery.nextSalvoWaveId
         maxBatchNumber = math.floor(explosiveCount / salvoSize) --[[@as uint # Both inputs are verified uints and with the math.floor() it can't go below 0]]
         -- Counting starts at 0 so flooring gives the -1 from total needed by loop.
     end
@@ -225,7 +225,7 @@ ExplosiveDelivery.ScheduleExplosiveDeliveryCommand = function(command)
         explosiveCount = math.min(salvoSize, explosiveCountRemaining) --[[@as uint]]
         explosiveCountRemaining = explosiveCountRemaining - explosiveCount
 
-        global.explosiveDelivery.nextId = global.explosiveDelivery.nextId + 1
+        storage.explosiveDelivery.nextId = storage.explosiveDelivery.nextId + 1
         ---@type ExplosiveDelivery_DelayedCommandDetails
         local delayedCommandDetails = {
             explosiveCount = explosiveCount,
@@ -263,10 +263,10 @@ ExplosiveDelivery.ScheduleExplosiveDeliveryCommand = function(command)
             end
         end
         if scheduleTick ~= -1 then
-            EventScheduler.ScheduleEventOnce(batchScheduleTick, "ExplosiveDelivery.DeliverExplosives", global.explosiveDelivery.nextId, delayedCommandDetails)
+            EventScheduler.ScheduleEventOnce(batchScheduleTick, "ExplosiveDelivery.DeliverExplosives", storage.explosiveDelivery.nextId, delayedCommandDetails)
         else
             ---@type UtilityScheduledEvent_CallbackObject
-            local eventData = { tick = command.tick, name = "ExplosiveDelivery.DeliverExplosives", instanceId = global.explosiveDelivery.nextId, data = delayedCommandDetails }
+            local eventData = { tick = command.tick, name = "ExplosiveDelivery.DeliverExplosives", instanceId = storage.explosiveDelivery.nextId, data = delayedCommandDetails }
             ExplosiveDelivery.DeliverExplosives(eventData)
         end
     end
@@ -292,10 +292,10 @@ ExplosiveDelivery.DeliverExplosives = function(eventData)
     local targetPos, surface
     local salvoWaveId = data.salvoWaveId -- Variables existence is a work around for Sumneko's missing object field nil detection.
     -- Check if we need to obtain a target position from the salvo wave rather than calculate it now. SalvoWaveId is nil if its a single explosive grouping.
-    if salvoWaveId ~= nil and global.explosiveDelivery.salvoWaveDetails[salvoWaveId] ~= nil then
+    if salvoWaveId ~= nil and storage.explosiveDelivery.salvoWaveDetails[salvoWaveId] ~= nil then
         if not data.salvoFollowPlayer then
             -- Load the initial salvo target position for every subsequent salvo.
-            targetPos = global.explosiveDelivery.salvoWaveDetails[salvoWaveId].targetPosition
+            targetPos = storage.explosiveDelivery.salvoWaveDetails[salvoWaveId].targetPosition
         else
             -- Calculate the target position for every salvo.
             targetPos = data.targetPosition or targetPlayer.position
@@ -304,9 +304,9 @@ ExplosiveDelivery.DeliverExplosives = function(eventData)
                 targetPos.y = targetPos.y + data.targetOffset.y
             end
         end
-        surface = global.explosiveDelivery.salvoWaveDetails[salvoWaveId].targetSurface
+        surface = storage.explosiveDelivery.salvoWaveDetails[salvoWaveId].targetSurface
         if data.finalSalvo then
-            global.explosiveDelivery.salvoWaveDetails[salvoWaveId] = nil
+            storage.explosiveDelivery.salvoWaveDetails[salvoWaveId] = nil
         end
 
         -- Check the surface is still valid as it could have been deleted mid salvo.
@@ -324,7 +324,7 @@ ExplosiveDelivery.DeliverExplosives = function(eventData)
         surface = targetPlayer.surface
         if salvoWaveId ~= nil then
             -- Cache the salvo wave target position for the rest of the salvo wave.
-            global.explosiveDelivery.salvoWaveDetails[salvoWaveId] = {
+            storage.explosiveDelivery.salvoWaveDetails[salvoWaveId] = {
                 targetPosition = targetPos,
                 targetSurface = surface
             }
@@ -335,7 +335,7 @@ ExplosiveDelivery.DeliverExplosives = function(eventData)
     for _ = 1, data.explosiveCount do
         -- The explosives have to be fired at something, so we make a temporary dummy target entity at the desired explosion position.
         local targetEntityPos = PositionUtils.RandomLocationInRadius(targetPos, data.accuracyRadiusMax, data.accuracyRadiusMin)
-        local targetEntity = surface.create_entity { name = "muppet_streamer-explosive-delivery-target", position = targetEntityPos }
+        local targetEntity = surface.create_entity { name = "muppet_streamer_v2-explosive-delivery-target", position = targetEntityPos }
 
         -- If the entity fails to create (should never happen) just skip this explosive.
         if targetEntity == nil then
@@ -348,10 +348,10 @@ ExplosiveDelivery.DeliverExplosives = function(eventData)
 
         if explosiveType.type == "projectile" then
             ---@cast explosiveType ExplosiveDelivery_Type_Projectile
-            surface.create_entity { name = explosiveType.projectileName, position = explosiveCreatePos, target = targetEntity, speed = explosiveType.speed, force = global.Forces.muppet_streamer_enemy, create_build_effect_smoke = false, raise_built = true }
+            surface.create_entity { name = explosiveType.projectileName, position = explosiveCreatePos, target = targetEntity, speed = explosiveType.speed, force = storage.Forces.muppet_streamer_v2_enemy, create_build_effect_smoke = false, raise_built = true }
         elseif explosiveType.type == "stream" then
             ---@cast explosiveType ExplosiveDelivery_Type_Stream
-            surface.create_entity { name = explosiveType.streamName, position = explosiveCreatePos, target = targetEntity, source_position = explosiveCreatePos, force = global.Forces.muppet_streamer_enemy, create_build_effect_smoke = false, raise_built = true }
+            surface.create_entity { name = explosiveType.streamName, position = explosiveCreatePos, target = targetEntity, source_position = explosiveCreatePos, force = storage.Forces.muppet_streamer_v2_enemy, create_build_effect_smoke = false, raise_built = true }
         end
 
         -- Remove the temporary dummy target entity.
@@ -420,17 +420,17 @@ ExplosiveDelivery.Types = {
     ---@class ExplosiveDelivery_Type_Stream
     smallSpit = {
         type = "stream",
-        streamName = "muppet_streamer-small_spit-stream"
+        streamName = "muppet_streamer_v2-small_spit-stream"
     },
     ---@class ExplosiveDelivery_Type_Stream
     mediumSpit = {
         type = "stream",
-        streamName = "muppet_streamer-medium_spit-stream"
+        streamName = "muppet_streamer_v2-medium_spit-stream"
     },
     ---@class ExplosiveDelivery_Type_Stream
     largeSpit = {
         type = "stream",
-        streamName = "muppet_streamer-large_spit-stream"
+        streamName = "muppet_streamer_v2-large_spit-stream"
     },
     ---@class ExplosiveDelivery_Type_Custom_Generic
     custom = {

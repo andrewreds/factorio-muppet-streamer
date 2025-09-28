@@ -16,10 +16,10 @@ local Common = require("scripts.common")
 local DelayedLua = require("scripts.delayed-lua")
 
 local function CreateGlobals()
-    global.originalPlayersPermissionGroup = global.originalPlayersPermissionGroup or {} ---@type table<uint, LuaPermissionGroup> # Used to track the last non-modded permission group across all the features. So we restore back to it after jumping between modded permission groups. Reset upon the last feature expiring.
+    storage.originalPlayersPermissionGroup = storage.originalPlayersPermissionGroup or {} ---@type table<uint, LuaPermissionGroup> # Used to track the last non-modded permission group across all the features. So we restore back to it after jumping between modded permission groups. Reset upon the last feature expiring.
 
     ---@class MuppetStreamer_Forces
-    global.Forces = global.Forces or {}
+    storage.Forces = storage.Forces or {}
 
     TeamMember.CreateGlobals()
     BuildingGhosts.CreateGlobals()
@@ -39,9 +39,9 @@ end
 
 local function OnLoad()
     --Any Remote Interface registration calls can go in here or in root of control.lua
-    remote.remove_interface("muppet_streamer")
+    remote.remove_interface("muppet_streamer_v2")
     remote.add_interface(
-        "muppet_streamer",
+        "muppet_streamer_v2",
         {
             run_command = Common.CallCommandFromRemote,
             increase_team_member_level = TeamMember.RemoteIncreaseTeamMemberLevel,
@@ -85,10 +85,10 @@ local function OnStartup()
     AggressiveDriver.OnStartup()
 
     -- Ensure our special enemy force is always present.
-    if global.Forces.muppet_streamer_enemy == nil then
-        global.Forces.muppet_streamer_enemy = game.forces["muppet_streamer_enemy"]
-        if global.Forces.muppet_streamer_enemy == nil then
-            global.Forces.muppet_streamer_enemy = game.create_force("muppet_streamer_enemy") -- No alliances set to any other force.
+    if storage.Forces.muppet_streamer_v2_enemy == nil then
+        storage.Forces.muppet_streamer_v2_enemy = game.forces["muppet_streamer_v2_enemy"]
+        if storage.Forces.muppet_streamer_v2_enemy == nil then
+            storage.Forces.muppet_streamer_v2_enemy = game.create_force("muppet_streamer_v2_enemy") -- No alliances set to any other force.
         end
     end
 end

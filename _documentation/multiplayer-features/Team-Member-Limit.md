@@ -26,10 +26,10 @@ Command and Remote interface to increase the max team member count by a set amou
 
 Command:
 
-- syntax: `/muppet_streamer_change_team_member_max NUMBER`
-- example to increase by 2: `/muppet_streamer_change_team_member_max 2`
+- syntax: `/muppet_streamer_v2_change_team_member_max NUMBER`
+- example to increase by 2: `/muppet_streamer_v2_change_team_member_max 2`
 
 Remote Interface:
 
-- syntax: muppet_streamer , increase_team_member_level , NUMBER
-- example to increase by 2: `remote.call('muppet_streamer', 'increase_team_member_level', 2)`
+- syntax: muppet_streamer_v2 , increase_team_member_level , NUMBER
+- example to increase by 2: `remote.call('muppet_streamer_v2', 'increase_team_member_level', 2)`

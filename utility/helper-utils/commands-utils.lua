@@ -157,7 +157,7 @@ end
 ---@return table<string, any>|nil dataTable # The dataTable of arguments or nil if invalid or none provided.
 CommandsUtils.GetSettingsTableFromCommandParameterString = function(commandParameterString, mandatory, commandName, allowedSettingNames)
     commandParameterString = commandParameterString or ""
-    local dataTable = game.json_to_table(commandParameterString)
+    local dataTable = helpers.json_to_table(commandParameterString)
 
     -- If populated check its valid.
     if commandParameterString ~= "" and dataTable == nil then
@@ -440,7 +440,7 @@ CommandsUtils._StringToTypedObject = function(inputText)
     -- Only try to handle JSON to table conversation if it looks like a JSON string. The games built in conversation handler can return some non JSON things as other basic types, but with some special characters being stripped in the process.
     local firstCharacter = string.sub(inputText, 1, 1)
     if firstCharacter == "{" or firstCharacter == "[" then
-        typedText = game.json_to_table(inputText)
+        typedText = helpers.json_to_table(inputText)
         if typedText ~= nil then
             return typedText
         end

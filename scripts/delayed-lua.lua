@@ -10,8 +10,8 @@ local MathUtils = require("utility.helper-utils.math-utils")
 ---@field functionData table|nil
 
 DelayedLua.CreateGlobals = function()
-    global.delayedLua = global.delayedLua or {} ---@class DelayedLua_Global
-    global.delayedLua.nextId = global.delayedLua.nextId or 0 ---@type uint
+    storage.delayedLua = storage.delayedLua or {} ---@class DelayedLua_Global
+    storage.delayedLua.nextId = storage.delayedLua.nextId or 0 ---@type uint
 end
 
 DelayedLua.OnLoad = function()
@@ -76,18 +76,18 @@ DelayedLua.AddDelayedLua_Remote = function(delay, functionString, functionData)
         end
     end
 
-    global.delayedLua.nextId = global.delayedLua.nextId + 1
+    storage.delayedLua.nextId = storage.delayedLua.nextId + 1
     ---@type DelayedLua_ScheduledEvent
-    local scheduledEvent = { id = global.delayedLua.nextId, functionString = functionString, functionData = functionData }
+    local scheduledEvent = { id = storage.delayedLua.nextId, functionString = functionString, functionData = functionData }
     if scheduleTick ~= -1 then
-        EventScheduler.ScheduleEventOnce(scheduleTick, "DelayedLua.ActionDelayedLua", global.delayedLua.nextId, scheduledEvent)
+        EventScheduler.ScheduleEventOnce(scheduleTick, "DelayedLua.ActionDelayedLua", storage.delayedLua.nextId, scheduledEvent)
     else
         ---@type UtilityScheduledEvent_CallbackObject
-        local eventData = { tick = currentTick, name = "DelayedLua.ActionDelayedLua", instanceId = global.delayedLua.nextId, data = scheduledEvent }
+        local eventData = { tick = currentTick, name = "DelayedLua.ActionDelayedLua", instanceId = storage.delayedLua.nextId, data = scheduledEvent }
         DelayedLua.ActionDelayedLua(eventData)
     end
 
-    return global.delayedLua.nextId
+    return storage.delayedLua.nextId
 end
 
 --- Gets a Lua function from the functionString argument in a safe manner, handling any errors in the process.
@@ -139,7 +139,7 @@ DelayedLua.ActionDelayedLua = function(event)
         fullErrorDetails = fullErrorDetails .. "\r\n\r\n" .. "Delayed Lua Code - raw LuaFunction as a string:" .. "\r\n" .. scheduledEvent.functionString
 
         local logFileName = Constants.ModName .. " - Delayed Lua runtime code error details - " .. tostring(event.instanceId .. ".log")
-        game.write_file(logFileName, fullErrorDetails, false) -- Write file overwriting any same named file.
+        helpers.write_file(logFileName, fullErrorDetails, false) -- Write file overwriting any same named file.
 
         LoggingUtils.LogPrintError(errorMessagePrefix .. "delayed lua code execution errored:     " .. tostring(errorMessage))
         LoggingUtils.LogPrintError(errorMessagePrefix .. "see log file in Factorio's `script-output` folder for full details:    " .. logFileName)
@@ -247,7 +247,7 @@ DelayedLua.CheckScheduledId = function(scheduleId, errorMessagePrefix)
     elseif scheduleId < 0 then
         LoggingUtils.LogPrintError(errorMessagePrefix .. "`scheduleId` argument must be 0 or greater, provided: " .. tostring(scheduleId))
         return false
-    elseif scheduleId > global.delayedLua.nextId then
+    elseif scheduleId > storage.delayedLua.nextId then
         LoggingUtils.LogPrintError(errorMessagePrefix .. "`scheduleId` argument must not be greater than the max scheduled Lua code Id, provided: " .. tostring(scheduleId))
         return false
     end

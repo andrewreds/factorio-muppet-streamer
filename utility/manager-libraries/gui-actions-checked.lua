@@ -47,11 +47,11 @@ GuiActionsChecked.RegisterGuiForCheckedStateChange = function(elementName, eleme
         error("GuiActions.RegisterGuiForCheckedStateChange called with missing arguments")
     end
     local name = GuiActionsChecked._GenerateGuiElementName(elementName, elementType)
-    global.UTILITYGUIACTIONSGUICHECKED = global.UTILITYGUIACTIONSGUICHECKED or {} ---@type table<string, UtilityGuiActionsChecked_GuiCheckedDetails>
+    storage.UTILITYGUIACTIONSGUICHECKED = storage.UTILITYGUIACTIONSGUICHECKED or {} ---@type table<string, UtilityGuiActionsChecked_GuiCheckedDetails>
     if not disabled then
-        global.UTILITYGUIACTIONSGUICHECKED[name] = { actionName = actionName, data = data }
+        storage.UTILITYGUIACTIONSGUICHECKED[name] = { actionName = actionName, data = data }
     else
-        global.UTILITYGUIACTIONSGUICHECKED[name] = nil
+        storage.UTILITYGUIACTIONSGUICHECKED[name] = nil
     end
 end
 
@@ -64,11 +64,11 @@ GuiActionsChecked.RemoveGuiForCheckedStateChange = function(elementName, element
     if elementName == nil then
         error("GuiActions.RemoveButtonName called with missing arguments")
     end
-    if global.UTILITYGUIACTIONSGUICHECKED == nil then
+    if storage.UTILITYGUIACTIONSGUICHECKED == nil then
         return
     end
     local name = GuiActionsChecked._GenerateGuiElementName(elementName, elementType)
-    global.UTILITYGUIACTIONSGUICHECKED[name] = nil
+    storage.UTILITYGUIACTIONSGUICHECKED[name] = nil
 end
 
 --------------------------------------------------------------------------------------------
@@ -78,11 +78,11 @@ end
 --- Called when each on_gui_checked_state_changed event occurs and identifies any registered actionName functions to trigger.
 ---@param rawFactorioEventData on_gui_checked_state_changed
 GuiActionsChecked._HandleGuiCheckedAction = function(rawFactorioEventData)
-    if global.UTILITYGUIACTIONSGUICHECKED == nil then
+    if storage.UTILITYGUIACTIONSGUICHECKED == nil then
         return
     end
     local checkedElementName = rawFactorioEventData.element.name
-    local guiCheckedDetails = global.UTILITYGUIACTIONSGUICHECKED[checkedElementName]
+    local guiCheckedDetails = storage.UTILITYGUIACTIONSGUICHECKED[checkedElementName]
     if guiCheckedDetails ~= nil then
         local actionName = guiCheckedDetails.actionName
         local actionFunction = MOD.guiCheckedActions[actionName]

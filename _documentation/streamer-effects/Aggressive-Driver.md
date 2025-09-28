@@ -34,7 +34,7 @@ Note: all examples target the player named `muppet9010`, you will need to replac
 <details><summary>show details</summary>
 <p>
 
-Remote Interface Syntax: `/sc remote.call('muppet_streamer', 'run_command', 'muppet_streamer_aggressive_driver', [OPTIONS TABLE])`
+Remote Interface Syntax: `/sc remote.call('muppet_streamer_v2', 'run_command', 'muppet_streamer_v2_aggressive_driver', [OPTIONS TABLE])`
 
 The options must be provided as a Lua table.
 
@@ -42,10 +42,10 @@ Examples:
 
 | Example | Code |
 | --- | --- |
-| standard usage with teleport to a near vehicle | `/sc remote.call('muppet_streamer', 'run_command', 'muppet_streamer_aggressive_driver', {target="muppet9010", duration=30, teleportDistance=100})` |
-| only be aggressive if currently driving a vehicle | `/sc remote.call('muppet_streamer', 'run_command', 'muppet_streamer_aggressive_driver', {target="muppet9010", duration=30, commandeerVehicle=false})` |
-| only teleport in to a train type | `/sc remote.call('muppet_streamer', 'run_command', 'muppet_streamer_aggressive_driver', {target="muppet9010", duration=30, teleportDistance=100, teleportWhitelistTypes="locomotive,cargo-wagon,fluid-wagon,artillery-wagon"})` |
-| don't aggressively walk if no vehicle is found | `/sc remote.call('muppet_streamer', 'run_command', 'muppet_streamer_aggressive_driver', {target="muppet9010", duration=30, teleportDistance=100, aggressiveWalking="never"})` |
+| standard usage with teleport to a near vehicle | `/sc remote.call('muppet_streamer_v2', 'run_command', 'muppet_streamer_v2_aggressive_driver', {target="muppet9010", duration=30, teleportDistance=100})` |
+| only be aggressive if currently driving a vehicle | `/sc remote.call('muppet_streamer_v2', 'run_command', 'muppet_streamer_v2_aggressive_driver', {target="muppet9010", duration=30, commandeerVehicle=false})` |
+| only teleport in to a train type | `/sc remote.call('muppet_streamer_v2', 'run_command', 'muppet_streamer_v2_aggressive_driver', {target="muppet9010", duration=30, teleportDistance=100, teleportWhitelistTypes="locomotive,cargo-wagon,fluid-wagon,artillery-wagon"})` |
+| don't aggressively walk if no vehicle is found | `/sc remote.call('muppet_streamer_v2', 'run_command', 'muppet_streamer_v2_aggressive_driver', {target="muppet9010", duration=30, teleportDistance=100, aggressiveWalking="never"})` |
 
 
 Further details and more advanced usage of using Remote Interfaces can be found here on the [Streamer Effect Options Syntax Wiki page](https://github.com/muppet9010/factorio-muppet-streamer/wiki/Streamer-Effect-Options-Syntax).
@@ -60,7 +60,7 @@ Further details and more advanced usage of using Remote Interfaces can be found 
 <details><summary>show details</summary>
 <p>
 
-Command Syntax: `/muppet_streamer_aggressive_driver [OPTIONS TABLE AS JSON STRING]`
+Command Syntax: `/muppet_streamer_v2_aggressive_driver [OPTIONS TABLE AS JSON STRING]`
 
 The effect's options must be provided as a JSON string of a table.
 
@@ -68,10 +68,10 @@ Examples:
 
 | Example | Code |
 | --- | --- |
-| standard usage with teleport to a near vehicle | `/muppet_streamer_aggressive_driver {"target":"muppet9010", "duration":30, "teleportDistance":100}` |
-| only be aggressive if currently driving a vehicle | `/muppet_streamer_aggressive_driver {"target":"muppet9010", "duration":30, "commandeerVehicle":false}` |
-| only teleport in to a train type | `/muppet_streamer_aggressive_driver {"target":"muppet9010", "duration":30, "teleportDistance":100, "teleportWhitelistTypes":"locomotive,cargo-wagon,fluid-wagon,artillery-wagon"}` |
-| don't aggressively walk if no vehicle is found | `/muppet_streamer_aggressive_driver {"target":"muppet9010", "duration":30, "teleportDistance":100, "aggressiveWalking":"never"}` |
+| standard usage with teleport to a near vehicle | `/muppet_streamer_v2_aggressive_driver {"target":"muppet9010", "duration":30, "teleportDistance":100}` |
+| only be aggressive if currently driving a vehicle | `/muppet_streamer_v2_aggressive_driver {"target":"muppet9010", "duration":30, "commandeerVehicle":false}` |
+| only teleport in to a train type | `/muppet_streamer_v2_aggressive_driver {"target":"muppet9010", "duration":30, "teleportDistance":100, "teleportWhitelistTypes":"locomotive,cargo-wagon,fluid-wagon,artillery-wagon"}` |
+| don't aggressively walk if no vehicle is found | `/muppet_streamer_v2_aggressive_driver {"target":"muppet9010", "duration":30, "teleportDistance":100, "aggressiveWalking":"never"}` |
 
 </p>
 </details>
@@ -109,6 +109,6 @@ You can make yourself just walk aggressively by having the game eject you from a
 local player = game.get_player(playerName);
 if player ~= nil then;
     player.driving = false;
-    remote.call('muppet_streamer', 'run_command', 'muppet_streamer_aggressive_driver', {target=playerName, duration=30});
+    remote.call('muppet_streamer_v2', 'run_command', 'muppet_streamer_v2_aggressive_driver', {target=playerName, duration=30});
 end;
 ```

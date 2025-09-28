@@ -7,14 +7,14 @@ local CommandsUtils = require("utility.helper-utils.commands-utils")
 local LoggingUtils = require("utility.helper-utils.logging-utils")
 
 TeamMember.CreateGlobals = function()
-    global.teamMember = global.teamMember or {} ---@class TeamMember_Global
-    global.teamMember.recruitedMaxCount = global.teamMember.recruitedMaxCount or 0 ---@type uint
-    global.teamMember.playerGuiOpened = global.teamMember.playerGuiOpened or {} ---@type table<uint, boolean> # Key'd by player_index.
-    global.teamMember.recruitTeamMemberTitle = global.teamMember.recruitTeamMemberTitle or "" ---@type string
+    storage.teamMember = storage.teamMember or {} ---@class TeamMember_Global
+    storage.teamMember.recruitedMaxCount = storage.teamMember.recruitedMaxCount or 0 ---@type uint
+    storage.teamMember.playerGuiOpened = storage.teamMember.playerGuiOpened or {} ---@type table<uint, boolean> # Key'd by player_index.
+    storage.teamMember.recruitTeamMemberTitle = storage.teamMember.recruitTeamMemberTitle or "" ---@type string
 end
 
 TeamMember.OnLoad = function()
-    if settings.startup["muppet_streamer-recruit_team_member_technology_cost"].value --[[@as int]] < 0 then
+    if settings.startup["muppet_streamer_v2-recruit_team_member_technology_cost"].value --[[@as int]] < 0 then
         return
     end
 
@@ -22,11 +22,11 @@ TeamMember.OnLoad = function()
     Events.RegisterHandlerEvent(defines.events.on_lua_shortcut, "TeamMember", TeamMember.OnLuaShortcut)
     Events.RegisterHandlerEvent(defines.events.on_player_joined_game, "TeamMember", TeamMember.OnPlayerJoinedGame)
     Events.RegisterHandlerEvent(defines.events.on_player_left_game, "TeamMember", TeamMember.OnPlayerLeftGame)
-    CommandsUtils.Register("muppet_streamer_change_team_member_max", { "api-description.muppet_streamer_change_team_member_max" }, TeamMember.CommandChangeTeamMemberLevel, true)
+    CommandsUtils.Register("muppet_streamer_v2_change_team_member_max", { "api-description.muppet_streamer_v2_change_team_member_max" }, TeamMember.CommandChangeTeamMemberLevel, true)
 end
 
 TeamMember.OnStartup = function()
-    if settings.startup["muppet_streamer-recruit_team_member_technology_cost"].value --[[@as int]] < 0 then
+    if settings.startup["muppet_streamer_v2-recruit_team_member_technology_cost"].value --[[@as int]] < 0 then
         return
     end
 
@@ -39,16 +39,16 @@ TeamMember.OnSettingChanged = function(event)
     if event ~= nil then
         settingName = event.setting
     end
-    if (settingName == nil or settingName == "muppet_streamer-recruited_team_member_gui_title") then
-        global.teamMember.recruitTeamMemberTitle = settings.global["muppet_streamer-recruited_team_member_gui_title"].value --[[@as string]]
+    if (settingName == nil or settingName == "muppet_streamer_v2-recruited_team_member_gui_title") then
+        storage.teamMember.recruitTeamMemberTitle = settings.global["muppet_streamer_v2-recruited_team_member_gui_title"].value --[[@as string]]
     end
 end
 
 ---@param event on_research_finished
 TeamMember.OnResearchFinished = function(event)
     local technology = event.research
-    if string.find(technology.name, "muppet_streamer-recruit_team_member", 0, true) then
-        global.teamMember.recruitedMaxCount = technology.level
+    if string.find(technology.name, "muppet_streamer_v2-recruit_team_member", 0, true) then
+        storage.teamMember.recruitedMaxCount = technology.level
         TeamMember.GuiUpdateForAll()
     end
 end
@@ -56,13 +56,13 @@ end
 ---@param event on_lua_shortcut
 TeamMember.OnLuaShortcut = function(event)
     local shortcutName = event.prototype_name
-    if shortcutName == "muppet_streamer-team_member_gui_button" then
+    if shortcutName == "muppet_streamer_v2-team_member_gui_button" then
         local player = game.get_player(event.player_index)
         if player == nil then
-            LoggingUtils.LogPrintWarning("ERROR: muppet_streamer team member feature: Player has been deleted since the player clicked the shortcut button.")
+            LoggingUtils.LogPrintWarning("ERROR: muppet_streamer_v2 team member feature: Player has been deleted since the player clicked the shortcut button.")
             return
         end
-        if global.teamMember.playerGuiOpened[player.index] then
+        if storage.teamMember.playerGuiOpened[player.index] then
             TeamMember.GuiCloseForPlayer(player)
         else
             TeamMember.GuiOpenForPlayer(player)
@@ -73,10 +73,10 @@ end
 ---@param event on_player_joined_game
 TeamMember.OnPlayerJoinedGame = function(event)
     local playerIndex = event.player_index
-    global.teamMember.playerGuiOpened[playerIndex] = global.teamMember.playerGuiOpened[playerIndex] or true
+    storage.teamMember.playerGuiOpened[playerIndex] = storage.teamMember.playerGuiOpened[playerIndex] or true
     local player = game.get_player(playerIndex)
     if player == nil then
-        LoggingUtils.LogPrintWarning("ERROR: muppet_streamer team member feature: Player has been deleted while they were joining the server.")
+        LoggingUtils.LogPrintWarning("ERROR: muppet_streamer_v2 team member feature: Player has been deleted while they were joining the server.")
         return
     end
     TeamMember.GuiRecreateForPlayer(player)
@@ -96,7 +96,7 @@ end
 ---@param player LuaPlayer
 TeamMember.GuiRecreateForPlayer = function(player)
     GuiUtil.DestroyPlayersReferenceStorage(player.index, "TeamMember")
-    if not global.teamMember.playerGuiOpened[player.index] then
+    if not storage.teamMember.playerGuiOpened[player.index] then
         return
     end
     TeamMember.GuiOpenForPlayer(player)
@@ -104,15 +104,15 @@ end
 
 ---@param player LuaPlayer
 TeamMember.GuiOpenForPlayer = function(player)
-    global.teamMember.playerGuiOpened[player.index] = true
-    player.set_shortcut_toggled("muppet_streamer-team_member_gui_button", true)
+    storage.teamMember.playerGuiOpened[player.index] = true
+    player.set_shortcut_toggled("muppet_streamer_v2-team_member_gui_button", true)
     TeamMember.GuiCreateForPlayer(player)
 end
 
 ---@param player LuaPlayer
 TeamMember.GuiCloseForPlayer = function(player)
-    global.teamMember.playerGuiOpened[player.index] = false
-    player.set_shortcut_toggled("muppet_streamer-team_member_gui_button", false)
+    storage.teamMember.playerGuiOpened[player.index] = false
+    player.set_shortcut_toggled("muppet_streamer_v2-team_member_gui_button", false)
     GuiUtil.DestroyPlayersReferenceStorage(player.index, "TeamMember")
 end
 
@@ -155,27 +155,27 @@ end
 
 ---@param player LuaPlayer
 TeamMember.GuiUpdateForPlayer = function(player)
-    if not global.teamMember.playerGuiOpened[player.index] then
+    if not storage.teamMember.playerGuiOpened[player.index] then
         return
     end
-    GuiUtil.UpdateElementFromPlayersReferenceStorage(player.index, "TeamMember", "team_members_recruited", "label", { caption = { "self", global.teamMember.recruitTeamMemberTitle, #game.connected_players - 1, global.teamMember.recruitedMaxCount } }, false)
+    GuiUtil.UpdateElementFromPlayersReferenceStorage(player.index, "TeamMember", "team_members_recruited", "label", { caption = { "self", storage.teamMember.recruitTeamMemberTitle, #game.connected_players - 1, storage.teamMember.recruitedMaxCount } }, false)
 end
 
 ---@param changeQuantity int
 TeamMember.RemoteIncreaseTeamMemberLevel = function(changeQuantity)
-    local errorMessageStartText = "ERROR: muppet_streamer_change_team_member_max remote interface "
-    if settings.startup["muppet_streamer-recruit_team_member_technology_cost"].value --[[@as int]] ~= 0 then
+    local errorMessageStartText = "ERROR: muppet_streamer_v2_change_team_member_max remote interface "
+    if settings.startup["muppet_streamer_v2-recruit_team_member_technology_cost"].value --[[@as int]] ~= 0 then
         LoggingUtils.LogPrintError(errorMessageStartText .. " is only suitable for use when technology researches aren't being used.")
         return
     end
-    global.teamMember.recruitedMaxCount = global.teamMember.recruitedMaxCount + changeQuantity
+    storage.teamMember.recruitedMaxCount = storage.teamMember.recruitedMaxCount + changeQuantity
     TeamMember.GuiUpdateForAll()
 end
 
 ---@param command CustomCommandData
 TeamMember.CommandChangeTeamMemberLevel = function(command)
     local args = CommandsUtils.GetArgumentsFromCommand(command.parameter)
-    local errorMessageStartText = "ERROR: muppet_streamer_change_team_member_max command "
+    local errorMessageStartText = "ERROR: muppet_streamer_v2_change_team_member_max command "
     if #args ~= 1 then
         LoggingUtils.LogPrintError(errorMessageStartText .. "requires a value to be provided to change the level by.")
         LoggingUtils.LogPrintError(errorMessageStartText .. "received text: " .. command.parameter)
@@ -191,13 +191,13 @@ TeamMember.CommandChangeTeamMemberLevel = function(command)
         changeValue = math.floor(changeValue) ---@type int
     end
 
-    if settings.startup["muppet_streamer-recruit_team_member_technology_cost"].value --[[@as int]] ~= 0 then
+    if settings.startup["muppet_streamer_v2-recruit_team_member_technology_cost"].value --[[@as int]] ~= 0 then
         LoggingUtils.LogPrintError(errorMessageStartText .. " is only suitable for use when technology researches aren't being used.")
         LoggingUtils.LogPrintError(errorMessageStartText .. "received text: " .. command.parameter)
         return
     end
 
-    global.teamMember.recruitedMaxCount = global.teamMember.recruitedMaxCount + changeValue
+    storage.teamMember.recruitedMaxCount = storage.teamMember.recruitedMaxCount + changeValue
     TeamMember.GuiUpdateForAll()
 end
 

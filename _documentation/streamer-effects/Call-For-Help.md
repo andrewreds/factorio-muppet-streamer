@@ -32,7 +32,7 @@ Note: all examples target the player named `muppet9010`, you will need to replac
 <details><summary>show details</summary>
 <p>
 
-Remote Interface Syntax: `/sc remote.call('muppet_streamer', 'run_command', 'muppet_streamer_call_for_help', [OPTIONS TABLE])`
+Remote Interface Syntax: `/sc remote.call('muppet_streamer_v2', 'run_command', 'muppet_streamer_v2_call_for_help', [OPTIONS TABLE])`
 
 The options must be provided as a Lua table.
 
@@ -40,8 +40,8 @@ Examples:
 
 | Example | Code |
 | --- | --- |
-| call in the greater of either 3 or 50% of valid players | `/sc remote.call('muppet_streamer', 'run_command', 'muppet_streamer_call_for_help', {target="muppet9010", callSelection="random", number=3, activePercentage=50})` |
-| call in all the players nearby | `/sc remote.call('muppet_streamer', 'run_command', 'muppet_streamer_call_for_help', {target="muppet9010", callRadius=200, callSelection="random", activePercentage=100})` |
+| call in the greater of either 3 or 50% of valid players | `/sc remote.call('muppet_streamer_v2', 'run_command', 'muppet_streamer_v2_call_for_help', {target="muppet9010", callSelection="random", number=3, activePercentage=50})` |
+| call in all the players nearby | `/sc remote.call('muppet_streamer_v2', 'run_command', 'muppet_streamer_v2_call_for_help', {target="muppet9010", callRadius=200, callSelection="random", activePercentage=100})` |
 
 
 Further details and more advanced usage of using Remote Interfaces can be found here on the [Streamer Effect Options Syntax Wiki page](https://github.com/muppet9010/factorio-muppet-streamer/wiki/Streamer-Effect-Options-Syntax).
@@ -56,7 +56,7 @@ Further details and more advanced usage of using Remote Interfaces can be found 
 <details><summary>show details</summary>
 <p>
 
-Command Syntax: `/muppet_streamer_call_for_help [OPTIONS TABLE AS JSON STRING]`
+Command Syntax: `/muppet_streamer_v2_call_for_help [OPTIONS TABLE AS JSON STRING]`
 
 The effect's options must be provided as a JSON string of a table.
 
@@ -64,8 +64,8 @@ Examples:
 
 | Example | Code |
 | --- | --- |
-| call in the greater of either 3 or 50% of valid players | `/muppet_streamer_call_for_help {"target":"muppet9010", "callSelection":"random", "number":3, "activePercentage":50}` |
-| call in all the players nearby | `/muppet_streamer_call_for_help {"target":"muppet9010", "callRadius":200, "callSelection":"random", "activePercentage":100}` |
+| call in the greater of either 3 or 50% of valid players | `/muppet_streamer_v2_call_for_help {"target":"muppet9010", "callSelection":"random", "number":3, "activePercentage":50}` |
+| call in all the players nearby | `/muppet_streamer_v2_call_for_help {"target":"muppet9010", "callRadius":200, "callSelection":"random", "activePercentage":100}` |
 
 </p>
 </details>

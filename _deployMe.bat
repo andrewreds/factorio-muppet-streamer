@@ -5,7 +5,7 @@
 REM GET CURRENT NAMES AND VERSIONS
 SET folderpath=%cd%
 SET batchfilename=%~n0%~x0
-SET factoriofolder=C:\FactorioModding
+SET factoriofolder=A:\FactorioModding
 
 
 REM GET VERSION AND MOD NAME FROM INFO FILE

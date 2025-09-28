@@ -6,17 +6,17 @@ local TableUtils = require("utility.helper-utils.table-utils")
 -- List the new base name to the old stream and fire.
 local spitsToCreate = {
     {
-        newNameBase = "muppet_streamer-small_spit",
+        newNameBase = "muppet_streamer_v2-small_spit",
         oldSpitName = "acid-stream-spitter-small",
         oldFireName = "acid-splash-fire-spitter-small"
     },
     {
-        newNameBase = "muppet_streamer-medium_spit",
+        newNameBase = "muppet_streamer_v2-medium_spit",
         oldSpitName = "acid-stream-worm-medium",
         oldFireName = "acid-splash-fire-worm-medium"
     },
     {
-        newNameBase = "muppet_streamer-large_spit",
+        newNameBase = "muppet_streamer_v2-large_spit",
         oldSpitName = "acid-stream-worm-behemoth",
         oldFireName = "acid-splash-fire-worm-behemoth"
     }
@@ -51,13 +51,14 @@ for _, details in pairs(spitsToCreate) do
 
     -- Make the sounds twice as loud so they are actually hear-able.
     ---@cast spitStreamImpactSound_PlaySoundTriggerEffectItems PlaySoundTriggerEffectItem
-    for _, soundEffectItem in pairs(spitStreamImpactSound_PlaySoundTriggerEffectItems.sound) do
+    for _, soundEffectItem in pairs(spitStreamImpactSound_PlaySoundTriggerEffectItems.sound.variations) do
         soundEffectItem.volume = soundEffectItem.volume * 2
     end
 
     local spitFire = TableUtils.DeepCopy(data.raw["fire"][details.oldFireName])
     spitFire.name = details.newNameBase .. "-fire"
-    local newCreatedEffect = { type = "direct",
+    local newCreatedEffect = {
+        type = "direct",
         action_delivery =
         {
             type = "instant",

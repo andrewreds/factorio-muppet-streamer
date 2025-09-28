@@ -48,16 +48,16 @@ local EffectEndStatus = {
 ---@field ammoPrototype LuaItemPrototype
 ---@field suppressMessages boolean
 
-local CommandName = "muppet_streamer_malfunctioning_weapon"
+local CommandName = "muppet_streamer_v2_malfunctioning_weapon"
 
 MalfunctioningWeapon.CreateGlobals = function()
-    global.malfunctioningWeapon = global.malfunctioningWeapon or {} ---@class MalfunctioningWeapon_Global
-    global.malfunctioningWeapon.affectedPlayers = global.malfunctioningWeapon.affectedPlayers or {} ---@type table<uint, MalfunctioningWeapon_AffectedPlayerDetails> # Key'd by player_index.
-    global.malfunctioningWeapon.nextId = global.malfunctioningWeapon.nextId or 0 ---@type uint
+    storage.malfunctioningWeapon = storage.malfunctioningWeapon or {} ---@class MalfunctioningWeapon_Global
+    storage.malfunctioningWeapon.affectedPlayers = storage.malfunctioningWeapon.affectedPlayers or {} ---@type table<uint, MalfunctioningWeapon_AffectedPlayerDetails> # Key'd by player_index.
+    storage.malfunctioningWeapon.nextId = storage.malfunctioningWeapon.nextId or 0 ---@type uint
 end
 
 MalfunctioningWeapon.OnLoad = function()
-    CommandsUtils.Register("muppet_streamer_malfunctioning_weapon", { "api-description.muppet_streamer_malfunctioning_weapon" }, MalfunctioningWeapon.MalfunctioningWeaponCommand, true)
+    CommandsUtils.Register("muppet_streamer_v2_malfunctioning_weapon", { "api-description.muppet_streamer_v2_malfunctioning_weapon" }, MalfunctioningWeapon.MalfunctioningWeaponCommand, true)
     EventScheduler.RegisterScheduledEventType("MalfunctioningWeapon.ShootWeapon", MalfunctioningWeapon.ShootWeapon)
     Events.RegisterHandlerEvent(defines.events.on_pre_player_died, "MalfunctioningWeapon.OnPrePlayerDied", MalfunctioningWeapon.OnPrePlayerDied)
     EventScheduler.RegisterScheduledEventType("MalfunctioningWeapon.ApplyToPlayer", MalfunctioningWeapon.ApplyToPlayer)
@@ -102,7 +102,7 @@ MalfunctioningWeapon.MalfunctioningWeaponCommand = function(command)
     if not valid then return end
     if weaponPrototype == nil then
         -- No custom weapon set, so use the base game weapon and confirm its valid.
-        weaponPrototype = game.item_prototypes["flamethrower"]
+        weaponPrototype = prototypes.item["flamethrower"]
         if weaponPrototype == nil or weaponPrototype.type ~= "gun" then
             CommandsUtils.LogPrintError(CommandName, nil, "tried to use base game 'flamethrower' weapon, but it doesn't exist in this save.", command.parameter)
             return
@@ -113,7 +113,7 @@ MalfunctioningWeapon.MalfunctioningWeaponCommand = function(command)
     if not valid then return end
     if ammoPrototype == nil then
         -- No custom ammo set, so use the base game ammo and confirm its valid.
-        ammoPrototype = game.item_prototypes["flamethrower-ammo"]
+        ammoPrototype = prototypes.item["flamethrower-ammo"]
         if ammoPrototype == nil or ammoPrototype.type ~= "ammo" then
             CommandsUtils.LogPrintError(CommandName, nil, "tried to use base game 'flamethrower-ammo' ammo, but it doesn't exist in this save.", command.parameter)
             return
@@ -122,7 +122,8 @@ MalfunctioningWeapon.MalfunctioningWeaponCommand = function(command)
 
     --Check that the ammo is suitable for our needs.
     local ammoType = ammoPrototype.get_ammo_type("player") ---@cast ammoType -nil # We've already validated this is of type ammo.
-    if not PlayerWeapon.IsAmmoCompatibleWithWeapon(ammoType, weaponPrototype) then
+    local ammoCategory = ammoPrototype.ammo_category.name
+    if not PlayerWeapon.IsAmmoCompatibleWithWeapon(ammoCategory, weaponPrototype) then
         CommandsUtils.LogPrintError(CommandName, nil, "ammo isn't compatible with the weapon.", command.parameter)
         return
     end
@@ -143,14 +144,14 @@ MalfunctioningWeapon.MalfunctioningWeaponCommand = function(command)
     -- Some modded weapons may have a reload time greater than the delay setting and so we must wait for this otherwise we can't start shooting when we expect.
     reloadTicks = math.max(reloadTicks, ammoPrototype.reload_time)
 
-    global.malfunctioningWeapon.nextId = global.malfunctioningWeapon.nextId + 1 ---@type uint # Needed for weird bug reason, maybe in Sumneko or maybe the plugin with its fake global.
+    storage.malfunctioningWeapon.nextId = storage.malfunctioningWeapon.nextId + 1 ---@type uint # Needed for weird bug reason, maybe in Sumneko or maybe the plugin with its fake storage.
     ---@type MalfunctioningWeapon_ScheduledEventDetails
     local scheduledEventDetails = { target = target, ammoCount = ammoCount, reloadTicks = reloadTicks, weaponPrototype = weaponPrototype, ammoPrototype = ammoPrototype, suppressMessages = suppressMessages }
     if scheduleTick ~= -1 then
-        EventScheduler.ScheduleEventOnce(scheduleTick, "MalfunctioningWeapon.ApplyToPlayer", global.malfunctioningWeapon.nextId, scheduledEventDetails)
+        EventScheduler.ScheduleEventOnce(scheduleTick, "MalfunctioningWeapon.ApplyToPlayer", storage.malfunctioningWeapon.nextId, scheduledEventDetails)
     else
         ---@type UtilityScheduledEvent_CallbackObject
-        local eventData = { tick = command.tick, name = "MalfunctioningWeapon.ApplyToPlayer", instanceId = global.malfunctioningWeapon.nextId, data = scheduledEventDetails }
+        local eventData = { tick = command.tick, name = "MalfunctioningWeapon.ApplyToPlayer", instanceId = storage.malfunctioningWeapon.nextId, data = scheduledEventDetails }
         MalfunctioningWeapon.ApplyToPlayer(eventData)
     end
 end
@@ -166,7 +167,7 @@ MalfunctioningWeapon.ApplyToPlayer = function(eventData)
     end
     local targetPlayer_index, targetPlayer_character = targetPlayer.index, targetPlayer.character
     if targetPlayer.controller_type ~= defines.controllers.character or targetPlayer_character == nil then
-        if not data.suppressMessages then game.print({ "message.muppet_streamer_malfunctioning_weapon_not_character_controller", data.target }) end
+        if not data.suppressMessages then game.print({ "message.muppet_streamer_v2_malfunctioning_weapon_not_character_controller", data.target }) end
         return
     end
 
@@ -181,8 +182,8 @@ MalfunctioningWeapon.ApplyToPlayer = function(eventData)
     end
 
     -- If this player already has the effect active then terminate this new instance.
-    if global.malfunctioningWeapon.affectedPlayers[targetPlayer_index] ~= nil then
-        if not data.suppressMessages then game.print({ "message.muppet_streamer_duplicate_command_ignored", "Malfunctioning Weapon", data.target }) end
+    if storage.malfunctioningWeapon.affectedPlayers[targetPlayer_index] ~= nil then
+        if not data.suppressMessages then game.print({ "message.muppet_streamer_v2_duplicate_command_ignored", "Malfunctioning Weapon", data.target }) end
         return
     end
 
@@ -229,10 +230,10 @@ MalfunctioningWeapon.ApplyToPlayer = function(eventData)
     local startingAmmoItemStacksCount, startingAmmoItemStackAmmo = selectedAmmoItemStack.count, selectedAmmoItemStack.ammo
 
     -- Store the players current permission group. Left as the previously stored group if an effect was already being applied to the player, or captured if no present effect affects them.
-    global.originalPlayersPermissionGroup[targetPlayer_index] = global.originalPlayersPermissionGroup[targetPlayer_index] or targetPlayer.permission_group
+    storage.originalPlayersPermissionGroup[targetPlayer_index] = storage.originalPlayersPermissionGroup[targetPlayer_index] or targetPlayer.permission_group
 
     targetPlayer.permission_group = MalfunctioningWeapon.GetOrCreatePermissionGroup()
-    global.malfunctioningWeapon.affectedPlayers[targetPlayer_index] = { weaponGiven = weaponGiven, burstsLeft = data.ammoCount, removedWeaponDetails = removedWeaponDetails, weaponPrototype = data.weaponPrototype, ammoPrototype = data.ammoPrototype, suppressMessages = data.suppressMessages }
+    storage.malfunctioningWeapon.affectedPlayers[targetPlayer_index] = { weaponGiven = weaponGiven, burstsLeft = data.ammoCount, removedWeaponDetails = removedWeaponDetails, weaponPrototype = data.weaponPrototype, ammoPrototype = data.ammoPrototype, suppressMessages = data.suppressMessages }
 
     local startingAngle = math.random(0, 360)
 
@@ -242,7 +243,7 @@ MalfunctioningWeapon.ApplyToPlayer = function(eventData)
     local cooldownTicks = math.max(MathUtils.RoundNumberToDecimalPlaces(cooldown, 0), 1) --[[@as uint]]
     -- One or more ticks (rounded). Anything that fires quicker than once per tick will be slowed down as other code can't handle it.
 
-    if not data.suppressMessages then game.print({ "message.muppet_streamer_malfunctioning_weapon_start", targetPlayer.name, data.weaponPrototype.localised_name }) end
+    if not data.suppressMessages then game.print({ "message.muppet_streamer_v2_malfunctioning_weapon_start", targetPlayer.name, data.weaponPrototype.localised_name }) end
 
     ---@type MalfunctioningWeapon_ShootWeaponDetails
     local ShootWeaponDetails = { player = targetPlayer, angle = startingAngle, distance = startingDistance, currentBurstTicks = 0, burstsDone = 0, maxBursts = data.ammoCount, player_index = targetPlayer_index, usedSomeAmmo = false, startingAmmoItemStacksCount = startingAmmoItemStacksCount, startingAmmoItemStackAmmo = startingAmmoItemStackAmmo, weaponPrototype = data.weaponPrototype, ammoPrototype = data.ammoPrototype, minRange = minRange, maxRange = maxRange, cooldownTicks = cooldownTicks, reloadTicks = data.reloadTicks }
@@ -326,7 +327,7 @@ MalfunctioningWeapon.ShootWeapon = function(eventData)
         -- End of shooting ticks. Ready for next shooting and take break.
         data.currentBurstTicks = 0
         data.burstsDone = data.burstsDone + 1
-        global.malfunctioningWeapon.affectedPlayers[playerIndex].burstsLeft = global.malfunctioningWeapon.affectedPlayers[playerIndex].burstsLeft - 1
+        storage.malfunctioningWeapon.affectedPlayers[playerIndex].burstsLeft = storage.malfunctioningWeapon.affectedPlayers[playerIndex].burstsLeft - 1
         player.shooting_state = { state = defines.shooting.not_shooting }
 
         if data.burstsDone == data.maxBursts then
@@ -380,13 +381,13 @@ end
 ---@param player LuaPlayer|nil # Obtained if needed and not provided.
 ---@param status MalfunctioningWeapon_EffectEndStatus
 MalfunctioningWeapon.StopEffectOnPlayer = function(playerIndex, player, status)
-    local affectedPlayerDetails = global.malfunctioningWeapon.affectedPlayers[playerIndex]
+    local affectedPlayerDetails = storage.malfunctioningWeapon.affectedPlayers[playerIndex]
     if affectedPlayerDetails == nil then
         return
     end
 
     -- Remove the flag against this player as being currently affected by the malfunctioning weapon.
-    global.malfunctioningWeapon.affectedPlayers[playerIndex] = nil
+    storage.malfunctioningWeapon.affectedPlayers[playerIndex] = nil
 
     player = player or game.get_player(playerIndex)
     if player == nil then
@@ -412,8 +413,8 @@ MalfunctioningWeapon.StopEffectOnPlayer = function(playerIndex, player, status)
     -- Return the player to their initial permission group.
     if player.permission_group.name == "MalfunctioningWeapon" then
         -- If the permission group has been changed by something else don't set it back to the last non modded one.
-        player.permission_group = global.originalPlayersPermissionGroup[playerIndex]
-        global.originalPlayersPermissionGroup[playerIndex] = nil
+        player.permission_group = storage.originalPlayersPermissionGroup[playerIndex]
+        storage.originalPlayersPermissionGroup[playerIndex] = nil
     end
 
     -- Remove any shooting state set and maintained from previous ticks.
@@ -421,7 +422,7 @@ MalfunctioningWeapon.StopEffectOnPlayer = function(playerIndex, player, status)
 
     -- Print a message based on ending status.
     if status == EffectEndStatus.completed then
-        if not affectedPlayerDetails.suppressMessages then game.print({ "message.muppet_streamer_malfunctioning_weapon_stop", player.name }) end
+        if not affectedPlayerDetails.suppressMessages then game.print({ "message.muppet_streamer_v2_malfunctioning_weapon_stop", player.name }) end
     end
 end
 

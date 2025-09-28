@@ -1,8 +1,8 @@
 local Constants = require("constants")
 
-local recruitTeamMemberCost = tonumber(settings.startup["muppet_streamer-recruit_team_member_technology_cost"].value)
-local recruitTeamMemberTitle = settings.startup["muppet_streamer-recruit_team_member_technology_title"].value
-local recruitTeamMemberDescription = settings.startup["muppet_streamer-recruit_team_member_technology_description"].value
+local recruitTeamMemberCost = tonumber(settings.startup["muppet_streamer_v2-recruit_team_member_technology_cost"].value)
+local recruitTeamMemberTitle = settings.startup["muppet_streamer_v2-recruit_team_member_technology_title"].value
+local recruitTeamMemberDescription = settings.startup["muppet_streamer_v2-recruit_team_member_technology_description"].value
 
 if recruitTeamMemberCost < 0 then
     return
@@ -13,7 +13,7 @@ end
 ---@type Prototype.Technology
 local recruitTeamMemberTechnology_1 = {
     type = "technology",
-    name = "muppet_streamer-recruit_team_member-1",
+    name = "muppet_streamer_v2-recruit_team_member-1",
     icon_size = (140),
     icon = Constants.AssetModName .. "/graphics/technology/recruit_team_member.png",
     prerequisites = {},
@@ -35,15 +35,15 @@ local recruitTeamMemberTechnology_1 = {
 ---@type Prototype.Technology
 local recruitTeamMemberTechnology_2 = {
     type = "technology",
-    name = "muppet_streamer-recruit_team_member-2",
+    name = "muppet_streamer_v2-recruit_team_member-2",
     icon_size = (140),
     icon = Constants.AssetModName .. "/graphics/technology/recruit_team_member.png",
-    prerequisites = { "logistic-science-pack", "muppet_streamer-recruit_team_member-1" },
+    prerequisites = { "logistic-science-pack", "muppet_streamer_v2-recruit_team_member-1" },
     unit = {
         count_formula = recruitTeamMemberCost,
         ingredients = {
             { "automation-science-pack", 1 },
-            { "logistic-science-pack", 1 }
+            { "logistic-science-pack",   1 }
         },
         time = 60
     },
@@ -58,16 +58,16 @@ local recruitTeamMemberTechnology_2 = {
 ---@type Prototype.Technology
 local recruitTeamMemberTechnology_3 = {
     type = "technology",
-    name = "muppet_streamer-recruit_team_member-3",
+    name = "muppet_streamer_v2-recruit_team_member-3",
     icon_size = (140),
     icon = Constants.AssetModName .. "/graphics/technology/recruit_team_member.png",
-    prerequisites = { "muppet_streamer-recruit_team_member-2", "military-science-pack" },
+    prerequisites = { "muppet_streamer_v2-recruit_team_member-2", "military-science-pack" },
     unit = {
         count_formula = recruitTeamMemberCost,
         ingredients = {
             { "automation-science-pack", 1 },
-            { "logistic-science-pack", 1 },
-            { "military-science-pack", 1 }
+            { "logistic-science-pack",   1 },
+            { "military-science-pack",   1 }
         },
         time = 60
     },
@@ -82,17 +82,17 @@ local recruitTeamMemberTechnology_3 = {
 ---@type Prototype.Technology
 local recruitTeamMemberTechnology_4 = {
     type = "technology",
-    name = "muppet_streamer-recruit_team_member-4",
+    name = "muppet_streamer_v2-recruit_team_member-4",
     icon_size = (140),
     icon = Constants.AssetModName .. "/graphics/technology/recruit_team_member.png",
-    prerequisites = { "muppet_streamer-recruit_team_member-3", "chemical-science-pack" },
+    prerequisites = { "muppet_streamer_v2-recruit_team_member-3", "chemical-science-pack" },
     unit = {
         count_formula = recruitTeamMemberCost,
         ingredients = {
             { "automation-science-pack", 1 },
-            { "logistic-science-pack", 1 },
-            { "military-science-pack", 1 },
-            { "chemical-science-pack", 1 }
+            { "logistic-science-pack",   1 },
+            { "military-science-pack",   1 },
+            { "chemical-science-pack",   1 }
         },
         time = 60
     },
@@ -107,17 +107,17 @@ local recruitTeamMemberTechnology_4 = {
 ---@type Prototype.Technology
 local recruitTeamMemberTechnology_5 = {
     type = "technology",
-    name = "muppet_streamer-recruit_team_member-5",
+    name = "muppet_streamer_v2-recruit_team_member-5",
     icon_size = (140),
     icon = Constants.AssetModName .. "/graphics/technology/recruit_team_member.png",
-    prerequisites = { "muppet_streamer-recruit_team_member-4", "production-science-pack" },
+    prerequisites = { "muppet_streamer_v2-recruit_team_member-4", "production-science-pack" },
     unit = {
         count_formula = recruitTeamMemberCost,
         ingredients = {
             { "automation-science-pack", 1 },
-            { "logistic-science-pack", 1 },
-            { "military-science-pack", 1 },
-            { "chemical-science-pack", 1 },
+            { "logistic-science-pack",   1 },
+            { "military-science-pack",   1 },
+            { "chemical-science-pack",   1 },
             { "production-science-pack", 1 }
         },
         time = 60
@@ -133,19 +133,19 @@ local recruitTeamMemberTechnology_5 = {
 ---@type Prototype.Technology
 local recruitTeamMemberTechnology_6 = {
     type = "technology",
-    name = "muppet_streamer-recruit_team_member-6",
+    name = "muppet_streamer_v2-recruit_team_member-6",
     icon_size = (140),
     icon = Constants.AssetModName .. "/graphics/technology/recruit_team_member.png",
-    prerequisites = { "muppet_streamer-recruit_team_member-5", "utility-science-pack" },
+    prerequisites = { "muppet_streamer_v2-recruit_team_member-5", "utility-science-pack" },
     unit = {
         count_formula = recruitTeamMemberCost,
         ingredients = {
             { "automation-science-pack", 1 },
-            { "logistic-science-pack", 1 },
-            { "military-science-pack", 1 },
-            { "chemical-science-pack", 1 },
+            { "logistic-science-pack",   1 },
+            { "military-science-pack",   1 },
+            { "chemical-science-pack",   1 },
             { "production-science-pack", 1 },
-            { "utility-science-pack", 1 }
+            { "utility-science-pack",    1 }
         },
         time = 60
     },
@@ -160,20 +160,20 @@ local recruitTeamMemberTechnology_6 = {
 ---@type Prototype.Technology
 local recruitTeamMemberTechnology_7 = {
     type = "technology",
-    name = "muppet_streamer-recruit_team_member-7",
+    name = "muppet_streamer_v2-recruit_team_member-7",
     icon_size = (140),
     icon = Constants.AssetModName .. "/graphics/technology/recruit_team_member.png",
-    prerequisites = { "muppet_streamer-recruit_team_member-6", "space-science-pack" },
+    prerequisites = { "muppet_streamer_v2-recruit_team_member-6", "space-science-pack" },
     unit = {
         count_formula = "(2^(L-6))*" .. (recruitTeamMemberCost / 2),
         ingredients = {
             { "automation-science-pack", 1 },
-            { "logistic-science-pack", 1 },
-            { "military-science-pack", 1 },
-            { "chemical-science-pack", 1 },
+            { "logistic-science-pack",   1 },
+            { "military-science-pack",   1 },
+            { "chemical-science-pack",   1 },
             { "production-science-pack", 1 },
-            { "utility-science-pack", 1 },
-            { "space-science-pack", 1 }
+            { "utility-science-pack",    1 },
+            { "space-science-pack",      1 }
         },
         time = 60
     },

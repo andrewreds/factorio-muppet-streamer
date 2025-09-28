@@ -69,7 +69,7 @@ SettingsManager.HandleSettingWithArrayOfValues = function(factorioSettingType, f
     local values = settings[factorioSettingType][factorioSettingName].value ---@type boolean|number|string|nil # This is whatever the user has put in the text box.
     local tableOfValues ---@type AnyBasic|nil
     if type(values) == "string" then
-        tableOfValues = game.json_to_table(values)
+        tableOfValues = helpers.json_to_table(values)
     end
 
     local isMultipleGroups
@@ -169,7 +169,7 @@ SettingsManager._ValueToType = function(value, expectedType)
         value = string.gsub(tostring(value), "%%", "")
         return tonumber(value)
     elseif expectedType == SettingsManager.ExpectedValueTypes.boolean then
-        return BooleanUtils.ToBoolean(value--[[@as boolean|string|int]] )
+        return BooleanUtils.ToBoolean(value --[[@as boolean|string|int]])
     elseif expectedType.hasChildren then
         if type(value) ~= "table" then
             return nil

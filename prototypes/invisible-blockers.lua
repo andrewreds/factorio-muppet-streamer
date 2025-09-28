@@ -10,9 +10,9 @@
 
 ---@enum InvisibleBlocker_BlockerType
 local INVISIBLE_BLOCKER_BLOCKER_TYPE = {
-    all = { "player-layer", "train-layer", "object-layer" } --[[@as CollisionMask]],
-    building = { "object-layer" } --[[@as CollisionMask]],
-    train = { "train-layer" } --[[@as CollisionMask]]
+    all = { layers = { player = true, rail = true, object = true } } --[[@as CollisionMask]],
+    building = { layers = { object = true } } --[[@as CollisionMask]],
+    train = { layers = { rail = true } } --[[@as CollisionMask]]
 }
 
 ---@param size uint
@@ -22,14 +22,15 @@ local function CreateBlocker(size, blockerType, collisionMask)
     ---@type data.SimpleEntityPrototype
     local blockerPrototype = {
         type = "simple-entity",
-        name = "muppet_streamer-invisible_blocker-" .. blockerType .. "-" .. size,
-        localised_name = { "entity-name.muppet_streamer-invisible_blocker" },
+        name = "muppet_streamer_v2-invisible_blocker-" .. blockerType .. "-" .. size,
+        localised_name = { "entity-name.muppet_streamer_v2-invisible_blocker" },
         collision_box = { { -size, -size }, { size, size } },
         collision_mask = collisionMask,
         selection_box = { { -size, -size }, { size, size } }, --Only affects editor mode.
         selectable_in_game = false,
         allow_copy_paste = false,
-        flags = { "not-on-map", "not-deconstructable", "not-blueprintable", "hidden", "not-flammable" },
+        flags = { "not-on-map", "not-deconstructable", "not-blueprintable", "not-flammable" },
+        hidden = true,
         remove_decoratives = "false"
     }
 

@@ -45,7 +45,7 @@ end
 ---@return VehicleUtils_BestFuelTrackingTable trackingTable
 VehicleUtils.TrackBestFuelCount = function(itemName, itemCount, trackingTable)
     trackingTable = trackingTable or {}
-    local itemPrototype = game.item_prototypes[itemName]
+    local itemPrototype = prototypes.item[itemName]
     local fuelValue = itemPrototype.fuel_value
     if fuelValue == nil then
         return nil, trackingTable

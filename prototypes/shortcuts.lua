@@ -1,10 +1,10 @@
 local Constants = require("constants")
 
-if tonumber(settings.startup["muppet_streamer-recruit_team_member_technology_cost"].value) >= 0 then
+if tonumber(settings.startup["muppet_streamer_v2-recruit_team_member_technology_cost"].value) >= 0 then
     ---@type Prototype.Shortcut
     local teamMemberGUIButton = {
         type = "shortcut",
-        name = "muppet_streamer-team_member_gui_button",
+        name = "muppet_streamer_v2-team_member_gui_button",
         action = "lua",
         toggleable = true,
         icon = {

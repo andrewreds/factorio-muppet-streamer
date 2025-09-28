@@ -43,16 +43,16 @@ local EffectEndStatus = {
     invalid = "invalid"
 }
 
-local CommandName = "muppet_streamer_pants_on_fire"
+local CommandName = "muppet_streamer_v2_pants_on_fire"
 
 PantsOnFire.CreateGlobals = function()
-    global.PantsOnFire = global.PantsOnFire or {} ---@class PantsOnFire_Global
-    global.PantsOnFire.nextId = global.PantsOnFire.nextId or 0 ---@type uint
-    global.PantsOnFire.affectedPlayers = global.PantsOnFire.affectedPlayers or {} ---@type table<uint, PantsOnFire_AffectedPlayerDetails> # Key'd by player_index.
+    storage.PantsOnFire = storage.PantsOnFire or {} ---@class PantsOnFire_Global
+    storage.PantsOnFire.nextId = storage.PantsOnFire.nextId or 0 ---@type uint
+    storage.PantsOnFire.affectedPlayers = storage.PantsOnFire.affectedPlayers or {} ---@type table<uint, PantsOnFire_AffectedPlayerDetails> # Key'd by player_index.
 end
 
 PantsOnFire.OnLoad = function()
-    CommandsUtils.Register("muppet_streamer_pants_on_fire", { "api-description.muppet_streamer_pants_on_fire" }, PantsOnFire.PantsOnFireCommand, true)
+    CommandsUtils.Register("muppet_streamer_v2_pants_on_fire", { "api-description.muppet_streamer_v2_pants_on_fire" }, PantsOnFire.PantsOnFireCommand, true)
     Events.RegisterHandlerEvent(defines.events.on_pre_player_died, "PantsOnFire.OnPrePlayerDied", PantsOnFire.OnPrePlayerDied)
     EventScheduler.RegisterScheduledEventType("PantsOnFire.WalkCheck", PantsOnFire.WalkCheck)
     EventScheduler.RegisterScheduledEventType("PantsOnFire.ApplyToPlayer", PantsOnFire.ApplyToPlayer)
@@ -61,7 +61,6 @@ end
 
 ---@param command CustomCommandData
 PantsOnFire.PantsOnFireCommand = function(command)
-
     local commandData = CommandsUtils.GetSettingsTableFromCommandParameterString(command.parameter, true, CommandName, { "delay", "target", "duration", "fireHeadStart", "fireGap", "flameCount", "fireType", "suppressMessages" })
     if commandData == nil then
         return
@@ -133,14 +132,14 @@ PantsOnFire.PantsOnFireCommand = function(command)
         suppressMessages = false
     end
 
-    global.PantsOnFire.nextId = global.PantsOnFire.nextId + 1
+    storage.PantsOnFire.nextId = storage.PantsOnFire.nextId + 1
     ---@type PantsOnFire_ScheduledEventDetails
     local scheduledEventDetails = { target = target, finishTick = finishTick, fireHeadStart = fireHeadStart, fireGap = fireGap, flameCount = flameCount, firePrototype = firePrototype, suppressMessages = suppressMessages }
     if scheduleTick ~= -1 then
-        EventScheduler.ScheduleEventOnce(scheduleTick, "PantsOnFire.ApplyToPlayer", global.PantsOnFire.nextId, scheduledEventDetails)
+        EventScheduler.ScheduleEventOnce(scheduleTick, "PantsOnFire.ApplyToPlayer", storage.PantsOnFire.nextId, scheduledEventDetails)
     else
         ---@type UtilityScheduledEvent_CallbackObject
-        local eventData = { tick = command.tick, name = "PantsOnFire.ApplyToPlayer", instanceId = global.PantsOnFire.nextId, data = scheduledEventDetails }
+        local eventData = { tick = command.tick, name = "PantsOnFire.ApplyToPlayer", instanceId = storage.PantsOnFire.nextId, data = scheduledEventDetails }
         PantsOnFire.ApplyToPlayer(eventData)
     end
 end
@@ -155,7 +154,7 @@ PantsOnFire.ApplyToPlayer = function(eventData)
         return
     end
     if targetPlayer.controller_type ~= defines.controllers.character or targetPlayer.character == nil then
-        if not data.suppressMessages then game.print({ "message.muppet_streamer_pants_on_fire_not_character_controller", data.target }) end
+        if not data.suppressMessages then game.print({ "message.muppet_streamer_v2_pants_on_fire_not_character_controller", data.target }) end
         return
     end
     local targetPlayer_index = targetPlayer.index
@@ -167,14 +166,14 @@ PantsOnFire.ApplyToPlayer = function(eventData)
     end
 
     -- Effect is already applied to player so don't start a new one.
-    if global.PantsOnFire.affectedPlayers[targetPlayer_index] ~= nil then
-        if not data.suppressMessages then game.print({ "message.muppet_streamer_duplicate_command_ignored", "Pants On Fire", data.target }) end
+    if storage.PantsOnFire.affectedPlayers[targetPlayer_index] ~= nil then
+        if not data.suppressMessages then game.print({ "message.muppet_streamer_v2_duplicate_command_ignored", "Pants On Fire", data.target }) end
         return
     end
 
     -- Start the process on the player.
-    global.PantsOnFire.affectedPlayers[targetPlayer_index] = { suppressMessages = data.suppressMessages, steps = {} }
-    if not data.suppressMessages then game.print({ "message.muppet_streamer_pants_on_fire_start", targetPlayer.name }) end
+    storage.PantsOnFire.affectedPlayers[targetPlayer_index] = { suppressMessages = data.suppressMessages, steps = {} }
+    if not data.suppressMessages then game.print({ "message.muppet_streamer_v2_pants_on_fire_start", targetPlayer.name }) end
 
     -- stepPos starts at 0 so the first step happens at offset 1
     ---@type PantsOnFire_EffectDetails
@@ -194,7 +193,7 @@ PantsOnFire.WalkCheck = function(eventData)
     end
 
     -- Steps is a buffer of the players past position every fireGap tick interval.
-    local affectedPlayerDetails = global.PantsOnFire.affectedPlayers[playerIndex]
+    local affectedPlayerDetails = storage.PantsOnFire.affectedPlayers[playerIndex]
     if affectedPlayerDetails == nil then
         -- Don't process this tick as the effect has been stopped by an external event.
         return
@@ -230,7 +229,7 @@ PantsOnFire.WalkCheck = function(eventData)
         if step.surface.valid then
             -- Factorio auto deletes the fire-flame entity for us.
             -- 20 flames seems the minimum to set a tree on fire.
-            step.surface.create_entity({ name = data.firePrototype.name, position = step.position, initial_ground_flame_count = data.flameCount, force = global.Forces.muppet_streamer_enemy, create_build_effect_smoke = false, raise_built = true })
+            step.surface.create_entity({ name = data.firePrototype.name, position = step.position, initial_ground_flame_count = data.flameCount, force = storage.Forces.muppet_streamer_v2_enemy, create_build_effect_smoke = false, raise_built = true })
         end
     end
 
@@ -258,13 +257,13 @@ end
 ---@param player? LuaPlayer|nil
 ---@param status PantsOnFire_EffectEndStatus
 PantsOnFire.StopEffectOnPlayer = function(playerIndex, player, status)
-    local affectedPlayerDetails = global.PantsOnFire.affectedPlayers[playerIndex]
+    local affectedPlayerDetails = storage.PantsOnFire.affectedPlayers[playerIndex]
     if affectedPlayerDetails == nil then
         return
     end
 
     -- Remove the flag against this player as being currently affected by pants on fire.
-    global.PantsOnFire.affectedPlayers[playerIndex] = nil
+    storage.PantsOnFire.affectedPlayers[playerIndex] = nil
 
     player = player or game.get_player(playerIndex)
     if player == nil then
@@ -273,7 +272,7 @@ PantsOnFire.StopEffectOnPlayer = function(playerIndex, player, status)
     end
 
     if status == EffectEndStatus.completed then
-        if not affectedPlayerDetails.suppressMessages then game.print({ "message.muppet_streamer_pants_on_fire_stop", player.name }) end
+        if not affectedPlayerDetails.suppressMessages then game.print({ "message.muppet_streamer_v2_pants_on_fire_stop", player.name }) end
     end
 end
 

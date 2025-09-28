@@ -20,4 +20,4 @@ Teleport.FindExistingSpawnersOnAllSurfaces = function()
     return surfacesSpawners
 end
 
-global.teleport.surfaceBiterNests = Teleport.FindExistingSpawnersOnAllSurfaces()
+storage.teleport.surfaceBiterNests = Teleport.FindExistingSpawnersOnAllSurfaces()

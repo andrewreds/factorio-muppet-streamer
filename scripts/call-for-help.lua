@@ -16,8 +16,8 @@ local CallSelection = {
     nearest = "nearest"
 }
 
-local SinglePlayerTesting = false -- Set to true to let yourself go to your own support.
-local MaxRandomPositionsAroundTargetToTry = 50 -- Was 10, but upped to reduce odd vehicle rotation issues.
+local SinglePlayerTesting = false                -- Set to true to let yourself go to your own support.
+local MaxRandomPositionsAroundTargetToTry = 50   -- Was 10, but upped to reduce odd vehicle rotation issues.
 local MaxDistancePositionAroundTarget = 10.0 ---@type double
 local MaxPathfinderAttemptsForTargetLocation = 5 -- How many times the mod tries per player once it finds a valid placement position that then has a pathing request return false.
 
@@ -61,17 +61,17 @@ local MaxPathfinderAttemptsForTargetLocation = 5 -- How many times the mod tries
 ---@field player LuaPlayer
 ---@field distance double
 
-local CommandName = "muppet_streamer_call_for_help"
+local CommandName = "muppet_streamer_v2_call_for_help"
 
 CallForHelp.CreateGlobals = function()
-    global.callForHelp = global.callForHelp or {} ---@class CallForHelp_Global
-    global.callForHelp.nextId = global.callForHelp.nextId or 0 ---@type uint
-    global.callForHelp.pathingRequests = global.callForHelp.pathingRequests or {} ---@type table<uint, CallForHelp_PathRequestObject> # Key'd to the pathing request Ids,
-    global.callForHelp.callForHelpIds = global.callForHelp.callForHelpIds or {} ---@type table<uint, CallForHelp_CallForHelpObject> # Key'd to the callForHelp Ids.
+    storage.callForHelp = storage.callForHelp or {} ---@class CallForHelp_Global
+    storage.callForHelp.nextId = storage.callForHelp.nextId or 0 ---@type uint
+    storage.callForHelp.pathingRequests = storage.callForHelp.pathingRequests or {} ---@type table<uint, CallForHelp_PathRequestObject> # Key'd to the pathing request Ids,
+    storage.callForHelp.callForHelpIds = storage.callForHelp.callForHelpIds or {} ---@type table<uint, CallForHelp_CallForHelpObject> # Key'd to the callForHelp Ids.
 end
 
 CallForHelp.OnLoad = function()
-    CommandsUtils.Register("muppet_streamer_call_for_help", { "api-description.muppet_streamer_call_for_help" }, CallForHelp.CallForHelpCommand, true)
+    CommandsUtils.Register("muppet_streamer_v2_call_for_help", { "api-description.muppet_streamer_v2_call_for_help" }, CallForHelp.CallForHelpCommand, true)
     EventScheduler.RegisterScheduledEventType("CallForHelp.CallForHelp", CallForHelp.CallForHelp)
     Events.RegisterHandlerEvent(defines.events.on_script_path_request_finished, "CallForHelp.OnScriptPathRequestFinished", CallForHelp.OnScriptPathRequestFinished)
     MOD.Interfaces.Commands.CallForHelp = CallForHelp.CallForHelpCommand
@@ -79,7 +79,6 @@ end
 
 ---@param command CustomCommandData
 CallForHelp.CallForHelpCommand = function(command)
-
     local commandData = CommandsUtils.GetSettingsTableFromCommandParameterString(command.parameter, true, CommandName, { "delay", "target", "arrivalRadius", "callRadius", "sameSurfaceOnly", "sameTeamOnly", "blacklistedPlayerNames", "whitelistedPlayerNames", "callSelection", "number", "activePercentage", "suppressMessages" })
     if commandData == nil then
         return
@@ -185,14 +184,14 @@ CallForHelp.CallForHelpCommand = function(command)
         suppressMessages = false
     end
 
-    global.callForHelp.nextId = global.callForHelp.nextId + 1
+    storage.callForHelp.nextId = storage.callForHelp.nextId + 1
     ---@type CallForHelp_DelayedCommandDetails
-    local delayedCommandDetails = { callForHelpId = global.callForHelp.nextId, target = target, arrivalRadius = arrivalRadius, callRadius = callRadius, sameTeamOnly = sameTeamOnly, sameSurfaceOnly = sameSurfaceOnly, blacklistedPlayerNames = blacklistedPlayerNames, whitelistedPlayerNames = whitelistedPlayerNames, callSelection = callSelection, number = number, activePercentage = activePercentage, suppressMessages = suppressMessages }
+    local delayedCommandDetails = { callForHelpId = storage.callForHelp.nextId, target = target, arrivalRadius = arrivalRadius, callRadius = callRadius, sameTeamOnly = sameTeamOnly, sameSurfaceOnly = sameSurfaceOnly, blacklistedPlayerNames = blacklistedPlayerNames, whitelistedPlayerNames = whitelistedPlayerNames, callSelection = callSelection, number = number, activePercentage = activePercentage, suppressMessages = suppressMessages }
     if scheduleTick ~= -1 then
-        EventScheduler.ScheduleEventOnce(scheduleTick, "CallForHelp.CallForHelp", global.callForHelp.nextId, delayedCommandDetails)
+        EventScheduler.ScheduleEventOnce(scheduleTick, "CallForHelp.CallForHelp", storage.callForHelp.nextId, delayedCommandDetails)
     else
         ---@type UtilityScheduledEvent_CallbackObject
-        local eventData = { tick = command.tick, name = "CallForHelp.CallForHelp", instanceId = global.callForHelp.nextId, data = delayedCommandDetails }
+        local eventData = { tick = command.tick, name = "CallForHelp.CallForHelp", instanceId = storage.callForHelp.nextId, data = delayedCommandDetails }
         CallForHelp.CallForHelp(eventData)
     end
 end
@@ -207,7 +206,7 @@ CallForHelp.CallForHelp = function(eventData)
         return
     end
     if targetPlayer.controller_type ~= defines.controllers.character then
-        if not data.suppressMessages then game.print({ "message.muppet_streamer_call_for_help_not_character_controller", data.target }) end
+        if not data.suppressMessages then game.print({ "message.muppet_streamer_v2_call_for_help_not_character_controller", data.target }) end
         return
     end
 
@@ -246,7 +245,7 @@ CallForHelp.CallForHelp = function(eventData)
     -- Work out the max number of players that can be called to help at present.
     local maxPlayers = math.max(data.number, math.floor(data.activePercentage * #availablePlayers))
     if maxPlayers <= 0 then
-        if not data.suppressMessages then game.print({ "message.muppet_streamer_call_for_help_no_players_found", targetPlayer.name }) end
+        if not data.suppressMessages then game.print({ "message.muppet_streamer_v2_call_for_help_no_players_found", targetPlayer.name }) end
         return
     end
 
@@ -274,7 +273,7 @@ CallForHelp.CallForHelp = function(eventData)
         end
     end
     if #helpPlayersInRange == 0 then
-        if not data.suppressMessages then game.print({ "message.muppet_streamer_call_for_help_no_players_found", targetPlayer.name }) end
+        if not data.suppressMessages then game.print({ "message.muppet_streamer_v2_call_for_help_no_players_found", targetPlayer.name }) end
         return
     end
 
@@ -332,11 +331,10 @@ CallForHelp.CallForHelp = function(eventData)
     end
 
     -- Store the initial details for the call and start the process for each player trying to come to help.
-    if not data.suppressMessages then game.print({ "message.muppet_streamer_call_for_help_start", targetPlayer.name }) end
-    global.callForHelp.callForHelpIds[data.callForHelpId] = { callForHelpId = data.callForHelpId, pendingPathRequests = {} }
+    if not data.suppressMessages then game.print({ "message.muppet_streamer_v2_call_for_help_start", targetPlayer.name }) end
+    storage.callForHelp.callForHelpIds[data.callForHelpId] = { callForHelpId = data.callForHelpId, pendingPathRequests = {} }
     local helpPlayer_moved, freeTrainCarriage, freeTrainCarriage_index, helpPlayer_vehicle, helpPlayer_vehicle_type, helpPlayer_canGoInTargetsVehicle
     for _, helpPlayer in pairs(helpPlayers) do
-
         -- Put player in to the current player's vehicle first if possible.
         helpPlayer_moved = false
         if teleportHelpToVehicle then
@@ -414,7 +412,7 @@ CallForHelp.PlanTeleportHelpPlayer = function(helpPlayer, arrivalRadius, targetP
             pathRequestId = pathRequestId,
             helpPlayer = helpPlayer,
             helpPlayerPlacementEntity = teleportResponse.targetPlayerTeleportEntity,
-            helpPlayerForce = helpPlayer.force --[[@as LuaForce # read/write work around]] ,
+            helpPlayerForce = helpPlayer.force --[[@as LuaForce # read/write work around]],
             helpPlayerSurface = helpPlayer.surface,
             targetPlayer = targetPlayer,
             targetPlayerPosition = targetPlayerPosition,
@@ -427,13 +425,13 @@ CallForHelp.PlanTeleportHelpPlayer = function(helpPlayer, arrivalRadius, targetP
             sameTeamOnly = sameTeamOnly,
             suppressMessages = suppressMessages
         }
-        global.callForHelp.pathingRequests[pathRequestId] = pathRequestObject
-        global.callForHelp.callForHelpIds[callForHelpId].pendingPathRequests[pathRequestId] = pathRequestObject
+        storage.callForHelp.pathingRequests[pathRequestId] = pathRequestObject
+        storage.callForHelp.callForHelpIds[callForHelpId].pendingPathRequests[pathRequestId] = pathRequestObject
 
         return
     elseif teleportResponse.errorNoValidPositionFound then
         -- No valid position was found to try and teleport too.
-        if not suppressMessages then game.print({ "message.muppet_streamer_call_for_help_no_teleport_location_found", helpPlayer.name, targetPlayer.name }) end
+        if not suppressMessages then game.print({ "message.muppet_streamer_v2_call_for_help_no_teleport_location_found", helpPlayer.name, targetPlayer.name }) end
         return
     elseif teleportResponse.errorTeleportFailed then
         -- Failed to teleport the entity to the specific position.
@@ -446,15 +444,15 @@ end
 ---@param event on_script_path_request_finished
 CallForHelp.OnScriptPathRequestFinished = function(event)
     -- Check if this path request related to a Call For Help.
-    local pathRequest = global.callForHelp.pathingRequests[event.id]
+    local pathRequest = storage.callForHelp.pathingRequests[event.id]
     if pathRequest == nil then
         -- Not our path request
         return
     end
 
     -- Update the globals.
-    global.callForHelp.callForHelpIds[pathRequest.callForHelpId].pendingPathRequests[pathRequest.pathRequestId] = nil
-    global.callForHelp.pathingRequests[event.id] = nil
+    storage.callForHelp.callForHelpIds[pathRequest.callForHelpId].pendingPathRequests[pathRequest.pathRequestId] = nil
+    storage.callForHelp.pathingRequests[event.id] = nil
 
     local helpPlayer = pathRequest.helpPlayer
 
@@ -474,7 +472,7 @@ CallForHelp.OnScriptPathRequestFinished = function(event)
         -- Path request failed
         pathRequest.attempt = pathRequest.attempt + 1
         if pathRequest.attempt > MaxPathfinderAttemptsForTargetLocation then
-            if not pathRequest.suppressMessages then game.print({ "message.muppet_streamer_call_for_help_no_teleport_location_found", helpPlayer.name, pathRequest.targetPlayer.name }) end
+            if not pathRequest.suppressMessages then game.print({ "message.muppet_streamer_v2_call_for_help_no_teleport_location_found", helpPlayer.name, pathRequest.targetPlayer.name }) end
         else
             -- Make another request. Obtain fresh data where needed, but by and large try again with the same target location and details to join others already teleported.
             CallForHelp.PlanTeleportHelpPlayer(helpPlayer, pathRequest.arrivalRadius, pathRequest.targetPlayer, pathRequest.targetPlayerPosition, pathRequest.surface, targetPlayerEntity, pathRequest.callForHelpId, pathRequest.attempt, pathRequest.sameSurfaceOnly, pathRequest.sameTeamOnly, pathRequest.suppressMessages)
@@ -513,7 +511,7 @@ CallForHelp.OnScriptPathRequestFinished = function(event)
         local currentPlayerPlacementEntity, currentPlayerPlacementEntity_isVehicle = PlayerTeleport.GetPlayerTeleportPlacementEntity(helpPlayer, nil)
         if currentPlayerPlacementEntity == nil then
             -- If the helper player doesn't have an entity then nothing further to do for this player.
-            if not pathRequest.suppressMessages then game.print({ "message.muppet_streamer_call_for_help_teleport_action_failed", helpPlayer.name, LoggingUtils.PositionToString(pathRequest.position) }) end
+            if not pathRequest.suppressMessages then game.print({ "message.muppet_streamer_v2_call_for_help_teleport_action_failed", helpPlayer.name, LoggingUtils.PositionToString(pathRequest.position) }) end
             CallForHelp.CheckIfCallForHelpCompleted(pathRequest)
             return
         end
@@ -560,9 +558,9 @@ end
 --- If there's no pending path requests left then this call for help is completed.
 ---@param pathRequest CallForHelp_PathRequestObject
 CallForHelp.CheckIfCallForHelpCompleted = function(pathRequest)
-    if next(global.callForHelp.callForHelpIds[pathRequest.callForHelpId].pendingPathRequests) == nil then
-        if not pathRequest.suppressMessages then game.print({ "message.muppet_streamer_call_for_help_stop", pathRequest.targetPlayer.name }) end
-        global.callForHelp.callForHelpIds[pathRequest.callForHelpId] = nil
+    if next(storage.callForHelp.callForHelpIds[pathRequest.callForHelpId].pendingPathRequests) == nil then
+        if not pathRequest.suppressMessages then game.print({ "message.muppet_streamer_v2_call_for_help_stop", pathRequest.targetPlayer.name }) end
+        storage.callForHelp.callForHelpIds[pathRequest.callForHelpId] = nil
     end
 end
 
@@ -576,7 +574,7 @@ CallForHelp.GetTargetPlayersEntity = function(targetPlayer, suppressMessages)
     local targetPlayerEntity = targetPlayer_vehicle or targetPlayer.character
     if targetPlayerEntity == nil then
         -- Being in a character controller without a character is possible and Space Exploration may do it...
-        if not suppressMessages then game.print({ "message.muppet_streamer_call_for_help_no_character", targetPlayer.name }) end
+        if not suppressMessages then game.print({ "message.muppet_streamer_v2_call_for_help_no_character", targetPlayer.name }) end
         return nil, false
     end
     return targetPlayerEntity, targetPlayer_vehicle ~= nil

@@ -5,19 +5,19 @@ local MathUtils = require("utility.helper-utils.math-utils")
 local customGhostLife = 40000000 ---@type uint # Different to the vanilla value so it can be distinguished. Vanilla adds 36288000 (36million vs 40million).
 
 BuildingGhosts.CreateGlobals = function()
-    global.buildingGhosts = global.buildingGhosts or {} ---@class BuildingGhosts_Global
-    global.buildingGhosts.enabled = global.buildingGhosts.enabled or false ---@type boolean
+    storage.buildingGhosts = storage.buildingGhosts or {} ---@class BuildingGhosts_Global
+    storage.buildingGhosts.enabled = storage.buildingGhosts.enabled or false ---@type boolean
 end
 
 BuildingGhosts.OnStartup = function()
     -- Track changes in setting from last known and apply changes as required.
-    if not global.buildingGhosts.enabled and settings.startup["muppet_streamer-enable_building_ghosts"].value then
-        global.buildingGhosts.enabled = true
+    if not storage.buildingGhosts.enabled and settings.startup["muppet_streamer_v2-enable_building_ghosts"].value then
+        storage.buildingGhosts.enabled = true
         for _, force in pairs(game.forces) do
             BuildingGhosts.EnableForForce(force)
         end
-    elseif global.buildingGhosts.enabled and not settings.startup["muppet_streamer-enable_building_ghosts"].value then
-        global.buildingGhosts.enabled = false
+    elseif storage.buildingGhosts.enabled and not settings.startup["muppet_streamer_v2-enable_building_ghosts"].value then
+        storage.buildingGhosts.enabled = false
         for _, force in pairs(game.forces) do
             BuildingGhosts.DisableForForce(force)
         end
@@ -32,7 +32,7 @@ end
 --- Called when a force is reset or created by a mod/editor and we need to re-apply the ghost setting if enabled.
 ---@param event on_force_reset|on_force_created
 BuildingGhosts.OnForceChanged = function(event)
-    if settings.startup["muppet_streamer-enable_building_ghosts"].value then
+    if settings.startup["muppet_streamer_v2-enable_building_ghosts"].value then
         BuildingGhosts.EnableForForce(event.force)
     end
 end

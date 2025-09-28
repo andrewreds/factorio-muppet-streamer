@@ -53,11 +53,11 @@ GuiActionsClick.RegisterGuiForClick = function(elementName, elementType, actionN
     end
 
     local name = GuiActionsClick._GenerateGuiElementName(elementName, elementType)
-    global.UTILITYGUIACTIONSGUICLICK = global.UTILITYGUIACTIONSGUICLICK or {} ---@type table<string, UtilityGuiActionsClick_GuiClickDetails>
+    storage.UTILITYGUIACTIONSGUICLICK = storage.UTILITYGUIACTIONSGUICLICK or {} ---@type table<string, UtilityGuiActionsClick_GuiClickDetails>
     if not disabled then
-        global.UTILITYGUIACTIONSGUICLICK[name] = { actionName = actionName, data = data }
+        storage.UTILITYGUIACTIONSGUICLICK[name] = { actionName = actionName, data = data }
     else
-        global.UTILITYGUIACTIONSGUICLICK[name] = nil
+        storage.UTILITYGUIACTIONSGUICLICK[name] = nil
     end
 end
 
@@ -70,11 +70,11 @@ GuiActionsClick.RemoveGuiForClick = function(elementName, elementType)
     if elementName == nil then
         error("GuiActions.RemoveButtonName called with missing arguments")
     end
-    if global.UTILITYGUIACTIONSGUICLICK == nil then
+    if storage.UTILITYGUIACTIONSGUICLICK == nil then
         return
     end
     local name = GuiActionsClick._GenerateGuiElementName(elementName, elementType)
-    global.UTILITYGUIACTIONSGUICLICK[name] = nil
+    storage.UTILITYGUIACTIONSGUICLICK[name] = nil
 end
 
 --------------------------------------------------------------------------------------------
@@ -84,11 +84,11 @@ end
 --- Called when each on_gui_click event occurs and identifies any registered actionName functions to trigger.
 ---@param rawFactorioEventData on_gui_click
 GuiActionsClick._HandleGuiClickAction = function(rawFactorioEventData)
-    if global.UTILITYGUIACTIONSGUICLICK == nil then
+    if storage.UTILITYGUIACTIONSGUICLICK == nil then
         return
     end
     local clickedElementName = rawFactorioEventData.element.name
-    local guiClickDetails = global.UTILITYGUIACTIONSGUICLICK[clickedElementName]
+    local guiClickDetails = storage.UTILITYGUIACTIONSGUICLICK[clickedElementName]
     if guiClickDetails ~= nil then
         local actionName = guiClickDetails.actionName
         local actionFunction = MOD.guiClickActions[actionName]

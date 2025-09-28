@@ -75,18 +75,18 @@ local MaxDistancePositionAroundTarget = 10
 
 ---@alias surfaceForceBiterNests table<uint, table<string, table<uint, Teleport_SpawnerDetails>>> # A table of surface index numbers, to tables of force names, to spawner's details keyed by their unit number. Allows easy filtering to current surface and then batch ignoring of non-enemy spawners.
 
-local CommandName = "muppet_streamer_teleport"
+local CommandName = "muppet_streamer_v2_teleport"
 
 Teleport.CreateGlobals = function()
-    global.teleport = global.teleport or {} ---@class Teleport_Global
-    global.teleport.nextId = global.teleport.nextId or 0 ---@type uint
-    global.teleport.pathingRequests = global.teleport.pathingRequests or {} ---@type table<uint, Teleport_TeleportDetails> # The path request Id to its teleport details for when the path request completes.
-    global.teleport.surfaceBiterNests = global.teleport.surfaceBiterNests or Teleport.FindExistingSpawnersOnAllSurfaces() ---@type surfaceForceBiterNests
-    global.teleport.chunkGeneratedId = global.teleport.chunkGeneratedId or 0 ---@type uint
+    storage.teleport = storage.teleport or {} ---@class Teleport_Global
+    storage.teleport.nextId = storage.teleport.nextId or 0 ---@type uint
+    storage.teleport.pathingRequests = storage.teleport.pathingRequests or {} ---@type table<uint, Teleport_TeleportDetails> # The path request Id to its teleport details for when the path request completes.
+    storage.teleport.surfaceBiterNests = storage.teleport.surfaceBiterNests or Teleport.FindExistingSpawnersOnAllSurfaces() ---@type surfaceForceBiterNests
+    storage.teleport.chunkGeneratedId = storage.teleport.chunkGeneratedId or 0 ---@type uint
 end
 
 Teleport.OnLoad = function()
-    CommandsUtils.Register("muppet_streamer_teleport", { "api-description.muppet_streamer_teleport" }, Teleport.TeleportCommand, true)
+    CommandsUtils.Register("muppet_streamer_v2_teleport", { "api-description.muppet_streamer_v2_teleport" }, Teleport.TeleportCommand, true)
     EventScheduler.RegisterScheduledEventType("Teleport.PlanTeleportTarget", Teleport.PlanTeleportTarget)
     Events.RegisterHandlerEvent(defines.events.on_script_path_request_finished, "Teleport.OnScriptPathRequestFinished", Teleport.OnScriptPathRequestFinished)
     Events.RegisterHandlerEvent(defines.events.on_biter_base_built, "Teleport.OnBiterBaseBuilt", Teleport.OnBiterBaseBuilt)
@@ -242,17 +242,17 @@ end
 --- Schedule a commands details to occur after the set delay.
 ---@param commandValues Teleport_CommandDetails
 Teleport.ScheduleTeleportCommand = function(commandValues)
-    global.teleport.nextId = global.teleport.nextId + 1
+    storage.teleport.nextId = storage.teleport.nextId + 1
     local currentTick = game.tick
     local scheduleTick = commandValues.delay > 0 and currentTick + commandValues.delay or (-1) --[[@as UtilityScheduledEvent_UintNegative1]]
     ---@type UtilityScheduledEvent_UintNegative1
     ---@type Teleport_TeleportDetails
-    local teleportDetails = { teleportId = global.teleport.nextId, target = commandValues.target, arrivalRadius = commandValues.arrivalRadius, minDistance = commandValues.minDistance, maxDistance = commandValues.maxDistance, destinationType = commandValues.destinationType, destinationTargetPosition = commandValues.destinationTargetPosition, reachableOnly = commandValues.reachableOnly, targetAttempt = 0, backupTeleportSettings = commandValues.backupTeleportSettings, destinationTypeDescription = commandValues.destinationTypeDescription, thisAttemptPosition = nil, spawnerDistances = {}, suppressMessages = commandValues.suppressMessages }
+    local teleportDetails = { teleportId = storage.teleport.nextId, target = commandValues.target, arrivalRadius = commandValues.arrivalRadius, minDistance = commandValues.minDistance, maxDistance = commandValues.maxDistance, destinationType = commandValues.destinationType, destinationTargetPosition = commandValues.destinationTargetPosition, reachableOnly = commandValues.reachableOnly, targetAttempt = 0, backupTeleportSettings = commandValues.backupTeleportSettings, destinationTypeDescription = commandValues.destinationTypeDescription, thisAttemptPosition = nil, spawnerDistances = {}, suppressMessages = commandValues.suppressMessages }
     if scheduleTick ~= -1 then
-        EventScheduler.ScheduleEventOnce(scheduleTick, "Teleport.PlanTeleportTarget", global.teleport.nextId, teleportDetails)
+        EventScheduler.ScheduleEventOnce(scheduleTick, "Teleport.PlanTeleportTarget", storage.teleport.nextId, teleportDetails)
     else
         ---@type UtilityScheduledEvent_CallbackObject
-        local eventData = { tick = currentTick, name = "Teleport.PlanTeleportTarget", instanceId = global.teleport.nextId, data = teleportDetails }
+        local eventData = { tick = currentTick, name = "Teleport.PlanTeleportTarget", instanceId = storage.teleport.nextId, data = teleportDetails }
         Teleport.PlanTeleportTarget(eventData)
     end
 end
@@ -272,7 +272,7 @@ Teleport.PlanTeleportTarget = function(eventData)
 
     -- Check the player is alive (not dead) and not in editor mode. If they are just end the attempt.
     if targetPlayer.controller_type ~= defines.controllers.character then
-        if not data.suppressMessages then game.print({ "message.muppet_streamer_teleport_not_character_controller", data.target }) end
+        if not data.suppressMessages then game.print({ "message.muppet_streamer_v2_teleport_not_character_controller", data.target }) end
         return
     end
 
@@ -317,7 +317,7 @@ Teleport.PlanTeleportTarget = function(eventData)
             -- Is a first loop for this target player so build up the spawner list.
             ---@type double, double, double
             local spawnerDistance, distanceXDiff, distanceYDiff
-            for spawnersForceName, forcesSpawnerDetails in pairs(global.teleport.surfaceBiterNests[targetPlayer_surface_index]) do
+            for spawnersForceName, forcesSpawnerDetails in pairs(storage.teleport.surfaceBiterNests[targetPlayer_surface_index]) do
                 -- Check the force is an enemy. So we ignore all non-enemy spawners in bulk.
                 if targetPlayer_force_name ~= spawnersForceName and spawnersForceName ~= "neutral" and not targetPlayer_force.get_cease_fire(spawnersForceName) and not targetPlayer_force.get_friend(spawnersForceName) then
                     for _, spawnerDetails in pairs(forcesSpawnerDetails) do
@@ -333,7 +333,7 @@ Teleport.PlanTeleportTarget = function(eventData)
                             ---@type Teleport_TargetPlayerSpawnerDistanceDetails
                             local spawnerDistanceDetails = { distance = spawnerDistance, spawnerDetails = spawnerDetails }
                             -- While this is inserted as consistent key ID's it can be manipulated later to be gappy.
-                            data.spawnerDistances[#data.spawnerDistances + 1--[[@as uint]] ] = spawnerDistanceDetails
+                            data.spawnerDistances[ #data.spawnerDistances + 1 --[[@as uint]] ] = spawnerDistanceDetails
                         end
                     end
                 end
@@ -342,7 +342,7 @@ Teleport.PlanTeleportTarget = function(eventData)
 
         -- Handle if no valid spawners to try.
         if next(data.spawnerDistances) == nil then
-            if not data.suppressMessages then game.print({ "message.muppet_streamer_teleport_no_biter_nest_found", targetPlayer.name }) end
+            if not data.suppressMessages then game.print({ "message.muppet_streamer_v2_teleport_no_biter_nest_found", targetPlayer.name }) end
             Teleport.DoBackupTeleport(data)
             return
         end
@@ -364,7 +364,7 @@ Teleport.PlanTeleportTarget = function(eventData)
             firstSpawnerDistancesIndex, nearestSpawnerDistanceDetails = next(data.spawnerDistances)
             if nearestSpawnerDistanceDetails == nil then
                 -- Have already removed the last possible spawner as its invalid, so no valid targets.
-                if not data.suppressMessages then game.print({ "message.muppet_streamer_teleport_no_biter_nest_found", targetPlayer.name }) end
+                if not data.suppressMessages then game.print({ "message.muppet_streamer_v2_teleport_no_biter_nest_found", targetPlayer.name }) end
                 Teleport.DoBackupTeleport(data)
                 return
             end
@@ -375,7 +375,7 @@ Teleport.PlanTeleportTarget = function(eventData)
                 data.spawnerDistances[firstSpawnerDistancesIndex] = nil
 
                 -- Remove the spawner from the global spawner list.
-                global.teleport.surfaceBiterNests[targetPlayer_surface_index][nearestSpawnerDistanceDetails.spawnerDetails.forceName][nearestSpawnerDistanceDetails.spawnerDetails.unitNumber] = nil
+                storage.teleport.surfaceBiterNests[targetPlayer_surface_index][nearestSpawnerDistanceDetails.spawnerDetails.forceName][nearestSpawnerDistanceDetails.spawnerDetails.unitNumber] = nil
 
                 -- Clear the spawner result so the while loop continues to look at the nearest remaining one.
                 nearestSpawnerDistanceDetails = nil
@@ -387,7 +387,7 @@ Teleport.PlanTeleportTarget = function(eventData)
     elseif data.destinationType == DestinationTypeSelection.enemyUnit then
         local nearestEnemy = targetPlayer_surface.find_nearest_enemy { position = targetPlayer_position, max_distance = data.maxDistance, force = targetPlayer_force }
         if nearestEnemy == nil then
-            if not data.suppressMessages then game.print({ "message.muppet_streamer_teleport_no_enemy_unit_found", targetPlayer.name }) end
+            if not data.suppressMessages then game.print({ "message.muppet_streamer_v2_teleport_no_enemy_unit_found", targetPlayer.name }) end
             Teleport.DoBackupTeleport(data)
             return
         end
@@ -410,12 +410,12 @@ Teleport.PlanTeleportTarget = function(eventData)
     elseif pathRequestId ~= nil then
         -- A pathing request has been made, monitor it and react when it completes.
         data.targetPlayerPlacementEntity, data.thisAttemptPosition = teleportResponse.targetPlayerTeleportEntity, teleportResponse.targetPosition
-        global.teleport.pathingRequests[pathRequestId] = data
+        storage.teleport.pathingRequests[pathRequestId] = data
         return
     elseif teleportResponse.errorNoValidPositionFound then
         -- No valid position was found to try and teleport too.
         if data.targetAttempt > MaxTargetAttempts then
-            if not data.suppressMessages then game.print({ "message.muppet_streamer_teleport_no_teleport_location_found", targetPlayer.name }) end
+            if not data.suppressMessages then game.print({ "message.muppet_streamer_v2_teleport_no_teleport_location_found", targetPlayer.name }) end
             Teleport.DoBackupTeleport(data)
             return
         else
@@ -434,14 +434,14 @@ end
 ---@param event on_script_path_request_finished
 Teleport.OnScriptPathRequestFinished = function(event)
     -- Check if this path request related to a Teleport.
-    local data = global.teleport.pathingRequests[event.id]
+    local data = storage.teleport.pathingRequests[event.id]
     if data == nil then
         -- Not our path request.
         return
     end
 
     -- Update the globals.
-    global.teleport.pathingRequests[event.id] = nil
+    storage.teleport.pathingRequests[event.id] = nil
 
     -- Check some key LuaObjects still exist. This is to avoid risk of crashes during any checks for changes.
     if not data.targetPlayer_surface.valid or not data.targetPlayer_force.valid then
@@ -454,7 +454,7 @@ Teleport.OnScriptPathRequestFinished = function(event)
     if event.path == nil then
         -- Path request failed.
         if data.targetAttempt > MaxTargetAttempts then
-            if not data.suppressMessages then game.print({ "message.muppet_streamer_teleport_no_teleport_location_found", data.targetPlayer.name }) end
+            if not data.suppressMessages then game.print({ "message.muppet_streamer_v2_teleport_no_teleport_location_found", data.targetPlayer.name }) end
             Teleport.DoBackupTeleport(data)
         else
             Teleport.PlanTeleportTarget({ data = data })
@@ -466,7 +466,7 @@ Teleport.OnScriptPathRequestFinished = function(event)
 
         -- Check the player is still alive and in a suitable game state (not editor) to be teleported. If they aren't suitable just abandon the teleport.
         if data.targetPlayer.controller_type ~= defines.controllers.character then
-            if not data.suppressMessages then game.print({ "message.muppet_streamer_teleport_not_character_controller", data.target }) end
+            if not data.suppressMessages then game.print({ "message.muppet_streamer_v2_teleport_not_character_controller", data.target }) end
             return
         end
 
@@ -488,7 +488,7 @@ Teleport.OnScriptPathRequestFinished = function(event)
         local currentPlayerPlacementEntity, currentPlayerPlacementEntity_isVehicle = PlayerTeleport.GetPlayerTeleportPlacementEntity(data.targetPlayer, nil)
         if currentPlayerPlacementEntity == nil then
             -- If the target player doesn't have an entity then nothing further to do.
-            if not data.suppressMessages then game.print({ "message.muppet_streamer_teleport_no_character", data.targetPlayer.name }) end
+            if not data.suppressMessages then game.print({ "message.muppet_streamer_v2_teleport_no_character", data.targetPlayer.name }) end
             return
         end
         -- If a vehicle get its current nearest cardinal (4) direction to orientation.
@@ -530,7 +530,7 @@ end
 ---@param data Teleport_TeleportDetails
 Teleport.DoBackupTeleport = function(data)
     if data.backupTeleportSettings ~= nil then
-        if not data.suppressMessages then game.print({ "message.muppet_streamer_teleport_doing_backup", data.backupTeleportSettings.destinationTypeDescription, data.backupTeleportSettings.target }) end
+        if not data.suppressMessages then game.print({ "message.muppet_streamer_v2_teleport_doing_backup", data.backupTeleportSettings.destinationTypeDescription, data.backupTeleportSettings.target }) end
         Teleport.ScheduleTeleportCommand(data.backupTeleportSettings)
     end
 end
@@ -555,9 +555,9 @@ end
 
 ---@param event on_chunk_generated
 Teleport.OnChunkGenerated = function(event)
-    global.teleport.chunkGeneratedId = global.teleport.chunkGeneratedId + 1
+    storage.teleport.chunkGeneratedId = storage.teleport.chunkGeneratedId + 1
     -- Check the chunk in 1 ticks time to let any other mod or scenario complete its actions first.
-    EventScheduler.ScheduleEventOnce(event.tick + 1, "Teleport.OnChunkGenerated_Scheduled", global.teleport.chunkGeneratedId, event)
+    EventScheduler.ScheduleEventOnce(event.tick + 1, "Teleport.OnChunkGenerated_Scheduled", storage.teleport.chunkGeneratedId, event)
 end
 
 --- When a chunk is generated we wait for 1 tick and then this function is called. Lets any other mod/scenario mess with the spawner prior to use caching its details.
@@ -593,17 +593,17 @@ end
 Teleport.SpawnerCreated = function(spawner)
     -- Create the surface table if it doesn't exist. Happens when the surface is created adhoc during play.
     local spawner_surface_index = spawner.surface.index
-    global.teleport.surfaceBiterNests[spawner_surface_index] = global.teleport.surfaceBiterNests[spawner_surface_index] or {}
+    storage.teleport.surfaceBiterNests[spawner_surface_index] = storage.teleport.surfaceBiterNests[spawner_surface_index] or {}
     -- Record the spawner.
     local spawner_unitNumber, spawner_force_name = spawner.unit_number, spawner.force.name ---@cast spawner_unitNumber -nil # Spawner entities always have a unit_number field.
-    global.teleport.surfaceBiterNests[spawner_surface_index][spawner_force_name] = global.teleport.surfaceBiterNests[spawner_surface_index][spawner_force_name] or {}
-    global.teleport.surfaceBiterNests[spawner_surface_index][spawner_force_name][spawner_unitNumber] = { unitNumber = spawner_unitNumber, entity = spawner, forceName = spawner_force_name, position = spawner.position }
+    storage.teleport.surfaceBiterNests[spawner_surface_index][spawner_force_name] = storage.teleport.surfaceBiterNests[spawner_surface_index][spawner_force_name] or {}
+    storage.teleport.surfaceBiterNests[spawner_surface_index][spawner_force_name][spawner_unitNumber] = { unitNumber = spawner_unitNumber, entity = spawner, forceName = spawner_force_name, position = spawner.position }
 end
 
 --- Called when a spawner has been removed from the map and we need to remove it from our records.
 ---@param spawner LuaEntity
 Teleport.SpawnerRemoved = function(spawner)
-    local thisSurfaceBiterNests = global.teleport.surfaceBiterNests[spawner.surface.index]
+    local thisSurfaceBiterNests = storage.teleport.surfaceBiterNests[spawner.surface.index]
     if thisSurfaceBiterNests == nil then
         -- No records for this surface so nothing to remove. Shouldn't be possible to reach, but is safer.
         return
@@ -613,7 +613,7 @@ Teleport.SpawnerRemoved = function(spawner)
         -- No records for this force on this surface so nothing to remove. Shouldn't be possible to reach, but is safer.
         return
     end
-    thisSurfaceForceBiterNests[spawner.unit_number--[[@as uint # Spawner entity always has a unit_number.]] ] = nil
+    thisSurfaceForceBiterNests[ spawner.unit_number --[[@as uint # Spawner entity always has a unit_number.]] ] = nil
 end
 
 --- Find all existing spawners on all surfaces and record them. For use at mods initial load to handle being added to a map mid game.

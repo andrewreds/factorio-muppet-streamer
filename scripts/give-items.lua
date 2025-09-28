@@ -14,22 +14,21 @@ local MathUtils = require("utility.helper-utils.math-utils")
 ---@field selectWeapon boolean
 ---@field suppressMessages boolean
 
-local CommandName = "muppet_streamer_give_player_weapon_ammo"
+local CommandName = "muppet_streamer_v2_give_player_weapon_ammo"
 
 GiveItems.CreateGlobals = function()
-    global.giveItems = global.giveItems or {} ---@class GiveItems_Global
-    global.giveItems.nextId = global.giveItems.nextId or 0 ---@type uint
+    storage.giveItems = storage.giveItems or {} ---@class GiveItems_Global
+    storage.giveItems.nextId = storage.giveItems.nextId or 0 ---@type uint
 end
 
 GiveItems.OnLoad = function()
-    CommandsUtils.Register("muppet_streamer_give_player_weapon_ammo", { "api-description.muppet_streamer_give_player_weapon_ammo" }, GiveItems.GivePlayerWeaponAmmoCommand, true)
+    CommandsUtils.Register("muppet_streamer_v2_give_player_weapon_ammo", { "api-description.muppet_streamer_v2_give_player_weapon_ammo" }, GiveItems.GivePlayerWeaponAmmoCommand, true)
     EventScheduler.RegisterScheduledEventType("GiveItems.GiveWeaponAmmoScheduled", GiveItems.GiveWeaponAmmoScheduled)
     MOD.Interfaces.Commands.GiveItems = GiveItems.GivePlayerWeaponAmmoCommand
 end
 
 ---@param command CustomCommandData
 GiveItems.GivePlayerWeaponAmmoCommand = function(command)
-
     local commandData = CommandsUtils.GetSettingsTableFromCommandParameterString(command.parameter, true, CommandName, { "delay", "target", "weaponType", "forceWeaponToSlot", "selectWeapon", "ammoType", "ammoCount", "suppressMessages" })
     if commandData == nil then
         return
@@ -81,14 +80,14 @@ GiveItems.GivePlayerWeaponAmmoCommand = function(command)
         suppressMessages = false
     end
 
-    global.giveItems.nextId = global.giveItems.nextId + 1
+    storage.giveItems.nextId = storage.giveItems.nextId + 1
     ---@type GiveItems_GiveWeaponAmmoScheduled
     local giveWeaponAmmoScheduled = { target = target, ammoPrototype = ammoPrototype, ammoCount = ammoCount, weaponPrototype = weaponPrototype, forceWeaponToSlot = forceWeaponToSlot, selectWeapon = selectWeapon, suppressMessages = suppressMessages }
     if scheduleTick ~= -1 then
-        EventScheduler.ScheduleEventOnce(scheduleTick, "GiveItems.GiveWeaponAmmoScheduled", global.giveItems.nextId, giveWeaponAmmoScheduled)
+        EventScheduler.ScheduleEventOnce(scheduleTick, "GiveItems.GiveWeaponAmmoScheduled", storage.giveItems.nextId, giveWeaponAmmoScheduled)
     else
         ---@type UtilityScheduledEvent_CallbackObject
-        local eventData = { tick = command.tick, name = "GiveItems.GiveWeaponAmmoScheduled", instanceId = global.giveItems.nextId, data = giveWeaponAmmoScheduled }
+        local eventData = { tick = command.tick, name = "GiveItems.GiveWeaponAmmoScheduled", instanceId = storage.giveItems.nextId, data = giveWeaponAmmoScheduled }
         GiveItems.GiveWeaponAmmoScheduled(eventData)
     end
 end
@@ -103,7 +102,7 @@ GiveItems.GiveWeaponAmmoScheduled = function(eventData)
         return
     end
     if targetPlayer.controller_type ~= defines.controllers.character or targetPlayer.character == nil then
-        if not data.suppressMessages then game.print({ "message.muppet_streamer_give_player_weapon_ammo_not_character_controller", data.target }) end
+        if not data.suppressMessages then game.print({ "message.muppet_streamer_v2_give_player_weapon_ammo_not_character_controller", data.target }) end
         return
     end
 

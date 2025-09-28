@@ -23,8 +23,8 @@ Default features:
 # Usage
 
 Create via Lua script as a named prototype.
-- Prototype name format: `muppet_streamer-invisible_blocker-[BLOCKING_TYPE]-[SIZE]`.
-- e.g. `muppet_streamer-invisible_blocker-all-4`
+- Prototype name format: `muppet_streamer_v2-invisible_blocker-[BLOCKING_TYPE]-[SIZE]`.
+- e.g. `muppet_streamer_v2-invisible_blocker-all-4`
 
 Must be made indestructible (`destructible = false`) after creation via a Lua script, as this can't be set in the prototype definition unfortunately.
 
@@ -32,7 +32,7 @@ Example script to create a 4x4 Blocking All at a given location:
 ```
 /sc
 local placementPosition = {x=10, y=12};
-local blockerEntity = game.surfaces["nauvis"].create_entity({name="muppet_streamer-invisible_blocker-all-4", position=placementPosition, force = game.forces["player"]});
+local blockerEntity = game.surfaces["nauvis"].create_entity({name="muppet_streamer_v2-invisible_blocker-all-4", position=placementPosition, force = game.forces["player"]});
 blockerEntity.destructible = false;
 ```
 

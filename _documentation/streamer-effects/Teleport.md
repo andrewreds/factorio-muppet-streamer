@@ -18,7 +18,7 @@ Details on the options syntax is available on the [Streamer Effect Options Synta
 | maxDistance | DECIMAL | Mandatory Special | The maximum distance to teleport. Is not mandatory and ignored for `destinationType` of `spawn` or a specific position. |
 | reachableOnly | BOOLEAN | Optional | If the place you are teleported must be walkable back to where you were. Defaults to `false`. Only applicable for `destinationType` of `random` and `biterNest`. |
 | suppressMessages | BOOLEAN | Optional | If all standard effect messages are suppressed. Can be specified within nested `backupTeleportSettings` options, otherwise will be inherited from the parent command. Defaults to `false`. |
-| backupTeleportSettings | Teleport details in JSON string | Optional | a backup complete teleport action that will be done if the main/parent command is unsuccessful. Is a complete copy of the main muppet_streamer_teleport options as a JSON object. |
+| backupTeleportSettings | Teleport details in JSON string | Optional | a backup complete teleport action that will be done if the main/parent command is unsuccessful. Is a complete copy of the main muppet_streamer_v2_teleport options as a JSON object. |
 
 
 
@@ -31,7 +31,7 @@ Note: all examples target the player named `muppet9010`, you will need to replac
 <details><summary>show details</summary>
 <p>
 
-Remote Interface Syntax: `/sc remote.call('muppet_streamer', 'run_command', 'muppet_streamer_teleport', [OPTIONS TABLE])`
+Remote Interface Syntax: `/sc remote.call('muppet_streamer_v2', 'run_command', 'muppet_streamer_v2_teleport', [OPTIONS TABLE])`
 
 The options must be provided as a Lua table.
 
@@ -39,10 +39,10 @@ Examples:
 
 | Example | Code |
 | --- | --- |
-| nearest walkable biter nest | `/sc remote.call('muppet_streamer', 'run_command', 'muppet_streamer_teleport', {target="muppet9010", destinationType="biterNest", maxDistance=1000, reachableOnly=true})` |
-| random location | `/sc remote.call('muppet_streamer', 'run_command', 'muppet_streamer_teleport', {target="muppet9010", destinationType="random", minDistance=100, maxDistance=500, reachableOnly=true})` |
-| specific position | `/sc remote.call('muppet_streamer', 'run_command', 'muppet_streamer_teleport', {target="muppet9010", destinationType={200, 100}})` |
-| usage of a backup teleport | `/sc remote.call('muppet_streamer', 'run_command', 'muppet_streamer_teleport', {target="muppet9010", destinationType="biterNest", maxDistance=100, reachableOnly=true, backupTeleportSettings= {target="muppet9010", destinationType="random", minDistance=100, maxDistance=500, reachableOnly=true} })` |
+| nearest walkable biter nest | `/sc remote.call('muppet_streamer_v2', 'run_command', 'muppet_streamer_v2_teleport', {target="muppet9010", destinationType="biterNest", maxDistance=1000, reachableOnly=true})` |
+| random location | `/sc remote.call('muppet_streamer_v2', 'run_command', 'muppet_streamer_v2_teleport', {target="muppet9010", destinationType="random", minDistance=100, maxDistance=500, reachableOnly=true})` |
+| specific position | `/sc remote.call('muppet_streamer_v2', 'run_command', 'muppet_streamer_v2_teleport', {target="muppet9010", destinationType={200, 100}})` |
+| usage of a backup teleport | `/sc remote.call('muppet_streamer_v2', 'run_command', 'muppet_streamer_v2_teleport', {target="muppet9010", destinationType="biterNest", maxDistance=100, reachableOnly=true, backupTeleportSettings= {target="muppet9010", destinationType="random", minDistance=100, maxDistance=500, reachableOnly=true} })` |
 
 
 Further details and more advanced usage of using Remote Interfaces can be found here on the [Streamer Effect Options Syntax Wiki page](https://github.com/muppet9010/factorio-muppet-streamer/wiki/Streamer-Effect-Options-Syntax).
@@ -57,7 +57,7 @@ Further details and more advanced usage of using Remote Interfaces can be found 
 <details><summary>show details</summary>
 <p>
 
-Command Syntax: `/muppet_streamer_teleport [OPTIONS TABLE AS JSON STRING]`
+Command Syntax: `/muppet_streamer_v2_teleport [OPTIONS TABLE AS JSON STRING]`
 
 The effect's options must be provided as a JSON string of a table.
 
@@ -65,10 +65,10 @@ Examples:
 
 | Example | Code |
 | --- | --- |
-| nearest walkable biter nest | `/muppet_streamer_teleport {"target":"muppet9010", "destinationType":"biterNest", "maxDistance":1000, "reachableOnly":true}` |
-| random location | `/muppet_streamer_teleport {"target":"muppet9010", "destinationType":"random", "minDistance":100, "maxDistance":500, "reachableOnly":true}` |
-| specific position | `/muppet_streamer_teleport {"target":"muppet9010", "destinationType":[200, 100]}` |
-| usage of a backup teleport | `/muppet_streamer_teleport {"target":"muppet9010", "destinationType":"biterNest", "maxDistance":100, "reachableOnly":true, "backupTeleportSettings": {"target":"muppet9010", "destinationType":"random", "minDistance":100, "maxDistance":500, "reachableOnly":true} }` |
+| nearest walkable biter nest | `/muppet_streamer_v2_teleport {"target":"muppet9010", "destinationType":"biterNest", "maxDistance":1000, "reachableOnly":true}` |
+| random location | `/muppet_streamer_v2_teleport {"target":"muppet9010", "destinationType":"random", "minDistance":100, "maxDistance":500, "reachableOnly":true}` |
+| specific position | `/muppet_streamer_v2_teleport {"target":"muppet9010", "destinationType":[200, 100]}` |
+| usage of a backup teleport | `/muppet_streamer_v2_teleport {"target":"muppet9010", "destinationType":"biterNest", "maxDistance":100, "reachableOnly":true, "backupTeleportSettings": {"target":"muppet9010", "destinationType":"random", "minDistance":100, "maxDistance":500, "reachableOnly":true} }` |
 
 </p>
 </details>
