@@ -52,8 +52,10 @@ PantsOnFire.CreateGlobals = function()
 end
 
 PantsOnFire.OnLoad = function()
-    CommandsUtils.Register("muppet_streamer_v2_pants_on_fire", { "api-description.muppet_streamer_v2_pants_on_fire" }, PantsOnFire.PantsOnFireCommand, true)
-    Events.RegisterHandlerEvent(defines.events.on_pre_player_died, "PantsOnFire.OnPrePlayerDied", PantsOnFire.OnPrePlayerDied)
+    CommandsUtils.Register("muppet_streamer_v2_pants_on_fire", {"api-description.muppet_streamer_v2_pants_on_fire"},
+        PantsOnFire.PantsOnFireCommand, true)
+    Events.RegisterHandlerEvent(defines.events.on_pre_player_died, "PantsOnFire.OnPrePlayerDied",
+        PantsOnFire.OnPrePlayerDied)
     EventScheduler.RegisterScheduledEventType("PantsOnFire.WalkCheck", PantsOnFire.WalkCheck)
     EventScheduler.RegisterScheduledEventType("PantsOnFire.ApplyToPlayer", PantsOnFire.ApplyToPlayer)
     MOD.Interfaces.Commands.PantsOnFire = PantsOnFire.PantsOnFireCommand
@@ -61,16 +63,19 @@ end
 
 ---@param command CustomCommandData
 PantsOnFire.PantsOnFireCommand = function(command)
-    local commandData = CommandsUtils.GetSettingsTableFromCommandParameterString(command.parameter, true, CommandName, { "delay", "target", "duration", "fireHeadStart", "fireGap", "flameCount", "fireType", "suppressMessages" })
+    local commandData = CommandsUtils.GetSettingsTableFromCommandParameterString(command.parameter, true, CommandName,
+        {"delay", "target", "duration", "fireHeadStart", "fireGap", "flameCount", "fireType", "suppressMessages"})
     if commandData == nil then
         return
     end
 
     local delaySeconds = commandData.delay
-    if not CommandsUtils.CheckNumberArgument(delaySeconds, "double", false, CommandName, "delay", 0, nil, command.parameter) then
+    if not CommandsUtils.CheckNumberArgument(delaySeconds, "double", false, CommandName, "delay", 0, nil,
+        command.parameter) then
         return
     end ---@cast delaySeconds double|nil
-    local scheduleTick = Common.DelaySecondsSettingToScheduledEventTickValue(delaySeconds, command.tick, CommandName, "delay")
+    local scheduleTick = Common.DelaySecondsSettingToScheduledEventTickValue(delaySeconds, command.tick, CommandName,
+        "delay")
 
     local target = commandData.target
     if not Common.CheckPlayerNameSettingValue(target, CommandName, "target", command.parameter) then
@@ -78,7 +83,8 @@ PantsOnFire.PantsOnFireCommand = function(command)
     end ---@cast target string
 
     local durationSeconds = commandData.duration
-    if not CommandsUtils.CheckNumberArgument(durationSeconds, "double", true, CommandName, "duration", 1, math.floor(MathUtils.uintMax / 60), command.parameter) then
+    if not CommandsUtils.CheckNumberArgument(durationSeconds, "double", true, CommandName, "duration", 1,
+        math.floor(MathUtils.uintMax / 60), command.parameter) then
         return
     end ---@cast durationSeconds double
     local finishTick ---@type uint
@@ -90,7 +96,8 @@ PantsOnFire.PantsOnFireCommand = function(command)
     finishTick = MathUtils.ClampToUInt(finishTick + math.floor(durationSeconds * 60))
 
     local fireHeadStart = commandData.fireHeadStart
-    if not CommandsUtils.CheckNumberArgument(fireHeadStart, "int", false, CommandName, "fireHeadStart", 0, MathUtils.uintMax, command.parameter) then
+    if not CommandsUtils.CheckNumberArgument(fireHeadStart, "int", false, CommandName, "fireHeadStart", 0,
+        MathUtils.uintMax, command.parameter) then
         return
     end ---@cast fireHeadStart uint|nil
     if fireHeadStart == nil then
@@ -98,7 +105,8 @@ PantsOnFire.PantsOnFireCommand = function(command)
     end
 
     local fireGap = commandData.fireGap
-    if not CommandsUtils.CheckNumberArgument(fireGap, "int", false, CommandName, "fireGap", 1, MathUtils.uintMax, command.parameter) then
+    if not CommandsUtils.CheckNumberArgument(fireGap, "int", false, CommandName, "fireGap", 1, MathUtils.uintMax,
+        command.parameter) then
         return
     end ---@cast fireGap uint|nil
     if fireGap == nil then
@@ -107,15 +115,19 @@ PantsOnFire.PantsOnFireCommand = function(command)
 
     local flameCount = commandData.flameCount
     -- Flame count above 250 gives odd results.
-    if not CommandsUtils.CheckNumberArgument(flameCount, "int", false, CommandName, "flameCount", 1, 250, command.parameter) then
+    if not CommandsUtils.CheckNumberArgument(flameCount, "int", false, CommandName, "flameCount", 1, 250,
+        command.parameter) then
         return
     end ---@cast flameCount uint8|nil
     if flameCount == nil then
         flameCount = 30
     end
 
-    local firePrototype, valid = Common.GetEntityPrototypeFromCommandArgument(commandData.fireType, "fire", false, CommandName, "fireType", command.parameter)
-    if not valid then return end
+    local firePrototype, valid = Common.GetEntityPrototypeFromCommandArgument(commandData.fireType, "fire", false,
+        CommandName, "fireType", command.parameter)
+    if not valid then
+        return
+    end
     if firePrototype == nil then
         -- No custom weapon set, so use the base game weapon and confirm its valid.
         firePrototype = Common.GetBaseGameEntityByName("fire-flame", "fire", CommandName, command.parameter)
@@ -125,7 +137,8 @@ PantsOnFire.PantsOnFireCommand = function(command)
     end
 
     local suppressMessages = commandData.suppressMessages
-    if not CommandsUtils.CheckBooleanArgument(suppressMessages, false, CommandName, "suppressMessages", command.parameter) then
+    if not CommandsUtils.CheckBooleanArgument(suppressMessages, false, CommandName, "suppressMessages",
+        command.parameter) then
         return
     end ---@cast suppressMessages boolean|nil
     if suppressMessages == nil then
@@ -134,12 +147,26 @@ PantsOnFire.PantsOnFireCommand = function(command)
 
     storage.PantsOnFire.nextId = storage.PantsOnFire.nextId + 1
     ---@type PantsOnFire_ScheduledEventDetails
-    local scheduledEventDetails = { target = target, finishTick = finishTick, fireHeadStart = fireHeadStart, fireGap = fireGap, flameCount = flameCount, firePrototype = firePrototype, suppressMessages = suppressMessages }
+    local scheduledEventDetails = {
+        target = target,
+        finishTick = finishTick,
+        fireHeadStart = fireHeadStart,
+        fireGap = fireGap,
+        flameCount = flameCount,
+        firePrototype = firePrototype,
+        suppressMessages = suppressMessages
+    }
     if scheduleTick ~= -1 then
-        EventScheduler.ScheduleEventOnce(scheduleTick, "PantsOnFire.ApplyToPlayer", storage.PantsOnFire.nextId, scheduledEventDetails)
+        EventScheduler.ScheduleEventOnce(scheduleTick, "PantsOnFire.ApplyToPlayer", storage.PantsOnFire.nextId,
+            scheduledEventDetails)
     else
         ---@type UtilityScheduledEvent_CallbackObject
-        local eventData = { tick = command.tick, name = "PantsOnFire.ApplyToPlayer", instanceId = storage.PantsOnFire.nextId, data = scheduledEventDetails }
+        local eventData = {
+            tick = command.tick,
+            name = "PantsOnFire.ApplyToPlayer",
+            instanceId = storage.PantsOnFire.nextId,
+            data = scheduledEventDetails
+        }
         PantsOnFire.ApplyToPlayer(eventData)
     end
 end
@@ -154,32 +181,59 @@ PantsOnFire.ApplyToPlayer = function(eventData)
         return
     end
     if targetPlayer.controller_type ~= defines.controllers.character or targetPlayer.character == nil then
-        if not data.suppressMessages then game.print({ "message.muppet_streamer_v2_pants_on_fire_not_character_controller", data.target }) end
+        if not data.suppressMessages then
+            game.print({"message.muppet_streamer_v2_pants_on_fire_not_character_controller", data.target})
+        end
         return
     end
     local targetPlayer_index = targetPlayer.index
 
     -- Check the firePrototype is still valid (unchanged).
     if not data.firePrototype.valid then
-        CommandsUtils.LogPrintWarning(CommandName, nil, "The in-game fire prototype has been changed/removed since the command was run.", nil)
+        CommandsUtils.LogPrintWarning(CommandName, nil,
+            "The in-game fire prototype has been changed/removed since the command was run.", nil)
         return
     end
 
     -- Effect is already applied to player so don't start a new one.
     if storage.PantsOnFire.affectedPlayers[targetPlayer_index] ~= nil then
-        if not data.suppressMessages then game.print({ "message.muppet_streamer_v2_duplicate_command_ignored", "Pants On Fire", data.target }) end
+        if not data.suppressMessages then
+            game.print({"message.muppet_streamer_v2_duplicate_command_ignored", "Pants On Fire", data.target})
+        end
         return
     end
 
     -- Start the process on the player.
-    storage.PantsOnFire.affectedPlayers[targetPlayer_index] = { suppressMessages = data.suppressMessages, steps = {} }
-    if not data.suppressMessages then game.print({ "message.muppet_streamer_v2_pants_on_fire_start", targetPlayer.name }) end
+    storage.PantsOnFire.affectedPlayers[targetPlayer_index] = {
+        suppressMessages = data.suppressMessages,
+        steps = {}
+    }
+    if not data.suppressMessages then
+        game.print({"message.muppet_streamer_v2_pants_on_fire_start", targetPlayer.name})
+    end
 
     -- stepPos starts at 0 so the first step happens at offset 1
     ---@type PantsOnFire_EffectDetails
-    local effectDetails = { player_index = targetPlayer_index, player = targetPlayer, nextFireTick = eventData.tick, finishTick = data.finishTick, fireHeadStart = data.fireHeadStart, fireGap = data.fireGap, flameCount = data.flameCount, startFire = false, stepPos = 0, ticksInVehicle = 0, firePrototype = data.firePrototype, suppressMessages = data.suppressMessages }
+    local effectDetails = {
+        player_index = targetPlayer_index,
+        player = targetPlayer,
+        nextFireTick = eventData.tick,
+        finishTick = data.finishTick,
+        fireHeadStart = data.fireHeadStart,
+        fireGap = data.fireGap,
+        flameCount = data.flameCount,
+        startFire = false,
+        stepPos = 0,
+        ticksInVehicle = 0,
+        firePrototype = data.firePrototype,
+        suppressMessages = data.suppressMessages
+    }
     ---@type UtilityScheduledEvent_CallbackObject
-    local walkCheckCallbackObject = { tick = eventData.tick, instanceId = targetPlayer_index, data = effectDetails }
+    local walkCheckCallbackObject = {
+        tick = eventData.tick,
+        instanceId = targetPlayer_index,
+        data = effectDetails
+    }
     PantsOnFire.WalkCheck(walkCheckCallbackObject)
 end
 
@@ -210,7 +264,8 @@ PantsOnFire.WalkCheck = function(eventData)
 
     -- Check the firePrototype is still valid (unchanged).
     if not data.firePrototype.valid then
-        CommandsUtils.LogPrintWarning(CommandName, nil, "The in-game fire prototype has been changed/removed since the command was run.", nil)
+        CommandsUtils.LogPrintWarning(CommandName, nil,
+            "The in-game fire prototype has been changed/removed since the command was run.", nil)
         return
     end
 
@@ -225,16 +280,29 @@ PantsOnFire.WalkCheck = function(eventData)
     -- Create the fire entity if appropriate.
     if data.startFire then
         -- Get where the player was X steps back, or where they are right now.
-        local step = affectedPlayerDetails.steps[data.stepPos - data.fireHeadStart] or { surface = player.surface, position = player.position }
+        local step = affectedPlayerDetails.steps[data.stepPos - data.fireHeadStart] or {
+            surface = player.physical_surface,
+            position = player.physical_position
+        }
         if step.surface.valid then
             -- Factorio auto deletes the fire-flame entity for us.
             -- 20 flames seems the minimum to set a tree on fire.
-            step.surface.create_entity({ name = data.firePrototype.name, position = step.position, initial_ground_flame_count = data.flameCount, force = storage.Forces.muppet_streamer_v2_enemy, create_build_effect_smoke = false, raise_built = true })
+            step.surface.create_entity({
+                name = data.firePrototype.name,
+                position = step.position,
+                initial_ground_flame_count = data.flameCount,
+                force = storage.Forces.muppet_streamer_v2_enemy,
+                create_build_effect_smoke = false,
+                raise_built = true
+            })
         end
     end
 
     -- We must store both surface and position as player's surface may change.
-    affectedPlayerDetails.steps[data.stepPos] = { surface = player.surface, position = player.position }
+    affectedPlayerDetails.steps[data.stepPos] = {
+        surface = player.physical_surface,
+        position = player.physical_position
+    }
 
     -- Schedule the next loop if not finished yet.
     if eventData.tick < data.finishTick then
@@ -267,12 +335,15 @@ PantsOnFire.StopEffectOnPlayer = function(playerIndex, player, status)
 
     player = player or game.get_player(playerIndex)
     if player == nil then
-        CommandsUtils.LogPrintWarning(CommandName, nil, "Target player has been deleted while the effect was running.", nil)
+        CommandsUtils.LogPrintWarning(CommandName, nil, "Target player has been deleted while the effect was running.",
+            nil)
         return
     end
 
     if status == EffectEndStatus.completed then
-        if not affectedPlayerDetails.suppressMessages then game.print({ "message.muppet_streamer_v2_pants_on_fire_stop", player.name }) end
+        if not affectedPlayerDetails.suppressMessages then
+            game.print({"message.muppet_streamer_v2_pants_on_fire_stop", player.name})
+        end
     end
 end
 
