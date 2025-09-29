@@ -51,7 +51,7 @@ local EntityTypeNames = {
 ---@field ValidateEntityPrototypes fun(commandString?: string|nil): boolean # Checks that the LuaEntity for the entityName is as we expect; exists and correct type.
 ---@field GetDefaultForce fun(targetPlayer: LuaPlayer): LuaForce
 ---@field GetEntityName fun(surface: LuaSurface, position: MapPosition): string|nil # Should normally return something, but some advanced features may not, i.e. getting tree for void tiles.
----@field GetEntityAlignedPosition fun(position: MapPosition): MapPosition
+---@field GetEntityAlignedPosition (fun(position: MapPosition): MapPosition)|nil
 ---@field FindValidPlacementPosition fun(surface: LuaSurface, entityName: string, position: MapPosition, searchRadius, double): MapPosition|nil
 ---@field PlaceEntity fun(data: SpawnAroundPlayer_PlaceEntityDetails):LuaEntity|nil # Will return the entity created if it worked.
 ---@field GetPlayersMaxBotFollowers? fun(targetPlayer: LuaPlayer): uint
@@ -834,8 +834,7 @@ end
 ---@param turretName string # Prototype entity name
 ---@param ammoName? string|nil # Prototype item name
 ---@return SpawnAroundPlayer_EntityTypeDetails
-SpawnAroundPlayer.GenerateAmmoFiringTurretEntityTypeDetails =
-    function(turretName, ammoName)
+SpawnAroundPlayer.GenerateAmmoFiringTurretEntityTypeDetails = function(turretName, ammoName)
         local gridSize, searchOnlyInTileCenter = SpawnAroundPlayer.GetEntityTypeFunctionPlacementDetails(turretName)
 
         ---@type SpawnAroundPlayer_EntityTypeDetails
@@ -891,8 +890,7 @@ SpawnAroundPlayer.GenerateAmmoFiringTurretEntityTypeDetails =
 ---@param turretName string # Prototype entity name
 ---@param fluidName? string|nil # Prototype item name
 ---@return SpawnAroundPlayer_EntityTypeDetails
-SpawnAroundPlayer.GenerateFluidFiringTurretEntityTypeDetails =
-    function(turretName, fluidName)
+SpawnAroundPlayer.GenerateFluidFiringTurretEntityTypeDetails = function(turretName, fluidName)
         local gridSize, searchOnlyInTileCenter = SpawnAroundPlayer.GetEntityTypeFunctionPlacementDetails(turretName)
 
         ---@type SpawnAroundPlayer_EntityTypeDetails
@@ -1033,7 +1031,7 @@ SpawnAroundPlayer.GenerateStandardTileEntityTypeDetails = function(entityName, e
             }
             createdEntity.orientation = math.random() --[[@as RealOrientation]]
             return createdEntity
-        end
+        end,
     }
 
     if placeInCenterOfTile then

@@ -2,7 +2,7 @@
 --                            STARTUP SETTINGS
 ----------------------------------------------------------------------------------
 
----@type SettingType.BoolSetting
+---@type data.ModBoolSettingPrototype
 local enable_building_ghosts = {
     name = "muppet_streamer_v2-enable_building_ghosts",
     type = "bool-setting",
@@ -11,7 +11,7 @@ local enable_building_ghosts = {
     order = "1001"
 }
 
----@type SettingType.BoolSetting
+---@type data.ModBoolSettingPrototype
 local units_can_open_gates = {
     name = "muppet_streamer_v2-units_can_open_gates",
     type = "bool-setting",
@@ -20,7 +20,7 @@ local units_can_open_gates = {
     order = "1002"
 }
 
----@type SettingType.BoolSetting
+---@type data.ModBoolSettingPrototype
 local disable_intro_message = {
     name = "muppet_streamer_v2-disable_intro_message",
     type = "bool-setting",
@@ -29,7 +29,7 @@ local disable_intro_message = {
     order = "2001"
 }
 
----@type SettingType.BoolSetting
+---@type data.ModBoolSettingPrototype
 local disable_rocket_win = {
     name = "muppet_streamer_v2-disable_rocket_win",
     type = "bool-setting",
@@ -38,7 +38,7 @@ local disable_rocket_win = {
     order = "2002"
 }
 
----@type SettingType.IntSetting
+---@type data.ModIntSettingPrototype
 local starting_reveal = {
     name = "muppet_streamer_v2-starting_reveal",
     type = "int-setting",
@@ -48,7 +48,7 @@ local starting_reveal = {
     order = "2003"
 }
 
----@type SettingType.IntSetting
+---@type data.ModIntSettingPrototype
 local recruit_team_member_technology_cost = {
     name = "muppet_streamer_v2-recruit_team_member_technology_cost",
     type = "int-setting",
@@ -58,7 +58,7 @@ local recruit_team_member_technology_cost = {
     order = "3001"
 }
 
----@type SettingType.StringSetting
+---@type data.ModStringSettingPrototype
 local recruit_team_member_technology_title = {
     name = "muppet_streamer_v2-recruit_team_member_technology_title",
     type = "string-setting",
@@ -68,7 +68,7 @@ local recruit_team_member_technology_title = {
     order = "3002"
 }
 
----@type SettingType.StringSetting
+---@type data.ModStringSettingPrototype
 local recruit_team_member_technology_description = {
     name = "muppet_streamer_v2-recruit_team_member_technology_description",
     type = "string-setting",
@@ -82,7 +82,7 @@ local recruit_team_member_technology_description = {
 --                            RUNTIME GLOBAL SETTINGS
 ----------------------------------------------------------------------------------
 
----@type SettingType.StringSetting
+---@type data.ModStringSettingPrototype
 local recruited_team_member_gui_title = {
     name = "muppet_streamer_v2-recruited_team_member_gui_title",
     type = "string-setting",
@@ -96,4 +96,4 @@ local recruited_team_member_gui_title = {
 --                            ADD SETTING PROTOTYPES
 ----------------------------------------------------------------------------------
 
-data:extend(({ enable_building_ghosts, units_can_open_gates, disable_intro_message, disable_rocket_win, starting_reveal, recruit_team_member_technology_cost, recruit_team_member_technology_title, recruit_team_member_technology_description, recruited_team_member_gui_title }) --[[@as Prototype[] ]])
+data:extend(({ enable_building_ghosts, units_can_open_gates, disable_intro_message, disable_rocket_win, starting_reveal, recruit_team_member_technology_cost, recruit_team_member_technology_title, recruit_team_member_technology_description, recruited_team_member_gui_title }))

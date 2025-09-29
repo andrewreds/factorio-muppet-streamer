@@ -11,7 +11,7 @@ MOD.guiClickActions = MOD.guiClickActions or {} ---@type table<string, function>
 ---@field actionName string # The action name registered to this GUI element being clicked.
 ---@field playerIndex uint # The player_index of the player who clicked the GUI.
 ---@field data any # The data argument passed in when registering this function action name.
----@field eventData on_gui_click # The raw Factorio event data for the on_gui_click event.
+---@field eventData EventData.on_gui_click # The raw Factorio event data for the on_gui_click event.
 
 --------------------------------------------------------------------------------------------
 --                                    Public Functions
@@ -82,7 +82,7 @@ end
 --------------------------------------------------------------------------------------------
 
 --- Called when each on_gui_click event occurs and identifies any registered actionName functions to trigger.
----@param rawFactorioEventData on_gui_click
+---@param rawFactorioEventData EventData.on_gui_click
 GuiActionsClick._HandleGuiClickAction = function(rawFactorioEventData)
     if storage.UTILITYGUIACTIONSGUICLICK == nil then
         return
@@ -107,7 +107,7 @@ end
 --- Just happens to be the same as in GuiUtil, but not a requirement.
 ---@param elementName string
 ---@param elementType string
----@return UtilityGuiActionsClick_GuiElementName guiElementName
+---@return UtilityGuiActionsClick_GuiElementName|nil guiElementName
 GuiActionsClick._GenerateGuiElementName = function(elementName, elementType)
     if elementName == nil or elementType == nil then
         return nil

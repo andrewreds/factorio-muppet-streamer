@@ -11,7 +11,7 @@ MOD.guiOpenedActions = MOD.guiOpenedActions or {} ---@type table<string, functio
 ---@field playerIndex uint # The player_index of the player who opened the GUI.
 ---@field entity LuaEntity|nil # The entity that was clicked to open the GUI, if one was.
 ---@field data any # The data argument passed in when registering this function action name.
----@field eventData on_gui_opened # The raw Factorio event data for the on_gui_opened event.
+---@field eventData EventData.on_gui_opened # The raw Factorio event data for the on_gui_opened event.
 
 --------------------------------------------------------------------------------------------
 --                                    Public Functions
@@ -41,7 +41,9 @@ GuiActionsOpened.RegisterEntityForGuiOpenedAction = function(entity, actionName,
         error("GuiActions.RegisterEntityForGuiOpenedAction called with missing arguments")
     end
     data = data or {}
-    storage.UTILITYGUIACTIONSENTITYGUIOPENED = storage.UTILITYGUIACTIONSENTITYGUIOPENED or {} ---@type table<uint, table<string, table|nil>>
+    ---@type table<uint, table<string, table|nil>>
+    storage.UTILITYGUIACTIONSENTITYGUIOPENED = storage.UTILITYGUIACTIONSENTITYGUIOPENED or {}
+    
     local entity_unitNumber = entity.unit_number
     if entity_unitNumber == nil then
         error("GuiActionsOpened.RegisterEntityForGuiOpenedAction() only supports entities with populated unit_number field.")
@@ -103,7 +105,7 @@ end
 --------------------------------------------------------------------------------------------
 
 --- Called when each on_gui_opened event occurs and identifies any registered actionName functions to trigger.
----@param rawFactorioEventData on_gui_opened
+---@param rawFactorioEventData EventData.on_gui_opened
 GuiActionsOpened._HandleGuiOpenedAction = function(rawFactorioEventData)
     local guiType, entityOpened = rawFactorioEventData.gui_type, rawFactorioEventData.entity
 

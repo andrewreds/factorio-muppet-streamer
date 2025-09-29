@@ -57,8 +57,8 @@ local AggressiveWalkingTypes = {
 ---@field accelerationState defines.riding.acceleration # Should only ever be either accelerating or reversing.
 ---@field directionDurationTicks uint # How many more ticks the vehicle will carry on going in its steering direction. Only used/updated if the steering is "random".
 ---@field oldPlayerPosition MapPosition|nil # The players position last tick.
----@field ridingDirection defines.riding.direction # For if in a car or train vehicle.
----@field walkingDirection defines.direction # For when walking in a spider vehicle or on foot.
+---@field ridingDirection defines.riding.direction|nil # For if in a car or train vehicle.
+---@field walkingDirection defines.direction|nil # For when walking in a spider vehicle or on foot.
 
 ---@class AggressiveDriver_SortedVehicleEntry
 ---@field distance double
@@ -563,7 +563,7 @@ AggressiveDriver.ApplyToPlayer = function(eventData)
         aggressiveWalkingOnVehicleDeath = data.aggressiveWalkingOnVehicleDeath,
         accelerationTicks = 0,
         accelerationState = defines.riding.acceleration.accelerating,
-        directionDurationTicks = 0
+        directionDurationTicks = 0,
     }
     ---@type UtilityScheduledEvent_CallbackObject
     local driveCallbackObject = {
@@ -762,7 +762,7 @@ AggressiveDriver.Drive = function(eventData)
 end
 
 --- Called when a player has died, but before their character is turned in to a corpse.
----@param event on_pre_player_died
+---@param event EventData.on_pre_player_died
 AggressiveDriver.OnPrePlayerDied = function(event)
     AggressiveDriver.StopEffectOnPlayer(event.player_index, nil, EffectEndStatus.died)
 end

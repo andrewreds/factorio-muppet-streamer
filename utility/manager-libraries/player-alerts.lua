@@ -199,7 +199,7 @@ PlayerAlerts._GetForceAlert = function(alertId)
 end
 
 --- Called when a player joins a game.
----@param event on_player_joined_game
+---@param event EventData.on_player_joined_game
 PlayerAlerts._OnPlayerJoinedGame = function(event)
     local player = game.get_player(event.player_index)
     if player == nil then
@@ -220,7 +220,7 @@ PlayerAlerts._OnPlayerJoinedGame = function(event)
 end
 
 --- Called when a player changes forces either individually or when 2 forces are merged and this is called once for every player in the old force.
----@param event on_player_changed_force
+---@param event EventData.on_player_changed_force
 PlayerAlerts._OnPlayerChangedForce = function(event)
     local player = game.get_player(event.player_index)
     if player == nil then
@@ -247,7 +247,7 @@ PlayerAlerts._OnPlayerChangedForce = function(event)
 end
 
 --- Called when 2 forces are merging together. Is triggered before each player on the old force has PlayerAlerts._OnPlayerChangedForce() triggered.
----@param event on_forces_merging
+---@param event EventData.on_forces_merging
 PlayerAlerts._OnForcesMerging = function(event)
     local removedForce_index, mergedForce, mergedForce_index = event.source.index, event.destination, event.destination.index
 

@@ -24,7 +24,7 @@ local spitsToCreate = {
 
 -- For each stream and fire pair we want to change do it.
 for _, details in pairs(spitsToCreate) do
-    local spitStream = TableUtils.DeepCopy(data.raw["stream"][details.oldSpitName]) --[[@as Prototype.FluidStream]]
+    local spitStream = TableUtils.DeepCopy(data.raw["stream"][details.oldSpitName]) --[[@as data.FluidStreamPrototype]]
     spitStream.name = details.newNameBase .. "-stream"
     spitStream.working_sound = nil -- Remove the horrible in-air noise as it can drown out our landing noises and doesn't stack nicely.
     local spitStream_targetEffects = spitStream.initial_action[1].action_delivery.target_effects --[[@as TriggerEffectItem|TriggerEffectItem[] ]]
@@ -32,7 +32,8 @@ for _, details in pairs(spitsToCreate) do
     -- Find the first sound, grab a reference to the table and then remove it from the stream. We will add it to the fire later.
     for i, targetEffect in pairs(spitStream_targetEffects) do
         if targetEffect.type == "play-sound" then
-            ---@cast targetEffect PlaySoundTriggerEffectItem
+            ---@diagnostic disable-next-line: cast-type-mismatch
+            ---@cast targetEffect data.PlaySoundTriggerEffectItem
             spitStreamImpactSound_PlaySoundTriggerEffectItems = targetEffect
             table.remove(spitStream_targetEffects, i)
             break
@@ -41,7 +42,8 @@ for _, details in pairs(spitsToCreate) do
     -- Then update the fire name we will create.
     for i, targetEffect in pairs(spitStream_targetEffects) do
         if targetEffect.type == "create-fire" then
-            ---@cast targetEffect CreateFireTriggerEffectItem
+            ---@diagnostic disable-next-line: cast-type-mismatch
+            ---@cast targetEffect data.CreateFireTriggerEffectItem
             if targetEffect.entity_name == details.oldFireName then
                 targetEffect.entity_name = details.newNameBase .. "-fire"
                 break
@@ -50,7 +52,7 @@ for _, details in pairs(spitsToCreate) do
     end
 
     -- Make the sounds twice as loud so they are actually hear-able.
-    ---@cast spitStreamImpactSound_PlaySoundTriggerEffectItems PlaySoundTriggerEffectItem
+    ---@cast spitStreamImpactSound_PlaySoundTriggerEffectItems data.PlaySoundTriggerEffectItem
     for _, soundEffectItem in pairs(spitStreamImpactSound_PlaySoundTriggerEffectItems.sound.variations) do
         soundEffectItem.volume = soundEffectItem.volume * 2
     end

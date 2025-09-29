@@ -30,7 +30,7 @@ BuildingGhosts.OnLoad = function()
 end
 
 --- Called when a force is reset or created by a mod/editor and we need to re-apply the ghost setting if enabled.
----@param event on_force_reset|on_force_created
+---@param event EventData.on_force_reset|EventData.on_force_created
 BuildingGhosts.OnForceChanged = function(event)
     if settings.startup["muppet_streamer_v2-enable_building_ghosts"].value then
         BuildingGhosts.EnableForForce(event.force)

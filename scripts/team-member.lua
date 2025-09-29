@@ -33,7 +33,7 @@ TeamMember.OnStartup = function()
     TeamMember.GuiRecreateForAll()
 end
 
----@param event on_runtime_mod_setting_changed
+---@param event EventData.on_runtime_mod_setting_changed|nil
 TeamMember.OnSettingChanged = function(event)
     local settingName
     if event ~= nil then
@@ -44,7 +44,7 @@ TeamMember.OnSettingChanged = function(event)
     end
 end
 
----@param event on_research_finished
+---@param event EventData.on_research_finished
 TeamMember.OnResearchFinished = function(event)
     local technology = event.research
     if string.find(technology.name, "muppet_streamer_v2-recruit_team_member", 0, true) then
@@ -53,13 +53,14 @@ TeamMember.OnResearchFinished = function(event)
     end
 end
 
----@param event on_lua_shortcut
+---@param event EventData.on_lua_shortcut
 TeamMember.OnLuaShortcut = function(event)
     local shortcutName = event.prototype_name
     if shortcutName == "muppet_streamer_v2-team_member_gui_button" then
         local player = game.get_player(event.player_index)
         if player == nil then
-            LoggingUtils.LogPrintWarning("ERROR: muppet_streamer_v2 team member feature: Player has been deleted since the player clicked the shortcut button.")
+            LoggingUtils.LogPrintWarning(
+                "ERROR: muppet_streamer_v2 team member feature: Player has been deleted since the player clicked the shortcut button.")
             return
         end
         if storage.teamMember.playerGuiOpened[player.index] then
@@ -70,13 +71,14 @@ TeamMember.OnLuaShortcut = function(event)
     end
 end
 
----@param event on_player_joined_game
+---@param event EventData.on_player_joined_game
 TeamMember.OnPlayerJoinedGame = function(event)
     local playerIndex = event.player_index
     storage.teamMember.playerGuiOpened[playerIndex] = storage.teamMember.playerGuiOpened[playerIndex] or true
     local player = game.get_player(playerIndex)
     if player == nil then
-        LoggingUtils.LogPrintWarning("ERROR: muppet_streamer_v2 team member feature: Player has been deleted while they were joining the server.")
+        LoggingUtils.LogPrintWarning(
+            "ERROR: muppet_streamer_v2 team member feature: Player has been deleted while they were joining the server.")
         return
     end
     TeamMember.GuiRecreateForPlayer(player)
@@ -158,14 +160,17 @@ TeamMember.GuiUpdateForPlayer = function(player)
     if not storage.teamMember.playerGuiOpened[player.index] then
         return
     end
-    GuiUtil.UpdateElementFromPlayersReferenceStorage(player.index, "TeamMember", "team_members_recruited", "label", { caption = { "self", storage.teamMember.recruitTeamMemberTitle, #game.connected_players - 1, storage.teamMember.recruitedMaxCount } }, false)
+    GuiUtil.UpdateElementFromPlayersReferenceStorage(player.index, "TeamMember", "team_members_recruited", "label",
+        { caption = { "self", storage.teamMember.recruitTeamMemberTitle, #game.connected_players - 1, storage.teamMember.recruitedMaxCount } },
+        false)
 end
 
 ---@param changeQuantity int
 TeamMember.RemoteIncreaseTeamMemberLevel = function(changeQuantity)
     local errorMessageStartText = "ERROR: muppet_streamer_v2_change_team_member_max remote interface "
     if settings.startup["muppet_streamer_v2-recruit_team_member_technology_cost"].value --[[@as int]] ~= 0 then
-        LoggingUtils.LogPrintError(errorMessageStartText .. " is only suitable for use when technology researches aren't being used.")
+        LoggingUtils.LogPrintError(errorMessageStartText ..
+            " is only suitable for use when technology researches aren't being used.")
         return
     end
     storage.teamMember.recruitedMaxCount = storage.teamMember.recruitedMaxCount + changeQuantity
@@ -184,7 +189,8 @@ TeamMember.CommandChangeTeamMemberLevel = function(command)
     local changeValueString = args[1]
     local changeValue = tonumber(changeValueString)
     if changeValue == nil then
-        LoggingUtils.LogPrintError(errorMessageStartText .. "requires a number value to be provided to change the level by, provided: " .. changeValueString)
+        LoggingUtils.LogPrintError(errorMessageStartText ..
+            "requires a number value to be provided to change the level by, provided: " .. changeValueString)
         LoggingUtils.LogPrintError(errorMessageStartText .. "received text: " .. command.parameter)
         return
     else
@@ -192,7 +198,8 @@ TeamMember.CommandChangeTeamMemberLevel = function(command)
     end
 
     if settings.startup["muppet_streamer_v2-recruit_team_member_technology_cost"].value --[[@as int]] ~= 0 then
-        LoggingUtils.LogPrintError(errorMessageStartText .. " is only suitable for use when technology researches aren't being used.")
+        LoggingUtils.LogPrintError(errorMessageStartText ..
+            " is only suitable for use when technology researches aren't being used.")
         LoggingUtils.LogPrintError(errorMessageStartText .. "received text: " .. command.parameter)
         return
     end

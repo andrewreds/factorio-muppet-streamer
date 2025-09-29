@@ -18,9 +18,9 @@ MOD.scheduledEventNames =
     }
 
 ---@class UtilityScheduledEvent_CallbackObject
----@field tick uint # The current game tick.
----@field name string # The name of the scheduled event, as registered with EventScheduler.RegisterScheduledEventType().
----@field instanceId string|number # The instanceId the event was scheduled with.
+---@field tick? uint # The current game tick.
+---@field name? string # The name of the scheduled event, as registered with EventScheduler.RegisterScheduledEventType().
+---@field instanceId? string|number # The instanceId the event was scheduled with.
 ---@field data table # the custom data table that was provided when the event was scheduled or an empty table if none was provided.
 
 ---@class UtilityScheduledEvent_Information # Information about a scheduled event returned by some public query functions.
@@ -217,7 +217,7 @@ end
 --------------------------------------------------------------------------------------------
 
 --- Runs every tick and actions both any scheduled events for that tick and any events that run every tick. Removes the processed scheduled events as it goes.
----@param event on_tick
+---@param event EventData.on_tick
 EventScheduler._OnSchedulerCycle = function(event)
     local tick = event.tick
     if storage.UTILITYSCHEDULEDFUNCTIONS ~= nil and storage.UTILITYSCHEDULEDFUNCTIONS[tick] ~= nil then

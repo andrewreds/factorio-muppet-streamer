@@ -49,7 +49,7 @@ end
 ---@param collisionBoxOnlyEntities boolean
 ---@param onlyForceAffected LuaForce|nil
 ---@param entitiesExcluded? LuaEntity[]|nil
----@param killerForce? ForceIdentification|nil
+---@param killerForce? string|nil
 EntityUtils.KillAllKillableObjectsInArea = function(surface, positionedBoundingBox, killerEntity, collisionBoxOnlyEntities, onlyForceAffected, entitiesExcluded, killerForce)
     if killerForce == nil then
         killerForce = "neutral"
@@ -68,7 +68,7 @@ end
 ---@param killerEntity? LuaEntity|nil
 ---@param onlyForceAffected LuaForce|nil
 ---@param entitiesExcluded? LuaEntity[]|nil
----@param killerForce? ForceIdentification|nil
+---@param killerForce? string|nil
 EntityUtils.KillAllObjectsInArea = function(surface, positionedBoundingBox, killerEntity, onlyForceAffected, entitiesExcluded, killerForce)
     if killerForce == nil then
         killerForce = "neutral"

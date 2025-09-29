@@ -19,7 +19,7 @@ SettingsManager.ExpectedValueTypes = {
 ---@class UtilitySettingsManager_ExpectedValueType
 ---@field name string # Same as key in the ExpectedValueTypes table.
 ---@field hasChildren boolean # If the expected type is a list.
----@field childExpectedValueType UtilitySettingsManager_ExpectedValueType # The type of entry in the list.
+---@field childExpectedValueType? UtilitySettingsManager_ExpectedValueType # The type of entry in the list.
 
 ---@alias UtilityMultipleValuesInSettings_GlobalGroupsContainer table<uint, UtilityMultipleValuesInSettings_GlobalGroupsContainerOccurrence> # Key'd by the the occurrence number of the grouped settings (id argument when retrieving setting values).
 ---@alias UtilityMultipleValuesInSettings_GlobalGroupsContainerOccurrence table<string, UtilityMultipleValuesInSettings_GlobalGroupsContainerOccurrenceSetting>

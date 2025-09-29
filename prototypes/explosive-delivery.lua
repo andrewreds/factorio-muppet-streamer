@@ -1,4 +1,4 @@
----@type Prototype.SimpleEntity
+---@type data.SimpleEntityPrototype
 local explosiveDeliveryTarget = {
     type = "simple-entity",
     name = "muppet_streamer_v2-explosive-delivery-target",

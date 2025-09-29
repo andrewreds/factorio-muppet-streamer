@@ -316,7 +316,7 @@ PantsOnFire.WalkCheck = function(eventData)
 end
 
 --- Called when a player has died, but before their character is turned in to a corpse.
----@param event on_pre_player_died
+---@param event EventData.on_pre_player_died
 PantsOnFire.OnPrePlayerDied = function(event)
     PantsOnFire.StopEffectOnPlayer(event.player_index, nil, EffectEndStatus.died)
 end

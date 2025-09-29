@@ -446,27 +446,27 @@ end
 ---Name of the child element.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.add)
----@field enabled boolean|nil
+---@field enabled? boolean|nil
 ---Whether the child element is visible. Defaults to `true`.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.add)
----@field visible boolean|nil
+---@field visible? boolean|nil
 ---Whether the child element is ignored by interaction. Defaults to `false`.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.add)
----@field ignored_by_interaction boolean|nil
+---@field ignored_by_interaction? boolean|nil
 ---Style of the child element.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.add)
----@field tags Tags|nil
+---@field tags? Tags|nil
 ---Location in its parent that the child element should slot into. By default, the child will be appended onto the end.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.add)
----@field index uint|nil
+---@field index? uint|nil
 ---Where to position the child element when in the `relative` element.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.add)
----@field anchor GuiAnchor|nil
+---@field anchor? GuiAnchor|nil
 ---Applies to **"button"**: (optional)
 ---Which mouse buttons the button responds to. Defaults to `"left-and-right"`.
 ---
@@ -474,7 +474,7 @@ end
 ---The mouse buttons that the button responds to. Defaults to `"left-and-right"`.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.add)
----@field mouse_button_filter MouseButtonFlags|nil
+---@field mouse_button_filter? MouseButtonFlags|nil
 ---Applies to **"flow"**: (optional)
 ---The initial direction of the flow's layout. See [LuaGuiElement::direction](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.direction). Defaults to `"horizontal"`.
 ---
@@ -485,32 +485,32 @@ end
 ---The initial direction of the line. Defaults to `"horizontal"`.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.add)
----@field direction string|nil
+---@field direction? string|nil
 ---Applies to **"table"**: (required)
 ---Number of columns. This can't be changed after the table is created.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.add)
----@field column_count uint
+---@field column_count? uint
 ---Applies to **"table"**: (optional)
 ---Whether the table should draw vertical grid lines. Defaults to `false`.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.add)
----@field draw_vertical_lines boolean|nil
+---@field draw_vertical_lines? boolean|nil
 ---Applies to **"table"**: (optional)
 ---Whether the table should draw horizontal grid lines. Defaults to `false`.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.add)
----@field draw_horizontal_lines boolean|nil
+---@field draw_horizontal_lines? boolean|nil
 ---Applies to **"table"**: (optional)
 ---Whether the table should draw a single horizontal grid line after the headers. Defaults to `false`.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.add)
----@field draw_horizontal_line_after_headers boolean|nil
+---@field draw_horizontal_line_after_headers? boolean|nil
 ---Applies to **"table"**: (optional)
 ---Whether the content of the table should be vertically centered. Defaults to `true`.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.add)
----@field vertical_centering boolean|nil
+---@field vertical_centering? boolean|nil
 ---Applies to **"textfield"**: (optional)
 ---The initial text contained in the textfield.
 ---
@@ -518,32 +518,32 @@ end
 ---The initial text contained in the text-box.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.add)
----@field text string|nil
+---@field text? string|nil
 ---Applies to **"textfield"**: (optional)
 ---Defaults to `false`.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.add)
----@field numeric boolean|nil
+---@field numeric? boolean|nil
 ---Applies to **"textfield"**: (optional)
 ---Defaults to `false`.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.add)
----@field allow_decimal boolean|nil
+---@field allow_decimal? boolean|nil
 ---Applies to **"textfield"**: (optional)
 ---Defaults to `false`.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.add)
----@field allow_negative boolean|nil
+---@field allow_negative? boolean|nil
 ---Applies to **"textfield"**: (optional)
 ---Defaults to `false`.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.add)
----@field is_password boolean|nil
+---@field is_password? boolean|nil
 ---Applies to **"textfield"**: (optional)
 ---Defaults to `false`.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.add)
----@field lose_focus_on_confirm boolean|nil
+---@field lose_focus_on_confirm? boolean|nil
 ---Applies to **"textfield"**: (optional)
 ---Defaults to `false`.
 ---
@@ -551,7 +551,7 @@ end
 ---Defaults to `false`.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.add)
----@field clear_and_focus_on_right_click boolean|nil
+---@field clear_and_focus_on_right_click? boolean|nil
 ---Applies to **"progressbar"**: (optional)
 ---The initial value of the progressbar, in the range [0, 1]. Defaults to `0`.
 ---
@@ -559,7 +559,7 @@ end
 ---The initial value for the slider. Defaults to `minimum_value`.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.add)
----@field value double|nil
+---@field value? double|nil
 ---Applies to **"checkbox"**: (required)
 ---The initial checked-state of the checkbox.
 ---
@@ -567,7 +567,7 @@ end
 ---The initial checked-state of the radiobutton.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.add)
----@field state boolean
+---@field state? boolean
 ---Applies to **"sprite-button"**: (optional)
 ---Path to the image to display on the button.
 ---
@@ -575,42 +575,42 @@ end
 ---Path to the image to display.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.add)
----@field sprite SpritePath|nil
+---@field sprite? SpritePath|nil
 ---Applies to **"sprite-button"**: (optional)
 ---Path to the image to display on the button when it is hovered.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.add)
----@field hovered_sprite SpritePath|nil
+---@field hovered_sprite? SpritePath|nil
 ---Applies to **"sprite-button"**: (optional)
 ---Path to the image to display on the button when it is clicked.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.add)
----@field clicked_sprite SpritePath|nil
+---@field clicked_sprite? SpritePath|nil
 ---Applies to **"sprite-button"**: (optional)
 ---The number shown on the button.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.add)
----@field number double|nil
+---@field number? double|nil
 ---Applies to **"sprite-button"**: (optional)
 ---Formats small numbers as percentages. Defaults to `false`.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.add)
----@field show_percent_for_small_numbers boolean|nil
+---@field show_percent_for_small_numbers? boolean|nil
 ---Applies to **"sprite"**: (optional)
 ---Whether the widget should resize according to the sprite in it. Defaults to `true`.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.add)
----@field resize_to_sprite boolean|nil
+---@field resize_to_sprite? boolean|nil
 ---Applies to **"scroll-pane"**: (optional)
 ---Policy of the horizontal scroll bar. Possible values are `"auto"`, `"never"`, `"always"`, `"auto-and-reserve-space"`, `"dont-show-but-allow-scrolling"`. Defaults to `"auto"`.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.add)
----@field horizontal_scroll_policy string|nil
+---@field horizontal_scroll_policy? string|nil
 ---Applies to **"scroll-pane"**: (optional)
 ---Policy of the vertical scroll bar. Possible values are `"auto"`, `"never"`, `"always"`, `"auto-and-reserve-space"`, `"dont-show-but-allow-scrolling"`. Defaults to `"auto"`.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.add)
----@field vertical_scroll_policy string|nil
+---@field vertical_scroll_policy? string|nil
 ---Applies to **"drop-down"**: (optional)
 ---The initial items in the dropdown.
 ---
@@ -618,7 +618,7 @@ end
 ---The initial items in the listbox.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.add)
----@field items LocalisedString[]|nil
+---@field items? LocalisedString[]|nil
 ---Applies to **"drop-down"**: (optional)
 ---The index of the initially selected item. Defaults to 0.
 ---
@@ -626,7 +626,7 @@ end
 ---The index of the initially selected item. Defaults to 0.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.add)
----@field selected_index uint|nil
+---@field selected_index? uint|nil
 ---Applies to **"camera"**: (required)
 ---The position the camera centers on.
 ---
@@ -634,7 +634,7 @@ end
 ---The position the minimap centers on. Defaults to the player's current position.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.add)
----@field position MapPosition
+---@field position? MapPosition
 ---Applies to **"camera"**: (optional)
 ---The surface that the camera will render. Defaults to the player's current surface.
 ---
@@ -642,7 +642,7 @@ end
 ---The surface the camera will render. Defaults to the player's current surface.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.add)
----@field surface_index uint|nil
+---@field surface_index? uint|nil
 ---Applies to **"camera"**: (optional)
 ---The initial camera zoom. Defaults to `0.75`.
 ---
@@ -650,138 +650,138 @@ end
 ---The initial camera zoom. Defaults to `0.75`.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.add)
----@field zoom double|nil
+---@field zoom? double|nil
 ---Applies to **"choose-elem-button"**: (required)
 ---The type of the button - one of the following values.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.add)
----@field elem_type string
+---@field elem_type? string
 ---Applies to **"choose-elem-button"**: (optional)
 ---If type is `"item"` - the default value for the button.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.add)
----@field item string|nil
+---@field item? string|nil
 ---Applies to **"choose-elem-button"**: (optional)
 ---If type is `"tile"` - the default value for the button.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.add)
----@field tile string|nil
+---@field tile? string|nil
 ---Applies to **"choose-elem-button"**: (optional)
 ---If type is `"entity"` - the default value for the button.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.add)
----@field entity string|nil
+---@field entity? string|nil
 ---Applies to **"choose-elem-button"**: (optional)
 ---If type is `"signal"` - the default value for the button.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.add)
----@field signal SignalID|nil
+---@field signal? SignalID|nil
 ---Applies to **"choose-elem-button"**: (optional)
 ---If type is `"fluid"` - the default value for the button.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.add)
----@field fluid string|nil
+---@field fluid? string|nil
 ---Applies to **"choose-elem-button"**: (optional)
 ---If type is `"recipe"` - the default value for the button.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.add)
----@field recipe string|nil
+---@field recipe? string|nil
 ---Applies to **"choose-elem-button"**: (optional)
 ---If type is `"decorative"` - the default value for the button.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.add)
----@field decorative string|nil
+---@field decorative? string|nil
 ---Applies to **"choose-elem-button"**: (optional)
 ---If type is `"item-group"` - the default value for the button.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.add)
----@field item-group string|nil
+---@field item-group? string|nil
 ---Applies to **"choose-elem-button"**: (optional)
 ---If type is `"achievement"` - the default value for the button.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.add)
----@field achievement string|nil
+---@field achievement? string|nil
 ---Applies to **"choose-elem-button"**: (optional)
 ---If type is `"equipment"` - the default value for the button.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.add)
----@field equipment string|nil
+---@field equipment? string|nil
 ---Applies to **"choose-elem-button"**: (optional)
 ---If type is `"technology"` - the default value for the button.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.add)
----@field technology string|nil
+---@field technology? string|nil
 ---Applies to **"choose-elem-button"**: (optional)
 ---Filters describing what to show in the selection window. See [LuaGuiElement::elem_filters](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.elem_filters).
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.add)
----@field elem_filters PrototypeFilter[]|nil
+---@field elem_filters? PrototypeFilter[]|nil
 ---Applies to **"slider"**: (optional)
 ---The minimum value for the slider. Defaults to `0`.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.add)
----@field minimum_value double|nil
+---@field minimum_value? double|nil
 ---Applies to **"slider"**: (optional)
 ---The maximum value for the slider. Defaults to `30`.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.add)
----@field maximum_value double|nil
+---@field maximum_value? double|nil
 ---Applies to **"slider"**: (optional)
 ---The minimum value the slider can move. Defaults to `1`.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.add)
----@field value_step double|nil
+---@field value_step? double|nil
 ---Applies to **"slider"**: (optional)
 ---Defaults to `false`.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.add)
----@field discrete_slider boolean|nil
+---@field discrete_slider? boolean|nil
 ---Applies to **"slider"**: (optional)
 ---Defaults to `true`.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.add)
----@field discrete_values boolean|nil
+---@field discrete_values? boolean|nil
 ---Applies to **"minimap"**: (optional)
 ---The player index the map should use. Defaults to the current player.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.add)
----@field chart_player_index uint|nil
+---@field chart_player_index? uint|nil
 ---Applies to **"minimap"**: (optional)
 ---The force this minimap should use. Defaults to the player's current force.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.add)
----@field force string|nil
+---@field force? string|nil
 ---Applies to **"tab"**: (optional)
 ---The text to display after the normal tab text (designed to work with numbers).
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.add)
----@field badge_text LocalisedString|nil
+---@field badge_text? LocalisedString|nil
 ---Applies to **"switch"**: (optional)
 ---Possible values are `"left"`, `"right"`, or `"none"`. If set to "none", `allow_none_state` must be `true`. Defaults to `"left"`.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.add)
----@field switch_state string|nil
+---@field switch_state? string|nil
 ---Applies to **"switch"**: (optional)
 ---Whether the switch can be set to a middle state. Defaults to `false`.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.add)
----@field allow_none_state boolean|nil
+---@field allow_none_state? boolean|nil
 ---Applies to **"switch"**: (optional)
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.add)
----@field left_label_caption LocalisedString|nil
+---@field left_label_caption? LocalisedString|nil
 ---Applies to **"switch"**: (optional)
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.add)
----@field left_label_tooltip LocalisedString|nil
+---@field left_label_tooltip? LocalisedString|nil
 ---Applies to **"switch"**: (optional)
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.add)
----@field right_label_caption LocalisedString|nil
+---@field right_label_caption? LocalisedString|nil
 ---Applies to **"switch"**: (optional)
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.add)
----@field right_label_tooltip LocalisedString|nil
+---@field right_label_tooltip? LocalisedString|nil
 
 --------------------------------------------------------------------------
 -- A copy of the the base game's LuaGuiElement UPDATABLE attributes, but without the following attributes as they are included in my parent class; name, style, caption, tooltip.
@@ -795,14 +795,14 @@ end
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.allow_decimal)
 ---
 ---_Can only be used if this is textfield_
----@field allow_decimal boolean
+---@field allow_decimal? boolean
 ---[RW]
 ---Whether this textfield (when in numeric mode) allows negative numbers.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.allow_negative)
 ---
 ---_Can only be used if this is textfield_
----@field allow_negative boolean
+---@field allow_negative? boolean
 ---[RW]
 ---Whether the `"none"` state is allowed for this switch.
 ---
@@ -811,38 +811,38 @@ end
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.allow_none_state)
 ---
 ---_Can only be used if this is switch_
----@field allow_none_state boolean
+---@field allow_none_state? boolean
 ---[RW]
 ---Sets the anchor for this relative widget. Setting `nil` clears the anchor.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.anchor)
----@field anchor GuiAnchor
+---@field anchor? GuiAnchor
 ---[RW]
 ---Whether this frame auto-centers on window resize when stored in [LuaGui::screen](https://lua-api.factorio.com/latest/LuaGui.html#LuaGui.screen).
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.auto_center)
 ---
 ---_Can only be used if this is frame_
----@field auto_center boolean
+---@field auto_center? boolean
 ---[RW]
 ---The text to display after the normal tab text (designed to work with numbers)
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.badge_text)
 ---
 ---_Can only be used if this is tab_
----@field badge_text LocalisedString
+---@field badge_text? LocalisedString
 ---[RW]
 ---Makes it so right-clicking on this textfield clears and focuses it.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.clear_and_focus_on_right_click)
 ---
 ---_Can only be used if this is textfield or text-box_
----@field clear_and_focus_on_right_click boolean
+---@field clear_and_focus_on_right_click? boolean
 ---[RW]
 ---The image to display on this sprite-button when it is clicked.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.clicked_sprite)
----@field clicked_sprite SpritePath
+---@field clicked_sprite? SpritePath
 ---[RW]
 ---The frame drag target for this flow, frame, label, table, or empty-widget.
 ---
@@ -853,28 +853,28 @@ end
 ---**Note:** drag_target can only be set to a higher level parent element (this element must be owned at some nested level by the drag_target).
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.drag_target)
----@field drag_target LuaGuiElement
+---@field drag_target? LuaGuiElement
 ---[RW]
 ---Whether this table should draw a horizontal grid line below the first table row.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.draw_horizontal_line_after_headers)
 ---
 ---_Can only be used if this is table_
----@field draw_horizontal_line_after_headers boolean
+---@field draw_horizontal_line_after_headers? boolean
 ---[RW]
 ---Whether this table should draw horizontal grid lines.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.draw_horizontal_lines)
 ---
 ---_Can only be used if this is table_
----@field draw_horizontal_lines boolean
+---@field draw_horizontal_lines? boolean
 ---[RW]
 ---Whether this table should draw vertical grid lines.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.draw_vertical_lines)
 ---
 ---_Can only be used if this is table_
----@field draw_vertical_lines boolean
+---@field draw_vertical_lines? boolean
 ---[RW]
 ---The elem filters of this choose-elem-button or `nil` if there are no filters.
 ---
@@ -914,7 +914,7 @@ end
 ---```
 ---
 ---_Can only be used if this is choose-elem-button_
----@field elem_filters PrototypeFilter[]
+---@field elem_filters? PrototypeFilter[]
 ---[RW]
 ---The elem value of this choose-elem-button or `nil` if there is no value.
 ---
@@ -923,189 +923,189 @@ end
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.elem_value)
 ---
 ---_Can only be used if this is choose-elem-button_
----@field elem_value string|SignalID
+---@field elem_value? string|SignalID
 ---[RW]
 ---Whether this GUI element is enabled. Disabled GUI elements don't trigger events when clicked.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.enabled)
----@field enabled boolean
+---@field enabled? boolean
 ---[RW]
 ---The entity associated with this entity-preview, camera, minimap or `nil` if no entity is associated.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.entity)
----@field entity LuaEntity
+---@field entity? LuaEntity
 ---[RW]
 ---The force this minimap is using or `nil` if no force is set.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.force)
----@field force string
+---@field force? string
 ---[RW]
 ---Policy of the horizontal scroll bar. Possible values are `"auto"`, `"never"`, `"always"`, `"auto-and-reserve-space"`, `"dont-show-but-allow-scrolling"`.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.horizontal_scroll_policy)
 ---
 ---_Can only be used if this is scroll-pane_
----@field horizontal_scroll_policy string
+---@field horizontal_scroll_policy? string
 ---[RW]
 ---The image to display on this sprite-button when it is hovered.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.hovered_sprite)
 ---
 ---_Can only be used if this is sprite-button_
----@field hovered_sprite SpritePath
+---@field hovered_sprite? SpritePath
 ---[RW]
 ---Whether this GUI element is ignored by interaction. This makes clicks on this element 'go through' to the GUI element or even the game surface below it.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.ignored_by_interaction)
----@field ignored_by_interaction boolean
+---@field ignored_by_interaction? boolean
 ---[RW]
 ---Whether this textfield displays as a password field, which renders all characters as `*`.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.is_password)
 ---
 ---_Can only be used if this is textfield_
----@field is_password boolean
+---@field is_password? boolean
 ---[RW]
 ---The items in this dropdown or listbox.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.items)
----@field items LocalisedString[]
+---@field items? LocalisedString[]
 ---[RW]
 ---The text shown for the left switch label.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.left_label_caption)
 ---
 ---_Can only be used if this is switch_
----@field left_label_caption LocalisedString
+---@field left_label_caption? LocalisedString
 ---[RW]
 ---The tooltip shown on the left switch label.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.left_label_tooltip)
 ---
 ---_Can only be used if this is switch_
----@field left_label_tooltip LocalisedString
+---@field left_label_tooltip? LocalisedString
 ---[RW]
 ---The location of this widget when stored in [LuaGui::screen](https://lua-api.factorio.com/latest/LuaGui.html#LuaGui.screen), or `nil` if not set or not in [LuaGui::screen](https://lua-api.factorio.com/latest/LuaGui.html#LuaGui.screen).
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.location)
----@field location GuiLocation<int,int>
+---@field location? GuiLocation<int,int>
 ---[RW]
 ---Whether this choose-elem-button can be changed by the player.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.locked)
 ---
 ---_Can only be used if this is choose-elem-button_
----@field locked boolean
+---@field locked? boolean
 ---[RW]
 ---Whether this textfield loses focus after [defines.events.on_gui_confirmed](https://lua-api.factorio.com/latest/defines.html#defines.events.on_gui_confirmed) is fired.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.lose_focus_on_confirm)
 ---
 ---_Can only be used if this is textfield_
----@field lose_focus_on_confirm boolean
+---@field lose_focus_on_confirm? boolean
 ---[RW]
 ---The player index this minimap is using.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.minimap_player_index)
 ---
 ---_Can only be used if this is minimap_
----@field minimap_player_index uint
+---@field minimap_player_index? uint
 ---[RW]
 ---The mouse button filters for this button or sprite-button.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.mouse_button_filter)
----@field mouse_button_filter MouseButtonFlags
+---@field mouse_button_filter? MouseButtonFlags
 ---[RW]
 ---The number to be shown in the bottom right corner of this sprite-button. Set this to `nil` to show nothing.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.number)
----@field number double
+---@field number? double
 ---[RW]
 ---Whether this textfield is limited to only numeric characters.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.numeric)
 ---
 ---_Can only be used if this is textfield_
----@field numeric boolean
+---@field numeric? boolean
 ---[RW]
 ---The position this camera or minimap is focused on, if any.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.position)
----@field position MapPosition<int,int>
+---@field position? MapPosition<int,int>
 ---[RW]
 ---Whether this text-box is read-only. Defaults to `false`.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.read_only)
 ---
 ---_Can only be used if this is text-box_
----@field read_only boolean
+---@field read_only? boolean
 ---[RW]
 ---Whether the image widget should resize according to the sprite in it. Defaults to `true`.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.resize_to_sprite)
----@field resize_to_sprite boolean
+---@field resize_to_sprite? boolean
 ---[RW]
 ---The text shown for the right switch label.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.right_label_caption)
 ---
 ---_Can only be used if this is switch_
----@field right_label_caption LocalisedString
+---@field right_label_caption? LocalisedString
 ---[RW]
 ---The tooltip shown on the right switch label.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.right_label_tooltip)
 ---
 ---_Can only be used if this is switch_
----@field right_label_tooltip LocalisedString
+---@field right_label_tooltip? LocalisedString
 ---[RW]
 ---Whether the contents of this text-box are selectable. Defaults to `true`.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.selectable)
 ---
 ---_Can only be used if this is text-box_
----@field selectable boolean
+---@field selectable? boolean
 ---[RW]
 ---The selected index for this dropdown or listbox. Returns `0` if none is selected.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.selected_index)
----@field selected_index uint
+---@field selected_index? uint
 ---[RW]
 ---The selected tab index for this tabbed pane or `nil` if no tab is selected.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.selected_tab_index)
 ---
 ---_Can only be used if this is tabbed-pane_
----@field selected_tab_index uint
+---@field selected_tab_index? uint
 ---[RW]
 ---Related to the number to be shown in the bottom right corner of this sprite-button. When set to `true`, numbers that are non-zero and smaller than one are shown as a percentage rather than the value. For example, `0.5` will be shown as `50%` instead.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.show_percent_for_small_numbers)
----@field show_percent_for_small_numbers boolean
+---@field show_percent_for_small_numbers? boolean
 ---[RW]
 ---The value of this slider element.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.slider_value)
 ---
 ---_Can only be used if this is slider_
----@field slider_value double
+---@field slider_value? double
 ---[RW]
 ---The image to display on this sprite-button or sprite in the default state.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.sprite)
----@field sprite SpritePath
+---@field sprite? SpritePath
 ---[RW]
 ---Is this checkbox or radiobutton checked?
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.state)
 ---
 ---_Can only be used if this is CheckBox or RadioButton_
----@field state boolean
+---@field state? boolean
 ---[RW]
 ---The surface index this camera or minimap is using.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.surface_index)
----@field surface_index uint
+---@field surface_index? uint
 ---[RW]
 ---The switch state (left, none, right) for this switch.
 ---
@@ -1114,57 +1114,57 @@ end
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.switch_state)
 ---
 ---_Can only be used if this is switch_
----@field switch_state string
+---@field switch_state? string
 ---[RW]
 ---The tags associated with this LuaGuiElement.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.tags)
----@field tags Tags
+---@field tags? Tags
 ---[RW]
 ---The text contained in this textfield or text-box.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.text)
 ---
 ---_Can only be used if this is textfield or text-box_
----@field text string
+---@field text? string
 ---[RW]
 ---How much this progress bar is filled. It is a value in the range [0, 1].
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.value)
 ---
 ---_Can only be used if this is progressbar_
----@field value double
+---@field value? double
 ---[RW]
 ---Whether the content of this table should be vertically centered. Overrides [LuaStyle::column_alignments](https://lua-api.factorio.com/latest/LuaStyle.html#LuaStyle.column_alignments). Defaults to `true`.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.vertical_centering)
 ---
 ---_Can only be used if this is table_
----@field vertical_centering boolean
+---@field vertical_centering? boolean
 ---[RW]
 ---Policy of the vertical scroll bar. Possible values are `"auto"`, `"never"`, `"always"`, `"auto-and-reserve-space"`, `"dont-show-but-allow-scrolling"`.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.vertical_scroll_policy)
 ---
 ---_Can only be used if this is scroll-pane_
----@field vertical_scroll_policy string
+---@field vertical_scroll_policy? string
 ---[RW]
 ---Sets whether this GUI element is visible or completely hidden, taking no space in the layout.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.visible)
----@field visible boolean
+---@field visible? boolean
 ---[RW]
 ---Whether this text-box will word-wrap automatically. Defaults to `false`.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.word_wrap)
 ---
 ---_Can only be used if this is text-box_
----@field word_wrap boolean
+---@field word_wrap? boolean
 ---[RW]
 ---The zoom this camera or minimap is using.
 ---
 ---[View documentation](https://lua-api.factorio.com/latest/LuaGuiElement.html#LuaGuiElement.zoom)
----@field zoom double
+---@field zoom? double
 
 return GuiUtil
 

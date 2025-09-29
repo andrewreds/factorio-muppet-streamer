@@ -67,7 +67,7 @@ local function OnLoad()
     DelayedLua.OnLoad()
 end
 
----@param event on_runtime_mod_setting_changed
+---@param event EventData.on_runtime_mod_setting_changed|nil
 local function OnSettingChanged(event)
     TeamMember.OnSettingChanged(event)
     SpawnAroundPlayer.OnStartup()

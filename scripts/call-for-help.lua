@@ -37,25 +37,26 @@ local MaxPathfinderAttemptsForTargetLocation = 5 -- How many times the mod tries
 
 ---@class CallForHelp_CallForHelpObject
 ---@field callForHelpId uint
----@field pendingPathRequests table<uint, CallForHelp_PathRequestObject> # Key'd to the path request Id.
 
 ---@class CallForHelp_PathRequestObject # Details on a path request so that when it completes its results can be handled and back traced to the Call For Help it relates too.
 ---@field callForHelpId uint
----@field pathRequestId uint
----@field helpPlayer LuaPlayer
----@field helpPlayerPlacementEntity LuaEntity # The helping player's character or teleportable vehicle.
----@field helpPlayerForce LuaForce
----@field helpPlayerSurface LuaSurface
----@field targetPlayer LuaPlayer
----@field targetPlayerPosition MapPosition
----@field targetPlayerEntity LuaEntity
----@field surface LuaSurface
----@field position MapPosition
----@field attempt uint
----@field arrivalRadius double
----@field sameSurfaceOnly boolean
----@field sameTeamOnly boolean
----@field suppressMessages boolean
+---@field pathRequestId? uint
+---@field helpPlayer? LuaPlayer
+---@field helpPlayerPlacementEntity? LuaEntity # The helping player's character or teleportable vehicle.
+---@field helpPlayerForce? LuaForce
+---@field helpPlayerSurface? LuaSurface
+---@field targetPlayer? LuaPlayer
+---@field targetPlayerPosition? MapPosition
+---@field targetPlayerEntity? LuaEntity
+---@field surface? LuaSurface
+---@field position? MapPosition
+---@field attempt? uint
+---@field arrivalRadius? double
+---@field sameSurfaceOnly? boolean
+---@field sameTeamOnly? boolean
+---@field suppressMessages? boolean
+---@field pendingPathRequests? table<uint, CallForHelp_PathRequestObject> # Key'd to the path request Id.
+
 
 ---@class CallForHelp_HelpPlayerInRange
 ---@field player LuaPlayer
@@ -501,7 +502,7 @@ CallForHelp.PlanTeleportHelpPlayer = function(helpPlayer, arrivalRadius, targetP
 end
 
 --- React to path requests being completed. If the path request was for a teleport request then we need to validate things again as there could be a significant gap between the path request being made and the response coming back.
----@param event on_script_path_request_finished
+---@param event EventData.on_script_path_request_finished
 CallForHelp.OnScriptPathRequestFinished = function(event)
     -- Check if this path request related to a Call For Help.
     local pathRequest = storage.callForHelp.pathingRequests[event.id]

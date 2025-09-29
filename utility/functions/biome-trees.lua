@@ -1,3 +1,4 @@
+---@diagnostic disable: missing-parameter
 --[[
     Used to get tile (biome) appropriate trees, rather than just select any old tree. Means they will generally fit in to the map better, although vanilla forest types don't always fully match the biome they are in.
     Will only nicely handle vanilla and Alien Biomes tiles and trees, modded tiles will get a random tree if they are a land-ish type tile.

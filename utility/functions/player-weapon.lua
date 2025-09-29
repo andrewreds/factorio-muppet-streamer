@@ -9,11 +9,11 @@
 ----------------------------------------------------------------------------------
 
 ---@class UtilityPlayerWeapon_RemovedWeaponToEnsureWeapon
----@field gunInventoryIndex uint # The index in the gun and ammo inventory where the weapon was removed.
+---@field gunInventoryIndex? uint # The index in the gun and ammo inventory where the weapon was removed.
 ---@field weaponItemName? string|nil # Nil if no weapon was in the slot.
----@field weaponFilterName? string|nil # Nil if no weapon filter was set on the slot.
+---@field weaponFilterName? ItemFilter|nil # Nil if no weapon filter was set on the slot.
 ---@field ammoItemName? string|nil # Nil if no ammo was in the slot.
----@field ammoFilterName? string|nil # Nil if no ammo filter was set on the slot.
+---@field ammoFilterName? ItemFilter|nil # Nil if no ammo filter was set on the slot.
 ---@field beforeSelectedWeaponGunIndex uint # The weapon slot that the player had selected before the weapon was removed.
 
 --- Ensure the player has the specified weapon, clearing any weapon filters if needed. Includes options to ensure compatibility with a specific ammo type, otherwise will ensure the ammo slot setup allows the gun to be placed even if the ammo filter is incompatible.
@@ -239,7 +239,8 @@ end
 ---@param removedWeaponDetails UtilityPlayerWeapon_RemovedWeaponToEnsureWeapon
 PlayerWeapon.ReturnRemovedWeapon = function(player, removedWeaponDetails)
     ---@type LuaInventory, LuaInventory, LuaInventory
-    local playerGunInventory, playerAmmoInventory, playerCharacterInventory = nil, nil, nil
+    local playerGunInventory, playerAmmoInventory = nil, nil
+    local playerCharacterInventory = nil --- @type LuaInventory|nil
     if removedWeaponDetails.weaponFilterName ~= nil then
         playerGunInventory = playerGunInventory or player.get_inventory(defines.inventory.character_guns)
         playerGunInventory.set_filter(removedWeaponDetails.gunInventoryIndex, removedWeaponDetails.weaponFilterName)

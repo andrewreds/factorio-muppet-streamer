@@ -356,7 +356,7 @@ PlayerDropInventory.PlayerDropItems_Scheduled = function(event)
 end
 
 --- Converts an item stack into a table that can be placed on the ground with surface.spill_item_stack
----@param itemStackToDropFrom itemStack
+---@param itemStackToDropFrom LuaItemStack
 local function itemStackToDroppableItemTable(itemStackToDropFrom)
     -- CODE NOTE: ItemStacks are grouped by Factorio in to full health or damaged (health averaged across all items in itemStack).
     -- CODE NOTE: ItemStacks have a single durability and ammo stat which effectively is for the first item in the itemStack, with the other items in the itemStack all being full.
@@ -740,7 +740,7 @@ PlayerDropInventory.DropAllItemsFromInventories = function(player, data, itemCou
     end
 end
 
----@param event on_pre_player_died
+---@param event EventData.on_pre_player_died
 PlayerDropInventory.OnPrePlayerDied = function(event)
     PlayerDropInventory.StopEffectOnPlayer(event.player_index)
 end

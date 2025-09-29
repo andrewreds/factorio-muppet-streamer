@@ -10,7 +10,7 @@ end
 
 --Add the techs if cost is 0, but just hide them. Means other mods can use the info from the techs.
 
----@type Prototype.Technology
+---@type data.TechnologyPrototype
 local recruitTeamMemberTechnology_1 = {
     type = "technology",
     name = "muppet_streamer_v2-recruit_team_member-1",
@@ -32,7 +32,7 @@ local recruitTeamMemberTechnology_1 = {
     order = "zzz"
 }
 
----@type Prototype.Technology
+---@type data.TechnologyPrototype
 local recruitTeamMemberTechnology_2 = {
     type = "technology",
     name = "muppet_streamer_v2-recruit_team_member-2",
@@ -55,7 +55,7 @@ local recruitTeamMemberTechnology_2 = {
     order = "zzz"
 }
 
----@type Prototype.Technology
+---@type data.TechnologyPrototype
 local recruitTeamMemberTechnology_3 = {
     type = "technology",
     name = "muppet_streamer_v2-recruit_team_member-3",
@@ -79,7 +79,7 @@ local recruitTeamMemberTechnology_3 = {
     order = "zzz"
 }
 
----@type Prototype.Technology
+---@type data.TechnologyPrototype
 local recruitTeamMemberTechnology_4 = {
     type = "technology",
     name = "muppet_streamer_v2-recruit_team_member-4",
@@ -104,7 +104,7 @@ local recruitTeamMemberTechnology_4 = {
     order = "zzz"
 }
 
----@type Prototype.Technology
+---@type data.TechnologyPrototype
 local recruitTeamMemberTechnology_5 = {
     type = "technology",
     name = "muppet_streamer_v2-recruit_team_member-5",
@@ -130,7 +130,7 @@ local recruitTeamMemberTechnology_5 = {
     order = "zzz"
 }
 
----@type Prototype.Technology
+---@type data.TechnologyPrototype
 local recruitTeamMemberTechnology_6 = {
     type = "technology",
     name = "muppet_streamer_v2-recruit_team_member-6",
@@ -157,7 +157,7 @@ local recruitTeamMemberTechnology_6 = {
     order = "zzz"
 }
 
----@type Prototype.Technology
+---@type data.TechnologyPrototype
 local recruitTeamMemberTechnology_7 = {
     type = "technology",
     name = "muppet_streamer_v2-recruit_team_member-7",
@@ -184,4 +184,6 @@ local recruitTeamMemberTechnology_7 = {
     order = "zzz"
 }
 
-data:extend({ recruitTeamMemberTechnology_1, recruitTeamMemberTechnology_2, recruitTeamMemberTechnology_3, recruitTeamMemberTechnology_4, recruitTeamMemberTechnology_5, recruitTeamMemberTechnology_6, recruitTeamMemberTechnology_7 })
+data:extend({ recruitTeamMemberTechnology_1, recruitTeamMemberTechnology_2, recruitTeamMemberTechnology_3,
+    recruitTeamMemberTechnology_4, recruitTeamMemberTechnology_5, recruitTeamMemberTechnology_6,
+    recruitTeamMemberTechnology_7 })

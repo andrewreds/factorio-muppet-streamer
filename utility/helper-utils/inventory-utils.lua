@@ -197,7 +197,7 @@ InventoryUtils.TryInsertInventoryContents = function(contents, targetInventory, 
 end
 
 --- Takes an array of SimpleItemStack and inserts them in to an inventory. Updates each SimpleItemStack passed in with the new count.
----@param simpleItemStacks SimpleItemStack[]
+---@param simpleItemStacks LuaItemStack
 ---@param targetInventory LuaInventory
 ---@param dropUnmovedOnGround? boolean|nil # If TRUE then ALL items not moved are dropped on the ground. If FALSE then unmoved items are left in the source inventory. If not provided then defaults to FALSE.
 ---@param ratioToMove? double|nil # Ratio of the item count to try and move. Float number from 0 to 1. If not provided it defaults to 1. Number of items moved is rounded up.

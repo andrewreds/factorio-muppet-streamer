@@ -48,10 +48,10 @@ end
 ---@field trainWeight double # The total weight of the train.
 ---@field trainFrictionForce double # The total friction force of the train.
 ---@field trainWeightedFrictionForce double # The train's friction force divided by train weight.
----@field locomotiveFuelAccelerationPower double # The max acceleration power per tick the train can add for the fuel type on last data update.
+---@field locomotiveFuelAccelerationPower? double # The max acceleration power per tick the train can add for the fuel type on last data update.
 ---@field locomotiveAccelerationPower double # The max raw acceleration power per tick the train can add (ignoring fuel bonus).
 ---@field trainAirResistanceReductionMultiplier double # The air resistance of the train (lead carriage in current direction).
----@field maxSpeed double # The max speed the train can achieve on current fuel type.
+---@field maxSpeed? double # The max speed the train can achieve on current fuel type.
 ---@field trainRawBrakingForce double # The total braking force of the train ignoring any force bonus percentage from LuaForce.train_braking_force_bonus.
 ---@field forwardFacingLocoCount uint # The number of locomotives facing forwards. Used when recalculating locomotiveFuelAccelerationPower.
 
@@ -234,7 +234,7 @@ end
 ---@param initialSpeedAbsolute double
 ---@param distance double
 ---@return uint ticks # Rounded up.
----@return double absoluteFinalSpeed
+---@return double finalSpeed
 TrainUtils.EstimateAcceleratingTrainTicksAndFinalSpeedToCoverDistance = function(trainData, initialSpeedAbsolute, distance)
     -- Work out how long it will take to accelerate over the distance. This doesn't (can't) limit the train to its max speed.
     local initialSpeedAirResistance = (1 - trainData.trainAirResistanceReductionMultiplier) * initialSpeedAbsolute

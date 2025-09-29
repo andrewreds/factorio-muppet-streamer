@@ -48,10 +48,10 @@ local MaxDistancePositionAroundTarget = 10
 ---@class Teleport_TeleportDetails # The data on a teleport action being undertaken. This includes the attributes from the first Teleport_CommandDetails within it directly.
 ---@field teleportId uint
 ---@field target string
----@field targetPlayer LuaPlayer
----@field targetPlayer_surface LuaSurface
----@field targetPlayer_force LuaForce
----@field targetPlayerPlacementEntity LuaEntity # A player character or teleportable vehicle.
+---@field targetPlayer? LuaPlayer
+---@field targetPlayer_surface? LuaSurface
+---@field targetPlayer_force? LuaForce
+---@field targetPlayerPlacementEntity? LuaEntity # A player character or teleportable vehicle.
 ---@field arrivalRadius double
 ---@field minDistance double
 ---@field maxDistance double
@@ -533,7 +533,7 @@ Teleport.PlanTeleportTarget = function(eventData)
 end
 
 --- React to path requests being completed. If the path request was for a teleport request then we need to validate things again as there could be a significant gap between the path request being made and the response coming back.
----@param event on_script_path_request_finished
+---@param event EventData.on_script_path_request_finished
 Teleport.OnScriptPathRequestFinished = function(event)
     -- Check if this path request related to a Teleport.
     local data = storage.teleport.pathingRequests[event.id]
@@ -670,7 +670,7 @@ Teleport.DoBackupTeleport = function(data)
     end
 end
 
----@param event on_biter_base_built
+---@param event EventData.on_biter_base_built
 Teleport.OnBiterBaseBuilt = function(event)
     local entity = event.entity
     if not entity.valid or entity.type ~= "unit-spawner" then
@@ -679,7 +679,7 @@ Teleport.OnBiterBaseBuilt = function(event)
     Teleport.SpawnerCreated(entity)
 end
 
----@param event script_raised_built
+---@param event EventData.script_raised_built
 Teleport.ScriptRaisedBuilt = function(event)
     local entity = event.entity
     if not entity.valid or entity.type ~= "unit-spawner" then
@@ -688,7 +688,7 @@ Teleport.ScriptRaisedBuilt = function(event)
     Teleport.SpawnerCreated(entity)
 end
 
----@param event on_chunk_generated
+---@param event EventData.on_chunk_generated
 Teleport.OnChunkGenerated = function(event)
     storage.teleport.chunkGeneratedId = storage.teleport.chunkGeneratedId + 1
     -- Check the chunk in 1 ticks time to let any other mod or scenario complete its actions first.
@@ -699,7 +699,7 @@ end
 --- When a chunk is generated we wait for 1 tick and then this function is called. Lets any other mod/scenario mess with the spawner prior to use caching its details.
 ---@param eventData any
 Teleport.OnChunkGenerated_Scheduled = function(eventData)
-    local event = eventData.data ---@type on_chunk_generated
+    local event = eventData.data ---@type EventData.on_chunk_generated
     local spawners = event.surface.find_entities_filtered {
         area = event.area,
         type = "unit-spawner"
@@ -709,7 +709,7 @@ Teleport.OnChunkGenerated_Scheduled = function(eventData)
     end
 end
 
----@param event on_entity_died
+---@param event EventData.on_entity_died
 Teleport.OnEntityDied = function(event)
     local entity = event.entity
     if not entity.valid or entity.type ~= "unit-spawner" then
@@ -718,7 +718,7 @@ Teleport.OnEntityDied = function(event)
     Teleport.SpawnerRemoved(entity)
 end
 
----@param event script_raised_destroy
+---@param event EventData.script_raised_destroy
 Teleport.ScriptRaisedDestroy = function(event)
     local entity = event.entity
     if not entity.valid or entity.type ~= "unit-spawner" then
