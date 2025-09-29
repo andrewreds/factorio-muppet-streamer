@@ -341,10 +341,14 @@ GuiUtil._ApplyStylingArgumentsToElement = function(element, stylingArgs)
     if element == nil or (not element.valid) then
         return
     end
-    if stylingArgs.column_alignments ~= nil then
-        for k, v in pairs(stylingArgs.column_alignments) do
-            element.style.column_alignments[k] = v
+    local column_alignments = stylingArgs.column_alignments
+    if column_alignments ~= nil then
+        if type(column_alignments) == "table" then
+            for k, v in pairs(column_alignments) do
+                element.style.column_alignments[k] = v
+            end
         end
+
         stylingArgs.column_alignments = nil
     end
     local elementStyle = element.style ---@cast elementStyle table<string, any> # As we are just blindly writing key values to it.

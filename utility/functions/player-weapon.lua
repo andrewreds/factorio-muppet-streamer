@@ -265,7 +265,7 @@ PlayerWeapon.ReturnRemovedWeapon = function(player, removedWeaponDetails)
         if removedWeaponDetails.weaponItemName ~= nil then
             playerCharacterInventory = playerCharacterInventory or player.get_main_inventory()
             playerGunInventory = playerGunInventory or player.get_inventory(defines.inventory.character_guns)
-            if playerCharacterInventory.get_item_count(removedWeaponDetails.weaponItemName) >= 1 then
+            if playerCharacterInventory ~= nil and playerCharacterInventory.get_item_count(removedWeaponDetails.weaponItemName) >= 1 then
                 playerCharacterInventory.remove({
                     name = removedWeaponDetails.weaponItemName,
                     count = 1
@@ -280,6 +280,9 @@ PlayerWeapon.ReturnRemovedWeapon = function(player, removedWeaponDetails)
         -- If an ammo item was removed from the slot, so assuming the player still has it in their inventory return it to the ammo slot.
         if removedWeaponDetails.ammoItemName ~= nil then
             playerCharacterInventory = playerCharacterInventory or player.get_main_inventory()
+            if playerCharacterInventory == nil then
+                return
+            end
             playerAmmoInventory = playerAmmoInventory or player.get_inventory(defines.inventory.character_ammo)
             local ammoItemStackToReturn = playerCharacterInventory.find_item_stack(removedWeaponDetails.ammoItemName)
             if ammoItemStackToReturn ~= nil then
@@ -333,7 +336,9 @@ end
 ---@return boolean compatible
 PlayerWeapon.IsAmmoCompatibleWithWeapon = function(ammoCategory, weaponItemPrototype)
     local newWeaponType_categories = weaponItemPrototype.attack_parameters.ammo_categories
-
+    if newWeaponType_categories == nil then
+        return false
+    end
     for _, newWeaponType_category in pairs(newWeaponType_categories) do
         if ammoCategory == newWeaponType_category then
             return true

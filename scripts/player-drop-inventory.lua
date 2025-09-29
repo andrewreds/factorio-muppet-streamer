@@ -442,6 +442,9 @@ PlayerDropInventory.DropSomeItemsFromInventories = function(player, data, itemCo
     local inventoryContents = inventoriesContents[inventoryNameOfItemNumberToDrop]
     local itemStackToDropFrom_UpdatedForThisItem = false
     local itemIndex, itemStack = next(inventoryContents)
+    if itemStack == nil then
+        return
+    end
     local itemNameToDrop = itemStack.name
     local itemCount = itemStack.count
 
@@ -506,6 +509,11 @@ PlayerDropInventory.DropSomeItemsFromInventories = function(player, data, itemCo
             while itemCountedUpTo + itemCount < itemNumberToDrop do
                 itemCountedUpTo = itemCountedUpTo + itemCount
                 itemIndex, itemStack = next(inventoryContents, itemIndex)
+                if itemStack == nil then
+                    -- Run out of items in this this inventory to iterate through, ERROR.
+                    CommandsUtils.LogPrintError(CommandName, nil, "didn't find item number " .. itemNumberToDrop .. " in " .. player.name .. "'s inventory id " .. inventoryNameOfItemNumberToDrop, nil)
+                    return
+                end
                 itemNameToDrop = itemStack.name
                 itemQualityToDrop = itemStack.quality
                 itemCount = itemStack.count

@@ -236,7 +236,7 @@ EventScheduler._OnSchedulerCycle = function(event)
     if storage.UTILITYSCHEDULEDFUNCTIONSPERTICK ~= nil then
         -- Prefetch the next table entry as we will likely remove the inner instance entry and its parent eventName while in the loop. Advised solution by Factorio discord.
         local eventName, instances = next(storage.UTILITYSCHEDULEDFUNCTIONSPERTICK)
-        while eventName do
+        while eventName and instances ~= nil do
             local nextEventName, nextInstances = next(storage.UTILITYSCHEDULEDFUNCTIONSPERTICK, eventName)
             for instanceId, scheduledFunctionData in pairs(instances) do
                 ---@type UtilityScheduledEvent_CallbackObject

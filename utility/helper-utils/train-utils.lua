@@ -83,8 +83,10 @@ TrainUtils.GetTrainSpeedCalculationData = function(train, train_speed, trainCarr
     -- If trainCarriagesDataArray is nil we'll build it up as we go from the train_carriages array. This means that the functions logic only has 1 data structure to worry about. The trainCarriagesDataArray isn't passed out as a return and so while we build up the cache object it is dropped at the end of the function.
     if trainCarriagesDataArray == nil then
         trainCarriagesDataArray = {} ---@type TrainUtils_TrainCarriageData[]
-        for i, entity in pairs(train_carriages) do
-            trainCarriagesDataArray[i] = { entity = entity }
+        if train_carriages ~= nil then
+            for i, entity in pairs(train_carriages) do
+                trainCarriagesDataArray[i] = { entity = entity }
+            end
         end
     end
 
@@ -245,17 +247,18 @@ TrainUtils.EstimateAcceleratingTrainTicksAndFinalSpeedToCoverDistance = function
     local finalSpeed = initialSpeedAbsolute + (acceleration * ticks)
 
     -- If the train would be going faster than max speed at the end then cap at max speed and estimate extra time at this speed.
-    if finalSpeed > trainData.maxSpeed then
+    local maxSpeed = trainData.maxSpeed
+    if maxSpeed ~= nil and finalSpeed > maxSpeed then
         -- Work out how long and the distance covered it will take to get up to max speed. Code logic copied From TrainUtils.EstimateAcceleratingTrainTicksAndDistanceFromInitialToFinalSpeed().
-        local ticksToMaxSpeed = math_ceil((trainData.maxSpeed - initialSpeedAbsolute) / acceleration) --[[@as uint]]
-        local distanceToMaxSpeed = (ticksToMaxSpeed * initialSpeedAbsolute) + (((trainData.maxSpeed - initialSpeedAbsolute) * ticksToMaxSpeed) / 2)
+        local ticksToMaxSpeed = math_ceil((maxSpeed - initialSpeedAbsolute) / acceleration)
+        local distanceToMaxSpeed = (ticksToMaxSpeed * initialSpeedAbsolute) + (((maxSpeed - initialSpeedAbsolute) * ticksToMaxSpeed) / 2)
 
         -- Work out how long it will take to cover the remaining distance at max speed.
-        local ticksAtMaxSpeed = math_ceil((distance - distanceToMaxSpeed) / trainData.maxSpeed) --[[@as uint]]
+        local ticksAtMaxSpeed = math_ceil((distance - distanceToMaxSpeed) / maxSpeed)
 
         -- Set the final results.
         ticks = ticksToMaxSpeed + ticksAtMaxSpeed
-        finalSpeed = trainData.maxSpeed
+        finalSpeed = maxSpeed
     end
 
     return ticks, finalSpeed
@@ -388,10 +391,11 @@ TrainUtils.CalculateBrakingTrainsTimeAndStartingSpeedToBrakeToFinalSpeedOverDist
     local trainForceBrakingForce = trainData.trainRawBrakingForce + (trainData.trainRawBrakingForce * forcesBrakingForceBonus)
     local tickBrakingReduction = (trainForceBrakingForce + trainData.trainFrictionForce) / trainData.trainWeight
     local initialSpeed = math_sqrt((finalSpeedAbsolute ^ 2) + (2 * tickBrakingReduction * distance))
+    local maxSpeed = trainData.maxSpeed
 
-    if initialSpeed > trainData.maxSpeed then
+    if maxSpeed ~= nil and initialSpeed > maxSpeed then
         -- Initial speed is greater than max speed so cap the initial speed to max speed.
-        initialSpeed = trainData.maxSpeed
+        initialSpeed = maxSpeed
     end
 
     local speedToDropAbsolute = initialSpeed - finalSpeedAbsolute

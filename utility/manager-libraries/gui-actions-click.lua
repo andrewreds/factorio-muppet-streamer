@@ -53,6 +53,10 @@ GuiActionsClick.RegisterGuiForClick = function(elementName, elementType, actionN
     end
 
     local name = GuiActionsClick._GenerateGuiElementName(elementName, elementType)
+    if name == nil then
+        return
+    end
+
     storage.UTILITYGUIACTIONSGUICLICK = storage.UTILITYGUIACTIONSGUICLICK or {} ---@type table<string, UtilityGuiActionsClick_GuiClickDetails>
     if not disabled then
         storage.UTILITYGUIACTIONSGUICLICK[name] = { actionName = actionName, data = data }
@@ -74,6 +78,10 @@ GuiActionsClick.RemoveGuiForClick = function(elementName, elementType)
         return
     end
     local name = GuiActionsClick._GenerateGuiElementName(elementName, elementType)
+    if name == nil then
+        return
+    end
+    
     storage.UTILITYGUIACTIONSGUICLICK[name] = nil
 end
 

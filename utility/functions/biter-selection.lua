@@ -78,6 +78,9 @@ end
 BiterSelection._CalculateSpecificBiterSelectionProbabilities = function(spawnerType, currentEvolution)
     local rawUnitProbabilities = prototypes.entity[spawnerType].result_units
     local currentEvolutionProbabilities = {} ---@type UtilityBiterSelection_UnitChanceEntry[]
+    if rawUnitProbabilities == nil then
+        return currentEvolutionProbabilities
+    end
     for _, possibility in pairs(rawUnitProbabilities) do
         local startSpawnPointIndex ---@type int
         for spawnPointIndex, spawnPoint in pairs(possibility.spawn_points) do
