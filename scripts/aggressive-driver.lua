@@ -1,9 +1,7 @@
 --[[
     Assumptions:
         - All vehicles of type "car", "locomotive" and "spider-vehicle" have the ability to move themselves. I can't see a way via the API to check if they are actually capable of producing movement. I also assume all these vehicles can go backwards, as we just try and move backwards if forwards is blocked.
-]]
-
-local AggressiveDriver = {} ---@class AggressiveDriver
+]] local AggressiveDriver = {} ---@class AggressiveDriver
 local CommandsUtils = require("utility.helper-utils.commands-utils")
 local EventScheduler = require("utility.manager-libraries.event-scheduler")
 local PositionUtils = require("utility.helper-utils.position-utils")
@@ -69,14 +67,27 @@ local AggressiveWalkingTypes = {
 ---@class AggressiveDriver_AffectedPlayerDetails
 ---@field suppressMessages boolean
 
-
 ---@alias AggressiveDriver_CheckedTrainFuelStates table<uint, boolean> # The trains fuel state when checked during this effect already.
 
-
 local CommandName = "muppet_streamer_v2_aggressive_driver"
-local PrimaryVehicleTypes = { ["car"] = "car", ["locomotive"] = "locomotive", ["spider-vehicle"] = "spider-vehicle" }
-local SecondaryVehicleTypes = { ["cargo-wagon"] = "cargo-wagon", ["fluid-wagon"] = "fluid-wagon", ["artillery-wagon"] = "artillery-wagon" }
-local AllVehicleEntityTypes = { ["car"] = "car", ["locomotive"] = "locomotive", ["spider-vehicle"] = "spider-vehicle", ["cargo-wagon"] = "cargo-wagon", ["fluid-wagon"] = "fluid-wagon", ["artillery-wagon"] = "artillery-wagon" }
+local PrimaryVehicleTypes = {
+    ["car"] = "car",
+    ["locomotive"] = "locomotive",
+    ["spider-vehicle"] = "spider-vehicle"
+}
+local SecondaryVehicleTypes = {
+    ["cargo-wagon"] = "cargo-wagon",
+    ["fluid-wagon"] = "fluid-wagon",
+    ["artillery-wagon"] = "artillery-wagon"
+}
+local AllVehicleEntityTypes = {
+    ["car"] = "car",
+    ["locomotive"] = "locomotive",
+    ["spider-vehicle"] = "spider-vehicle",
+    ["cargo-wagon"] = "cargo-wagon",
+    ["fluid-wagon"] = "fluid-wagon",
+    ["artillery-wagon"] = "artillery-wagon"
+}
 
 AggressiveDriver.CreateGlobals = function()
     storage.aggressiveDriver = storage.aggressiveDriver or {} ---@class AggressiveDriver_Global
@@ -85,8 +96,10 @@ AggressiveDriver.CreateGlobals = function()
 end
 
 AggressiveDriver.OnLoad = function()
-    CommandsUtils.Register("muppet_streamer_v2_aggressive_driver", { "api-description.muppet_streamer_v2_aggressive_driver" }, AggressiveDriver.AggressiveDriverCommand, true)
-    Events.RegisterHandlerEvent(defines.events.on_pre_player_died, "AggressiveDriver.OnPrePlayerDied", AggressiveDriver.OnPrePlayerDied)
+    CommandsUtils.Register("muppet_streamer_v2_aggressive_driver",
+        {"api-description.muppet_streamer_v2_aggressive_driver"}, AggressiveDriver.AggressiveDriverCommand, true)
+    Events.RegisterHandlerEvent(defines.events.on_pre_player_died, "AggressiveDriver.OnPrePlayerDied",
+        AggressiveDriver.OnPrePlayerDied)
     EventScheduler.RegisterScheduledEventType("AggressiveDriver.Drive", AggressiveDriver.Drive)
     EventScheduler.RegisterScheduledEventType("AggressiveDriver.ApplyToPlayer", AggressiveDriver.ApplyToPlayer)
     MOD.Interfaces.Commands.AggressiveDriver = AggressiveDriver.AggressiveDriverCommand
@@ -98,16 +111,20 @@ end
 
 ---@param command CustomCommandData
 AggressiveDriver.AggressiveDriverCommand = function(command)
-    local commandData = CommandsUtils.GetSettingsTableFromCommandParameterString(command.parameter, true, CommandName, { "delay", "target", "duration", "control", "aggressiveWalking", "commandeerVehicle", "teleportDistance", "teleportWhitelistTypes", "teleportWhitelistNames", "suppressMessages" })
+    local commandData = CommandsUtils.GetSettingsTableFromCommandParameterString(command.parameter, true, CommandName,
+        {"delay", "target", "duration", "control", "aggressiveWalking", "commandeerVehicle", "teleportDistance",
+         "teleportWhitelistTypes", "teleportWhitelistNames", "suppressMessages"})
     if commandData == nil then
         return
     end
 
     local delaySeconds = commandData.delay
-    if not CommandsUtils.CheckNumberArgument(delaySeconds, "double", false, CommandName, "delay", 0, nil, command.parameter) then
+    if not CommandsUtils.CheckNumberArgument(delaySeconds, "double", false, CommandName, "delay", 0, nil,
+        command.parameter) then
         return
     end ---@cast delaySeconds double|nil
-    local scheduleTick = Common.DelaySecondsSettingToScheduledEventTickValue(delaySeconds, command.tick, CommandName, "delay")
+    local scheduleTick = Common.DelaySecondsSettingToScheduledEventTickValue(delaySeconds, command.tick, CommandName,
+        "delay")
 
     local target = commandData.target
     if not Common.CheckPlayerNameSettingValue(target, CommandName, "target", command.parameter) then
@@ -115,7 +132,8 @@ AggressiveDriver.AggressiveDriverCommand = function(command)
     end ---@cast target string
 
     local durationSeconds = commandData.duration
-    if not CommandsUtils.CheckNumberArgument(durationSeconds, "double", true, CommandName, "duration", 1, math.floor(MathUtils.uintMax / 60), command.parameter) then
+    if not CommandsUtils.CheckNumberArgument(durationSeconds, "double", true, CommandName, "duration", 1,
+        math.floor(MathUtils.uintMax / 60), command.parameter) then
         return
     end ---@cast durationSeconds double
     local duration = math.floor(durationSeconds * 60) --[[@as uint # Duration was validated as not exceeding a uint during input validation.]]
@@ -129,7 +147,8 @@ AggressiveDriver.AggressiveDriverCommand = function(command)
     end
 
     local aggressiveWalking = commandData.aggressiveWalking
-    if not CommandsUtils.CheckStringArgument(aggressiveWalking, false, CommandName, "aggressiveWalking", AggressiveWalkingTypes, command.parameter) then
+    if not CommandsUtils.CheckStringArgument(aggressiveWalking, false, CommandName, "aggressiveWalking",
+        AggressiveWalkingTypes, command.parameter) then
         return
     end ---@cast aggressiveWalking AggressiveDriver_AggressiveWalkingTypes|nil
     if aggressiveWalking == nil then
@@ -148,7 +167,8 @@ AggressiveDriver.AggressiveDriverCommand = function(command)
     end
 
     local commandeerVehicle = commandData.commandeerVehicle
-    if not CommandsUtils.CheckBooleanArgument(commandeerVehicle, false, CommandName, "commandeerVehicle", command.parameter) then
+    if not CommandsUtils.CheckBooleanArgument(commandeerVehicle, false, CommandName, "commandeerVehicle",
+        command.parameter) then
         return
     end ---@cast commandeerVehicle boolean|nil
     if commandeerVehicle == nil then
@@ -156,7 +176,8 @@ AggressiveDriver.AggressiveDriverCommand = function(command)
     end
 
     local teleportDistance = commandData.teleportDistance
-    if not CommandsUtils.CheckNumberArgument(teleportDistance, "double", false, CommandName, "teleportDistance", 0, nil, command.parameter) then
+    if not CommandsUtils.CheckNumberArgument(teleportDistance, "double", false, CommandName, "teleportDistance", 0, nil,
+        command.parameter) then
         return
     end ---@cast teleportDistance double|nil
     if teleportDistance == nil then
@@ -164,16 +185,19 @@ AggressiveDriver.AggressiveDriverCommand = function(command)
     end
 
     local teleportWhitelistTypes_string = commandData.teleportWhitelistTypes
-    if not CommandsUtils.CheckStringArgument(teleportWhitelistTypes_string, false, CommandName, "teleportWhitelistTypes", nil, command.parameter) then
+    if not CommandsUtils.CheckStringArgument(teleportWhitelistTypes_string, false, CommandName,
+        "teleportWhitelistTypes", nil, command.parameter) then
         return
     end ---@cast teleportWhitelistTypes_string string|nil
     local teleportWhitelistTypes ---@type table<string, string>|nil
     if teleportWhitelistTypes_string ~= nil and teleportWhitelistTypes_string ~= "" then
-        local teleportWhitelistTypes_raw = StringUtils.SplitStringOnCharactersToDictionary(teleportWhitelistTypes_string, ",")
+        local teleportWhitelistTypes_raw = StringUtils.SplitStringOnCharactersToDictionary(
+            teleportWhitelistTypes_string, ",")
         teleportWhitelistTypes = {}
         for entityTypeName in pairs(teleportWhitelistTypes_raw) do
             if AllVehicleEntityTypes[entityTypeName] == nil then
-                CommandsUtils.LogPrintError(CommandName, "teleportWhitelistTypes", "invalid vehicle type name: '" .. entityTypeName .. "'", command.parameter)
+                CommandsUtils.LogPrintError(CommandName, "teleportWhitelistTypes",
+                    "invalid vehicle type name: '" .. entityTypeName .. "'", command.parameter)
                 return
             end
             teleportWhitelistTypes[entityTypeName] = entityTypeName
@@ -181,16 +205,19 @@ AggressiveDriver.AggressiveDriverCommand = function(command)
     end
 
     local teleportWhitelistNames_string = commandData.teleportWhitelistNames
-    if not CommandsUtils.CheckStringArgument(teleportWhitelistNames_string, false, CommandName, "teleportWhitelistNames", nil, command.parameter) then
+    if not CommandsUtils.CheckStringArgument(teleportWhitelistNames_string, false, CommandName,
+        "teleportWhitelistNames", nil, command.parameter) then
         return
     end ---@cast teleportWhitelistNames_string string|nil
     local teleportWhitelistNames ---@type table<string, string>|nil
     if teleportWhitelistNames_string ~= nil and teleportWhitelistNames_string ~= "" then
-        local teleportWhitelistNames_raw = StringUtils.SplitStringOnCharactersToDictionary(teleportWhitelistNames_string, ",")
+        local teleportWhitelistNames_raw = StringUtils.SplitStringOnCharactersToDictionary(
+            teleportWhitelistNames_string, ",")
         teleportWhitelistNames = {}
         for entityName in pairs(teleportWhitelistNames_raw) do
             if prototypes.entity[entityName] == nil then
-                CommandsUtils.LogPrintError(CommandName, "teleportWhitelistNames", "invalid vehicle entity name: '" .. entityName .. "'", command.parameter)
+                CommandsUtils.LogPrintError(CommandName, "teleportWhitelistNames",
+                    "invalid vehicle entity name: '" .. entityName .. "'", command.parameter)
                 return
             end
             teleportWhitelistNames[entityName] = entityName
@@ -204,7 +231,8 @@ AggressiveDriver.AggressiveDriverCommand = function(command)
     end
 
     local suppressMessages = commandData.suppressMessages
-    if not CommandsUtils.CheckBooleanArgument(suppressMessages, false, CommandName, "suppressMessages", command.parameter) then
+    if not CommandsUtils.CheckBooleanArgument(suppressMessages, false, CommandName, "suppressMessages",
+        command.parameter) then
         return
     end ---@cast suppressMessages boolean|nil
     if suppressMessages == nil then
@@ -213,12 +241,29 @@ AggressiveDriver.AggressiveDriverCommand = function(command)
 
     storage.aggressiveDriver.nextId = storage.aggressiveDriver.nextId + 1
     ---@type AggressiveDriver_DelayedCommandDetails
-    local delayedCommandDetails = { target = target, duration = duration, control = control, aggressiveWalkingNoStartingVehicle = aggressiveWalkingNoStartingVehicle, aggressiveWalkingOnVehicleDeath = aggressiveWalkingOnVehicleDeath, commandeerVehicle = commandeerVehicle, teleportDistance = teleportDistance, teleportWhitelistTypes = teleportWhitelistTypes, teleportWhitelistNames = teleportWhitelistNames, suppressMessages = suppressMessages }
+    local delayedCommandDetails = {
+        target = target,
+        duration = duration,
+        control = control,
+        aggressiveWalkingNoStartingVehicle = aggressiveWalkingNoStartingVehicle,
+        aggressiveWalkingOnVehicleDeath = aggressiveWalkingOnVehicleDeath,
+        commandeerVehicle = commandeerVehicle,
+        teleportDistance = teleportDistance,
+        teleportWhitelistTypes = teleportWhitelistTypes,
+        teleportWhitelistNames = teleportWhitelistNames,
+        suppressMessages = suppressMessages
+    }
     if scheduleTick ~= -1 then
-        EventScheduler.ScheduleEventOnce(scheduleTick, "AggressiveDriver.ApplyToPlayer", storage.aggressiveDriver.nextId, delayedCommandDetails)
+        EventScheduler.ScheduleEventOnce(scheduleTick, "AggressiveDriver.ApplyToPlayer",
+            storage.aggressiveDriver.nextId, delayedCommandDetails)
     else
         ---@type UtilityScheduledEvent_CallbackObject
-        local eventData = { tick = command.tick, name = "AggressiveDriver.ApplyToPlayer", instanceId = storage.aggressiveDriver.nextId, data = delayedCommandDetails }
+        local eventData = {
+            tick = command.tick,
+            name = "AggressiveDriver.ApplyToPlayer",
+            instanceId = storage.aggressiveDriver.nextId,
+            data = delayedCommandDetails
+        }
         AggressiveDriver.ApplyToPlayer(eventData)
     end
 end
@@ -235,13 +280,17 @@ AggressiveDriver.ApplyToPlayer = function(eventData)
     local targetPlayer_character = targetPlayer.character
     -- Check the player has a character they can control. The character may be inside the vehicle at present.
     if targetPlayer.controller_type ~= defines.controllers.character or targetPlayer_character == nil then
-        if not data.suppressMessages then game.print({ "message.muppet_streamer_v2_aggressive_driver_not_character_controller", data.target }) end
+        if not data.suppressMessages then
+            game.print({"message.muppet_streamer_v2_aggressive_driver_not_character_controller", data.target})
+        end
         return
     end
 
     if storage.aggressiveDriver.affectedPlayers[targetPlayer.index] ~= nil then
         -- Player already being affected by this effect so just silently ignore it.
-        if not data.suppressMessages then game.print({ "message.muppet_streamer_v2_duplicate_command_ignored", "Aggressive Driver", data.target }) end
+        if not data.suppressMessages then
+            game.print({"message.muppet_streamer_v2_duplicate_command_ignored", "Aggressive Driver", data.target})
+        end
         return
     end
 
@@ -268,7 +317,9 @@ AggressiveDriver.ApplyToPlayer = function(eventData)
                     -- No current driver, so player must be in the passengers seat. We can always just move them across to the drivers seat.
                     inSuitableVehicle = true
                     playersVehicle.set_driver(targetPlayer)
-                    if not data.suppressMessages then game.print({ "message.muppet_streamer_v2_aggressive_commandeer_vehicle", targetPlayer.name }) end
+                    if not data.suppressMessages then
+                        game.print({"message.muppet_streamer_v2_aggressive_commandeer_vehicle", targetPlayer.name})
+                    end
                 else
                     -- There's a driver of the vehicle.
                     if data.commandeerVehicle then
@@ -281,7 +332,10 @@ AggressiveDriver.ApplyToPlayer = function(eventData)
                             inSuitableVehicle = true
                             playersVehicle.set_passenger(driver)
                             playersVehicle.set_driver(targetPlayer)
-                            if not data.suppressMessages then game.print({ "message.muppet_streamer_v2_aggressive_commandeer_vehicle_from_other", targetPlayer.name, AggressiveDriver.GetVehicleOccupierPlayer(driver).name }) end
+                            if not data.suppressMessages then
+                                game.print({"message.muppet_streamer_v2_aggressive_commandeer_vehicle_from_other",
+                                            targetPlayer.name, AggressiveDriver.GetVehicleOccupierPlayer(driver).name})
+                            end
                         end
                     else
                         -- Respect vehicle drivers.
@@ -303,19 +357,32 @@ AggressiveDriver.ApplyToPlayer = function(eventData)
 
     -- Look for suitable vehicles if not already in one.
     if not inSuitableVehicle and data.teleportDistance > 0 then
-        local targetPlayer_position = targetPlayer.position
+        local targetPlayer_position = targetPlayer.physical_position
 
         -- We sort vehicles based on their preference. We aim to dislodge as few other players as we can within the effect's setting's constraints.
         ---@type AggressiveDriver_SortedVehicleEntry[], AggressiveDriver_SortedVehicleEntry[], AggressiveDriver_SortedVehicleEntry[], AggressiveDriver_SortedVehicleEntry[], AggressiveDriver_SortedVehicleEntry[], AggressiveDriver_SortedVehicleEntry[]
-        local primaryDistanceSortedFreeVehicles, primaryDistanceSortedDriverOccupiedVehicles, primaryDistanceSortedFullyOccupiedVehicles, secondaryDistanceSortedFreeVehicles, secondaryDistanceSortedDriverOccupiedVehicles, secondaryDistanceSortedFullyOccupiedVehicles = {}, {}, {}, {}, {}, {}
+        local primaryDistanceSortedFreeVehicles, primaryDistanceSortedDriverOccupiedVehicles,
+            primaryDistanceSortedFullyOccupiedVehicles, secondaryDistanceSortedFreeVehicles,
+            secondaryDistanceSortedDriverOccupiedVehicles, secondaryDistanceSortedFullyOccupiedVehicles = {}, {}, {},
+            {}, {}, {}
 
         -- Search for specified vehicles within the teleport radius. Have to get by type and names separately as otherwise if both populated they restricted over each other. Generally only 1 search is done for standard requests, unless the user has put specific option combinations in that requires 2 searches.
         local vehicles
         if data.teleportWhitelistTypes ~= nil then
-            vehicles = targetPlayer.surface.find_entities_filtered { position = targetPlayer_position, radius = data.teleportDistance, force = targetPlayer.force, type = data.teleportWhitelistTypes }
+            vehicles = targetPlayer.physical_surface.find_entities_filtered {
+                position = targetPlayer_position,
+                radius = data.teleportDistance,
+                force = targetPlayer.force,
+                type = data.teleportWhitelistTypes
+            }
         end
         if data.teleportWhitelistNames ~= nil then
-            local vehicles_names = targetPlayer.surface.find_entities_filtered { position = targetPlayer_position, radius = data.teleportDistance, force = targetPlayer.force, name = data.teleportWhitelistNames }
+            local vehicles_names = targetPlayer.physical_surface.find_entities_filtered {
+                position = targetPlayer_position,
+                radius = data.teleportDistance,
+                force = targetPlayer.force,
+                name = data.teleportWhitelistNames
+            }
             if vehicles == nil then
                 vehicles = vehicles_names
             else
@@ -388,63 +455,67 @@ AggressiveDriver.ApplyToPlayer = function(eventData)
                 -- If the vehicle has a good fuel state then record it.
                 if AggressiveDriver.CheckVehiclesFuelState(vehicle, vehicle_type, checkedTrainFuelStates) then
                     distance = PositionUtils.GetDistance(targetPlayer_position, vehicle.position)
-                    list[#list + 1] = { distance = distance, vehicle = vehicle }
+                    list[#list + 1] = {
+                        distance = distance,
+                        vehicle = vehicle
+                    }
                 end
             end
         end
 
         -- Work over the various primary and secondary lists of vehicles in a descending player dislocation order to check the best ones first. If a list has vehicles sort them and put the player in the nearest one.
-        for _, vehicleList in pairs({ primaryDistanceSortedFreeVehicles, secondaryDistanceSortedFreeVehicles }) do
+        for _, vehicleList in pairs({primaryDistanceSortedFreeVehicles, secondaryDistanceSortedFreeVehicles}) do
             if #vehicleList > 0 then
-                table.sort(
-                    vehicleList,
-                    function(a, b)
-                        return a.distance < b.distance
-                    end
-                )
+                table.sort(vehicleList, function(a, b)
+                    return a.distance < b.distance
+                end)
                 -- Can just put us in the free drivers seat.
                 vehicleList[1].vehicle.set_driver(targetPlayer)
                 inSuitableVehicle = true
                 playersVehicle = vehicleList[1].vehicle
-                if not data.suppressMessages then game.print({ "message.muppet_streamer_v2_aggressive_commandeer_vehicle", targetPlayer.name }) end
+                if not data.suppressMessages then
+                    game.print({"message.muppet_streamer_v2_aggressive_commandeer_vehicle", targetPlayer.name})
+                end
                 break
             end
         end
         if not inSuitableVehicle then
-            for _, vehicleList in pairs({ primaryDistanceSortedDriverOccupiedVehicles, secondaryDistanceSortedDriverOccupiedVehicles }) do
+            for _, vehicleList in pairs({primaryDistanceSortedDriverOccupiedVehicles,
+                                         secondaryDistanceSortedDriverOccupiedVehicles}) do
                 if #vehicleList > 0 then
-                    table.sort(
-                        vehicleList,
-                        function(a, b)
-                            return a.distance < b.distance
-                        end
-                    )
+                    table.sort(vehicleList, function(a, b)
+                        return a.distance < b.distance
+                    end)
                     -- Move old driver to passenger seat and put us in there.
                     local oldDriver = vehicleList[1].vehicle.get_driver() ---@cast oldDriver - nil
                     vehicleList[1].vehicle.set_passenger(oldDriver)
                     vehicleList[1].vehicle.set_driver(targetPlayer)
                     inSuitableVehicle = true
                     playersVehicle = vehicleList[1].vehicle
-                    if not data.suppressMessages then game.print({ "message.muppet_streamer_v2_aggressive_commandeer_vehicle_from_other", targetPlayer.name, AggressiveDriver.GetVehicleOccupierPlayer(oldDriver).name }) end
+                    if not data.suppressMessages then
+                        game.print({"message.muppet_streamer_v2_aggressive_commandeer_vehicle_from_other",
+                                    targetPlayer.name, AggressiveDriver.GetVehicleOccupierPlayer(oldDriver).name})
+                    end
                     break
                 end
             end
         end
         if not inSuitableVehicle then
-            for _, vehicleList in pairs({ primaryDistanceSortedFullyOccupiedVehicles, secondaryDistanceSortedFullyOccupiedVehicles }) do
+            for _, vehicleList in pairs({primaryDistanceSortedFullyOccupiedVehicles,
+                                         secondaryDistanceSortedFullyOccupiedVehicles}) do
                 if #vehicleList > 0 then
-                    table.sort(
-                        vehicleList,
-                        function(a, b)
-                            return a.distance < b.distance
-                        end
-                    )
+                    table.sort(vehicleList, function(a, b)
+                        return a.distance < b.distance
+                    end)
                     -- Eject the old driver and put us in there. The passenger seat is already full so just leave it be.
                     local oldDriver = vehicleList[1].vehicle.get_driver() ---@cast oldDriver - nil
                     vehicleList[1].vehicle.set_driver(targetPlayer)
                     inSuitableVehicle = true
                     playersVehicle = vehicleList[1].vehicle
-                    if not data.suppressMessages then game.print({ "message.muppet_streamer_v2_aggressive_commandeer_vehicle_from_other", targetPlayer.name, AggressiveDriver.GetVehicleOccupierPlayer(oldDriver).name }) end
+                    if not data.suppressMessages then
+                        game.print({"message.muppet_streamer_v2_aggressive_commandeer_vehicle_from_other",
+                                    targetPlayer.name, AggressiveDriver.GetVehicleOccupierPlayer(oldDriver).name})
+                    end
                     break
                 end
             end
@@ -453,7 +524,9 @@ AggressiveDriver.ApplyToPlayer = function(eventData)
     if not inSuitableVehicle then
         if not data.aggressiveWalkingNoStartingVehicle then
             -- No aggressive walking for lack of starting vehicle, so the effect has failed to start.
-            if not data.suppressMessages then game.print({ "message.muppet_streamer_v2_aggressive_driver_no_vehicle", data.target }) end
+            if not data.suppressMessages then
+                game.print({"message.muppet_streamer_v2_aggressive_driver_no_vehicle", data.target})
+            end
             return
         end
 
@@ -464,18 +537,39 @@ AggressiveDriver.ApplyToPlayer = function(eventData)
     end
 
     -- Store the players current permission group. Left as the previously stored group if an effect was already being applied to the player, or captured if no present effect affects them.
-    storage.originalPlayersPermissionGroup[targetPlayer.index] = storage.originalPlayersPermissionGroup[targetPlayer.index] or targetPlayer.permission_group
+    storage.originalPlayersPermissionGroup[targetPlayer.index] =
+        storage.originalPlayersPermissionGroup[targetPlayer.index] or targetPlayer.permission_group
 
     targetPlayer.permission_group = AggressiveDriver.GetOrCreatePermissionGroup()
-    storage.aggressiveDriver.affectedPlayers[targetPlayer.index] = { suppressMessages = data.suppressMessages }
+    storage.aggressiveDriver.affectedPlayers[targetPlayer.index] = {
+        suppressMessages = data.suppressMessages
+    }
 
-    if not data.suppressMessages then game.print({ "message.muppet_streamer_v2_aggressive_driver_start", targetPlayer.name }) end
+    if not data.suppressMessages then
+        game.print({"message.muppet_streamer_v2_aggressive_driver_start", targetPlayer.name})
+    end
     -- A train will continue moving in its current direction, effectively ignoring the accelerationState value at the start. But a car and tank will always start going forwards regardless of their previous movement, as they are much faster forwards than backwards.
 
     ---@type AggressiveDriver_DriveEachTickDetails
-    local driveEachTickDetails = { player_index = targetPlayer.index, player = targetPlayer, beenInVehicle = inSuitableVehicle, inVehicleLastTick = inSuitableVehicle, duration = data.duration, control = data.control, aggressiveWalkingNoStartingVehicle = data.aggressiveWalkingNoStartingVehicle, aggressiveWalkingOnVehicleDeath = data.aggressiveWalkingOnVehicleDeath, accelerationTicks = 0, accelerationState = defines.riding.acceleration.accelerating, directionDurationTicks = 0 }
+    local driveEachTickDetails = {
+        player_index = targetPlayer.index,
+        player = targetPlayer,
+        beenInVehicle = inSuitableVehicle,
+        inVehicleLastTick = inSuitableVehicle,
+        duration = data.duration,
+        control = data.control,
+        aggressiveWalkingNoStartingVehicle = data.aggressiveWalkingNoStartingVehicle,
+        aggressiveWalkingOnVehicleDeath = data.aggressiveWalkingOnVehicleDeath,
+        accelerationTicks = 0,
+        accelerationState = defines.riding.acceleration.accelerating,
+        directionDurationTicks = 0
+    }
     ---@type UtilityScheduledEvent_CallbackObject
-    local driveCallbackObject = { tick = game.tick, instanceId = driveEachTickDetails.player_index, data = driveEachTickDetails }
+    local driveCallbackObject = {
+        tick = game.tick,
+        instanceId = driveEachTickDetails.player_index,
+        data = driveEachTickDetails
+    }
     AggressiveDriver.Drive(driveCallbackObject)
 end
 
@@ -551,14 +645,18 @@ AggressiveDriver.Drive = function(eventData)
                 data.accelerationTicks = 1
             else
                 -- Walk in the current direction.
-                player.walking_state = { walking = true, direction = player.walking_state.direction }
+                player.walking_state = {
+                    walking = true,
+                    direction = player.walking_state.direction
+                }
             end
         else
             -- Player has no control so we will set both acceleration and direction.
 
             -- Check if the player/spider is stuck against something and needs direction changing.
-            local currentPlayerPosition = player.position
-            if data.oldPlayerPosition ~= nil and data.oldPlayerPosition.x == currentPlayerPosition.x and data.oldPlayerPosition.y == currentPlayerPosition.y then
+            local currentPlayerPosition = player.physical_position
+            if data.oldPlayerPosition ~= nil and data.oldPlayerPosition.x == currentPlayerPosition.x and
+                data.oldPlayerPosition.y == currentPlayerPosition.y then
                 data.oldPlayerPosition = nil
                 data.directionDurationTicks = 0
             else
@@ -573,14 +671,18 @@ AggressiveDriver.Drive = function(eventData)
                 data.directionDurationTicks = data.directionDurationTicks - 1
             end
 
-            player.walking_state = { walking = true, direction = data.walkingDirection }
+            player.walking_state = {
+                walking = true,
+                direction = data.walkingDirection
+            }
         end
     else
         -- Cars and trains.
         ---@cast vehicle - nil
 
         -- Train carriages need special handling.
-        if vehicle_type == "locomotive" or vehicle_type == "cargo-wagon" or vehicle_type == "fluid-wagon" or vehicle_type == "artillery-wagon" then
+        if vehicle_type == "locomotive" or vehicle_type == "cargo-wagon" or vehicle_type == "fluid-wagon" or
+            vehicle_type == "artillery-wagon" then
             local train = vehicle.train ---@cast train -nil # A rolling_stock entity always has a train field.
 
             -- If the train isn't in manual mode then set it. We do this every tick if needed so that other players setting it to automatic gets overridden.
@@ -595,7 +697,8 @@ AggressiveDriver.Drive = function(eventData)
             local vehicle_speed = vehicle.speed
             if vehicle_speed ~= 0 then
                 local train_speed = train.speed
-                if (vehicle_speed > 0 and vehicle_speed == train_speed) or (vehicle_speed < 0 and vehicle_speed ~= train_speed) then
+                if (vehicle_speed > 0 and vehicle_speed == train_speed) or
+                    (vehicle_speed < 0 and vehicle_speed ~= train_speed) then
                     data.accelerationState = defines.riding.acceleration.accelerating
                 else
                     data.accelerationState = defines.riding.acceleration.reversing
@@ -625,7 +728,8 @@ AggressiveDriver.Drive = function(eventData)
 
             -- Either find a new direction if the directionDuration has run out, or just count it down 1.
             if data.directionDurationTicks == 0 then
-                if vehicle_type == "locomotive" or vehicle_type == "cargo-wagon" or vehicle_type == "fluid-wagon" or vehicle_type == "artillery-wagon" then
+                if vehicle_type == "locomotive" or vehicle_type == "cargo-wagon" or vehicle_type == "fluid-wagon" or
+                    vehicle_type == "artillery-wagon" then
                     -- Train carriages should change every tick as very fast trains may cross rail points very fast.
                     data.directionDurationTicks = 1
                 else
@@ -678,7 +782,8 @@ AggressiveDriver.StopEffectOnPlayer = function(playerIndex, player, status)
 
     player = player or game.get_player(playerIndex)
     if player == nil then
-        CommandsUtils.LogPrintWarning(CommandName, nil, "Target player has been deleted while the effect was running.", nil)
+        CommandsUtils.LogPrintWarning(CommandName, nil, "Target player has been deleted while the effect was running.",
+            nil)
         return
     end
 
@@ -695,11 +800,16 @@ AggressiveDriver.StopEffectOnPlayer = function(playerIndex, player, status)
         direction = defines.riding.direction.straight
     }
     -- Also set the players walking state back to nothing. Not sure this is needed from testing, but Mukkie claimed he kept on walking so added to be safe.
-    player.walking_state = { walking = false, direction = player.walking_state.direction }
+    player.walking_state = {
+        walking = false,
+        direction = player.walking_state.direction
+    }
 
     -- Print a message based on ending status.
     if status == EffectEndStatus.completed then
-        if not affectedPlayerDetails.suppressMessages then game.print({ "message.muppet_streamer_v2_aggressive_driver_stop", player.name }) end
+        if not affectedPlayerDetails.suppressMessages then
+            game.print({"message.muppet_streamer_v2_aggressive_driver_stop", player.name})
+        end
     end
 end
 
@@ -726,7 +836,8 @@ end
 ---@param checkedTrainFuelStates AggressiveDriver_CheckedTrainFuelStates
 ---@return boolean fuelStateGood
 AggressiveDriver.CheckVehiclesFuelState = function(vehicle, vehicle_type, checkedTrainFuelStates)
-    if vehicle_type == "locomotive" or vehicle_type == "cargo-wagon" or vehicle_type == "fluid-wagon" or vehicle_type == "artillery-wagon" then
+    if vehicle_type == "locomotive" or vehicle_type == "cargo-wagon" or vehicle_type == "fluid-wagon" or vehicle_type ==
+        "artillery-wagon" then
         -- Train type vehicle, so we need to check that any of the locomotives in the train aren't lacking fuel, not just this specific carriage.
         local train = vehicle.train ---@cast train - nil
         local train_id = train.id
