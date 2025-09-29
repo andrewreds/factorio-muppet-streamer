@@ -427,7 +427,8 @@ MalfunctioningWeapon.ShootWeapon = function(eventData)
                                                                                    .affectedPlayers[playerIndex]
                                                                                    .burstsLeft - 1
         player.shooting_state = {
-            state = defines.shooting.not_shooting
+            state = defines.shooting.not_shooting,
+            position = {0, 0},
         }
 
         if data.burstsDone == data.maxBursts then
@@ -526,7 +527,8 @@ MalfunctioningWeapon.StopEffectOnPlayer = function(playerIndex, player, status)
 
     -- Remove any shooting state set and maintained from previous ticks.
     player.shooting_state = {
-        state = defines.shooting.not_shooting
+        state = defines.shooting.not_shooting,
+        position = {0, 0},
     }
 
     -- Print a message based on ending status.

@@ -568,6 +568,7 @@ AggressiveDriver.ApplyToPlayer = function(eventData)
     ---@type UtilityScheduledEvent_CallbackObject
     local driveCallbackObject = {
         tick = game.tick,
+        name=eventData.name,
         instanceId = driveEachTickDetails.player_index,
         data = driveEachTickDetails
     }

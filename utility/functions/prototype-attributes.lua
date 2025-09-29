@@ -3,6 +3,8 @@ local PrototypeAttributes = {} ---@class Utility_PrototypeAttributes
 
 MOD = MOD or {} ---@class MOD
 MOD.UTILITYPrototypeAttributes = MOD.UTILITYPrototypeAttributes or {} ---@type UtilityPrototypeAttributes_CachedTypes
+MOD.Interfaces = MOD.Interfaces or {} ---@class MOD_InternalInterfaces
+MOD.Interfaces.Commands = MOD.Interfaces.Commands or {} ---@class MOD_InternalInterfaces_Commands
 
 --- Returns the request attribute of a prototype.
 ---

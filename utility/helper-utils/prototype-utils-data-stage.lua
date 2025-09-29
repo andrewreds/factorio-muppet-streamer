@@ -265,12 +265,12 @@ end
 
 PrototypeUtils.CreateLandPlacementTestEntityPrototype = function(entityToClone, newEntityName, subgroup)
     subgroup = subgroup or "other"
-    return PrototypeUtils.CreatePlacementTestEntityPrototype(entityToClone, newEntityName, subgroup, { "water-tile", "colliding-with-tiles-only" })
+    return PrototypeUtils.CreatePlacementTestEntityPrototype(entityToClone, newEntityName, subgroup, {layers = { "water-tile", "colliding-with-tiles-only" }})
 end
 
 PrototypeUtils.CreateWaterPlacementTestEntityPrototype = function(entityToClone, newEntityName, subgroup)
     subgroup = subgroup or "other"
-    return PrototypeUtils.CreatePlacementTestEntityPrototype(entityToClone, newEntityName, subgroup, { "ground-tile", "colliding-with-tiles-only" })
+    return PrototypeUtils.CreatePlacementTestEntityPrototype(entityToClone, newEntityName, subgroup, {layers = { "ground-tile", "colliding-with-tiles-only" }})
 end
 
 return PrototypeUtils

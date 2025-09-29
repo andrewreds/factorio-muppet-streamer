@@ -256,7 +256,7 @@ GuiUtil.UpdateElementFromPlayersReferenceStorage = function(playerIndex, storeNa
     ---@cast changes table<string, any>
     for argName, argValue in pairs(changes) do
         if argName == "caption" or argName == "tooltip" then
-            argValue = GuiUtil._ReplaceLocaleNameSelfWithGeneratedName({ name = generatedName, [argName] = argValue }, argName)
+            argValue = GuiUtil._ReplaceLocaleNameSelfWithGeneratedName({ name = generatedName, type = elementType, [argName] = argValue }, argName)
         end
         element[argName] = argValue --[[@as LuaGuiElement # Short term fix for bug in Debugger generated TypeDefs]]
     end

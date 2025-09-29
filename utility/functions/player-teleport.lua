@@ -29,7 +29,8 @@ PlayerTeleport.RequestTeleportToNearPosition = function(targetPlayer, targetSurf
         targetPosition = nil,
         teleportSucceeded = false,
         pathRequestId = nil,
-        errorNoValidPositionFound = false
+        errorNoValidPositionFound = false,
+        errorTeleportFailed = true,
     }
 
     -- Get the working data.
@@ -97,11 +98,12 @@ PlayerTeleport.RequestTeleportToNearPosition = function(targetPlayer, targetSurf
             pathfind_flags = { allow_paths_through_own_entities = true, cache = false }
         }
         responseDetails.pathRequestId = pathRequestId
+        responseDetails.errorTeleportFailed = false
         return responseDetails
     else
         responseDetails.teleportSucceeded = PlayerTeleport.TeleportToSpecificPosition(targetPlayer, targetSurface, arrivalPos)
-        if not responseDetails.teleportSucceeded then
-            responseDetails.errorTeleportFailed = true
+        if responseDetails.teleportSucceeded then
+            responseDetails.errorTeleportFailed = false
         end
         return responseDetails
     end
