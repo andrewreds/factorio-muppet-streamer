@@ -119,15 +119,7 @@ end
 ---@param eventData EventData
 Events.RaiseEvent = function(eventData)
     eventData.tick = game.tick
-    local eventName = eventData.name
-    if type(eventName) == "number" then
-        script.raise_event(eventName--[[@as uint]] , eventData)
-    elseif MOD.customEventNameToId[eventName] ~= nil then
-        local eventId = MOD.customEventNameToId[eventName--[[@as string]] ]
-        script.raise_event(eventId, eventData)
-    else
-        error("WARNING: raise event called that doesn't exist: " .. eventName)
-    end
+    script.raise_event(eventData.name, eventData)
 end
 
 --- Called from anywhere, including OnStartup in tick 0. This won't be passed out to other mods however, only run within this mod.
@@ -183,7 +175,14 @@ Events._RegisterEvent = function(eventName, thisFilterName, thisFilterData)
     local eventId
     local filterData
     thisFilterData = thisFilterData ~= nil and TableUtils.DeepCopy(thisFilterData) or nil -- DeepCopy it so if a persisted or shared table is passed in we don't cause changes to source table.
-    if type(eventName) == "number" then
+    if MOD.customEventNameToId[eventName] ~= nil then
+        -- Already registered custom event.
+        eventId = MOD.customEventNameToId[eventName]
+    elseif type(eventName) == "string" then
+        -- New custom event.
+        eventId = script.generate_event_name()
+        MOD.customEventNameToId[eventName] = eventId
+    else
         -- Factorio event.
         eventId = eventName
         if thisFilterData ~= nil then
@@ -208,13 +207,6 @@ Events._RegisterEvent = function(eventName, thisFilterName, thisFilterData)
                 end
             end
         end
-    elseif MOD.customEventNameToId[eventName] ~= nil then
-        -- Already registered custom event.
-        eventId = MOD.customEventNameToId[eventName]
-    else
-        -- New custom event.
-        eventId = script.generate_event_name()
-        MOD.customEventNameToId[eventName] = eventId
     end
     script.on_event(eventId, Events._HandleEvent, filterData)
     return eventId

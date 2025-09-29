@@ -72,11 +72,9 @@ SettingsManager.HandleSettingWithArrayOfValues = function(factorioSettingType, f
         tableOfValues = helpers.json_to_table(values)
     end
 
-    local isMultipleGroups
-    if tableOfValues == nil or type(tableOfValues) ~= "table" then
-        isMultipleGroups = false
-    else -- is a table type of value for setting
-        ---@cast tableOfValues table<uint, boolean|number|string>
+    local isMultipleGroups = false
+    if tableOfValues ~= nil and type(tableOfValues) == "table" then
+        -- is a table type of value for setting
         if not expectedValueType.hasChildren then
             isMultipleGroups = true
         else
@@ -86,24 +84,24 @@ SettingsManager.HandleSettingWithArrayOfValues = function(factorioSettingType, f
                     break
                 end
             end
-            isMultipleGroups = isMultipleGroups or false
+        end
+        
+        if isMultipleGroups then
+            ---@cast tableOfValues -nil # If it was nil this logic branch couldn't be reached.
+            for id, value in pairs(tableOfValues) do
+                local thisGlobalSettingContainer = SettingsManager._CreateGlobalGroupSettingsContainer(globalGroupsContainer, id, globalSettingContainerName)
+                local typedValue = SettingsManager._ValueToType(value, expectedValueType)
+                if typedValue ~= nil then
+                    thisGlobalSettingContainer[globalSettingName] = valueHandlingFunction(typedValue)
+                else
+                    thisGlobalSettingContainer[globalSettingName] = valueHandlingFunction(defaultValue)
+                    LoggingUtils.LogPrintWarning("Setting '[" .. factorioSettingType .. "][" .. factorioSettingName .. "]' for entry number '" .. id .. "' has an invalid value type. Expected a '" .. expectedValueType.name .. "' but got the value '" .. tostring(value) .. "', so using default value of '" .. tostring(defaultValue) .. "'")
+                end
+            end
+            defaultSettingsContainer[globalSettingName] = valueHandlingFunction(defaultValue)
         end
     end
-
-    if isMultipleGroups then
-        ---@cast tableOfValues -nil # If it was nil this logic branch couldn't be reached.
-        for id, value in pairs(tableOfValues) do
-            local thisGlobalSettingContainer = SettingsManager._CreateGlobalGroupSettingsContainer(globalGroupsContainer, id, globalSettingContainerName)
-            local typedValue = SettingsManager._ValueToType(value, expectedValueType)
-            if typedValue ~= nil then
-                thisGlobalSettingContainer[globalSettingName] = valueHandlingFunction(typedValue)
-            else
-                thisGlobalSettingContainer[globalSettingName] = valueHandlingFunction(defaultValue)
-                LoggingUtils.LogPrintWarning("Setting '[" .. factorioSettingType .. "][" .. factorioSettingName .. "]' for entry number '" .. id .. "' has an invalid value type. Expected a '" .. expectedValueType.name .. "' but got the value '" .. tostring(value) .. "', so using default value of '" .. tostring(defaultValue) .. "'")
-            end
-        end
-        defaultSettingsContainer[globalSettingName] = valueHandlingFunction(defaultValue)
-    else
+    if !isMultipleGroups then
         local value = tableOfValues or values
         local typedValue = SettingsManager._ValueToType(value, expectedValueType)
         if typedValue ~= nil then

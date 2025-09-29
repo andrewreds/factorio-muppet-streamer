@@ -1,8 +1,8 @@
 local Constants = require("constants")
 
 local recruitTeamMemberCost = tonumber(settings.startup["muppet_streamer_v2-recruit_team_member_technology_cost"].value)
-local recruitTeamMemberTitle = settings.startup["muppet_streamer_v2-recruit_team_member_technology_title"].value
-local recruitTeamMemberDescription = settings.startup["muppet_streamer_v2-recruit_team_member_technology_description"].value
+local recruitTeamMemberTitle = tostring(settings.startup["muppet_streamer_v2-recruit_team_member_technology_title"].value)
+local recruitTeamMemberDescription = tostring(settings.startup["muppet_streamer_v2-recruit_team_member_technology_description"].value)
 
 if recruitTeamMemberCost < 0 then
     return
@@ -18,7 +18,7 @@ local recruitTeamMemberTechnology_1 = {
     icon = Constants.AssetModName .. "/graphics/technology/recruit_team_member.png",
     prerequisites = {},
     unit = {
-        count_formula = recruitTeamMemberCost,
+        count_formula = tostring(recruitTeamMemberCost),
         ingredients = {
             { "automation-science-pack", 1 }
         },
@@ -40,7 +40,7 @@ local recruitTeamMemberTechnology_2 = {
     icon = Constants.AssetModName .. "/graphics/technology/recruit_team_member.png",
     prerequisites = { "logistic-science-pack", "muppet_streamer_v2-recruit_team_member-1" },
     unit = {
-        count_formula = recruitTeamMemberCost,
+        count_formula = tostring(recruitTeamMemberCost),
         ingredients = {
             { "automation-science-pack", 1 },
             { "logistic-science-pack",   1 }
@@ -87,7 +87,7 @@ local recruitTeamMemberTechnology_4 = {
     icon = Constants.AssetModName .. "/graphics/technology/recruit_team_member.png",
     prerequisites = { "muppet_streamer_v2-recruit_team_member-3", "chemical-science-pack" },
     unit = {
-        count_formula = recruitTeamMemberCost,
+        count_formula = tostring(recruitTeamMemberCost),
         ingredients = {
             { "automation-science-pack", 1 },
             { "logistic-science-pack",   1 },
@@ -112,7 +112,7 @@ local recruitTeamMemberTechnology_5 = {
     icon = Constants.AssetModName .. "/graphics/technology/recruit_team_member.png",
     prerequisites = { "muppet_streamer_v2-recruit_team_member-4", "production-science-pack" },
     unit = {
-        count_formula = recruitTeamMemberCost,
+        count_formula = tostring(recruitTeamMemberCost),
         ingredients = {
             { "automation-science-pack", 1 },
             { "logistic-science-pack",   1 },
@@ -138,7 +138,7 @@ local recruitTeamMemberTechnology_6 = {
     icon = Constants.AssetModName .. "/graphics/technology/recruit_team_member.png",
     prerequisites = { "muppet_streamer_v2-recruit_team_member-5", "utility-science-pack" },
     unit = {
-        count_formula = recruitTeamMemberCost,
+        count_formula = tostring(recruitTeamMemberCost),
         ingredients = {
             { "automation-science-pack", 1 },
             { "logistic-science-pack",   1 },

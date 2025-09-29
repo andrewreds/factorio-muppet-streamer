@@ -104,7 +104,7 @@ end
 ---@return UtilityGuiActionsChecked_GuiElementName guiElementName
 GuiActionsChecked._GenerateGuiElementName = function(elementName, elementType)
     if elementName == nil or elementType == nil then
-        return nil
+        return "<nil>"
     else
         return Constants.ModName .. "-" .. elementName .. "-" .. elementType
     end
