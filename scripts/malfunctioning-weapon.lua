@@ -57,12 +57,16 @@ MalfunctioningWeapon.CreateGlobals = function()
 end
 
 MalfunctioningWeapon.OnLoad = function()
-    CommandsUtils.Register("muppet_streamer_v2_malfunctioning_weapon", { "api-description.muppet_streamer_v2_malfunctioning_weapon" }, MalfunctioningWeapon.MalfunctioningWeaponCommand, true)
+    CommandsUtils.Register("muppet_streamer_v2_malfunctioning_weapon",
+        {"api-description.muppet_streamer_v2_malfunctioning_weapon"}, MalfunctioningWeapon.MalfunctioningWeaponCommand,
+        true)
     EventScheduler.RegisterScheduledEventType("MalfunctioningWeapon.ShootWeapon", MalfunctioningWeapon.ShootWeapon)
-    Events.RegisterHandlerEvent(defines.events.on_pre_player_died, "MalfunctioningWeapon.OnPrePlayerDied", MalfunctioningWeapon.OnPrePlayerDied)
+    Events.RegisterHandlerEvent(defines.events.on_pre_player_died, "MalfunctioningWeapon.OnPrePlayerDied",
+        MalfunctioningWeapon.OnPrePlayerDied)
     EventScheduler.RegisterScheduledEventType("MalfunctioningWeapon.ApplyToPlayer", MalfunctioningWeapon.ApplyToPlayer)
     MOD.Interfaces.Commands.MalfunctioningWeapon = MalfunctioningWeapon.MalfunctioningWeaponCommand
-    EventScheduler.RegisterScheduledEventType("MalfunctioningWeapon.StopEffectOnPlayer_Schedule", MalfunctioningWeapon.StopEffectOnPlayer_Schedule)
+    EventScheduler.RegisterScheduledEventType("MalfunctioningWeapon.StopEffectOnPlayer_Schedule",
+        MalfunctioningWeapon.StopEffectOnPlayer_Schedule)
 end
 
 MalfunctioningWeapon.OnStartup = function()
@@ -71,16 +75,19 @@ end
 
 ---@param command CustomCommandData
 MalfunctioningWeapon.MalfunctioningWeaponCommand = function(command)
-    local commandData = CommandsUtils.GetSettingsTableFromCommandParameterString(command.parameter, true, CommandName, { "delay", "target", "ammoCount", "reloadTime", "weaponType", "ammoType", "suppressMessages" })
+    local commandData = CommandsUtils.GetSettingsTableFromCommandParameterString(command.parameter, true, CommandName,
+        {"delay", "target", "ammoCount", "reloadTime", "weaponType", "ammoType", "suppressMessages"})
     if commandData == nil then
         return
     end
 
     local delaySeconds = commandData.delay
-    if not CommandsUtils.CheckNumberArgument(delaySeconds, "double", false, CommandName, "delay", 0, nil, command.parameter) then
+    if not CommandsUtils.CheckNumberArgument(delaySeconds, "double", false, CommandName, "delay", 0, nil,
+        command.parameter) then
         return
     end ---@cast delaySeconds double|nil
-    local scheduleTick = Common.DelaySecondsSettingToScheduledEventTickValue(delaySeconds, command.tick, CommandName, "delay")
+    local scheduleTick = Common.DelaySecondsSettingToScheduledEventTickValue(delaySeconds, command.tick, CommandName,
+        "delay")
 
     local target = commandData.target
     if not Common.CheckPlayerNameSettingValue(target, CommandName, "target", command.parameter) then
@@ -88,39 +95,49 @@ MalfunctioningWeapon.MalfunctioningWeaponCommand = function(command)
     end ---@cast target string
 
     local ammoCount = commandData.ammoCount
-    if not CommandsUtils.CheckNumberArgument(ammoCount, "int", true, CommandName, "ammoCount", 1, MathUtils.uintMax, command.parameter) then
+    if not CommandsUtils.CheckNumberArgument(ammoCount, "int", true, CommandName, "ammoCount", 1, MathUtils.uintMax,
+        command.parameter) then
         return
     end ---@cast ammoCount uint
 
     local reloadSeconds = commandData.reloadTime
-    if not CommandsUtils.CheckNumberArgument(reloadSeconds, "double", false, CommandName, "reloadTime", 1, math.floor(MathUtils.uintMax / 60), command.parameter) then
+    if not CommandsUtils.CheckNumberArgument(reloadSeconds, "double", false, CommandName, "reloadTime", 1,
+        math.floor(MathUtils.uintMax / 60), command.parameter) then
         return
     end ---@cast reloadSeconds double|nil
     local reloadTicks = math.max(math.floor((reloadSeconds or 3) * 60), 1) --[[@as uint # Reload was validated as not exceeding a uint during input validation.]]
 
-    local weaponPrototype, valid = Common.GetItemPrototypeFromCommandArgument(commandData.weaponType, "gun", false, CommandName, "weaponType", command.parameter)
-    if not valid then return end
+    local weaponPrototype, valid = Common.GetItemPrototypeFromCommandArgument(commandData.weaponType, "gun", false,
+        CommandName, "weaponType", command.parameter)
+    if not valid then
+        return
+    end
     if weaponPrototype == nil then
         -- No custom weapon set, so use the base game weapon and confirm its valid.
         weaponPrototype = prototypes.item["flamethrower"]
         if weaponPrototype == nil or weaponPrototype.type ~= "gun" then
-            CommandsUtils.LogPrintError(CommandName, nil, "tried to use base game 'flamethrower' weapon, but it doesn't exist in this save.", command.parameter)
+            CommandsUtils.LogPrintError(CommandName, nil,
+                "tried to use base game 'flamethrower' weapon, but it doesn't exist in this save.", command.parameter)
             return
         end
     end
 
-    local ammoPrototype, valid = Common.GetItemPrototypeFromCommandArgument(commandData.ammoType, "ammo", false, CommandName, "ammoType", command.parameter)
-    if not valid then return end
+    local ammoPrototype, valid = Common.GetItemPrototypeFromCommandArgument(commandData.ammoType, "ammo", false,
+        CommandName, "ammoType", command.parameter)
+    if not valid then
+        return
+    end
     if ammoPrototype == nil then
         -- No custom ammo set, so use the base game ammo and confirm its valid.
         ammoPrototype = prototypes.item["flamethrower-ammo"]
         if ammoPrototype == nil or ammoPrototype.type ~= "ammo" then
-            CommandsUtils.LogPrintError(CommandName, nil, "tried to use base game 'flamethrower-ammo' ammo, but it doesn't exist in this save.", command.parameter)
+            CommandsUtils.LogPrintError(CommandName, nil,
+                "tried to use base game 'flamethrower-ammo' ammo, but it doesn't exist in this save.", command.parameter)
             return
         end
     end
 
-    --Check that the ammo is suitable for our needs.
+    -- Check that the ammo is suitable for our needs.
     local ammoType = ammoPrototype.get_ammo_type("player") ---@cast ammoType -nil # We've already validated this is of type ammo.
     local ammoCategory = ammoPrototype.ammo_category.name
     if not PlayerWeapon.IsAmmoCompatibleWithWeapon(ammoCategory, weaponPrototype) then
@@ -129,12 +146,14 @@ MalfunctioningWeapon.MalfunctioningWeaponCommand = function(command)
     end
     local ammoType_targetType = ammoType.target_type
     if ammoType_targetType ~= "position" and ammoType_targetType ~= "direction" then
-        CommandsUtils.LogPrintError(CommandName, nil, "ammo can't be shot at the ground and so can't be used.", command.parameter)
+        CommandsUtils.LogPrintError(CommandName, nil, "ammo can't be shot at the ground and so can't be used.",
+            command.parameter)
         return
     end
 
     local suppressMessages = commandData.suppressMessages
-    if not CommandsUtils.CheckBooleanArgument(suppressMessages, false, CommandName, "suppressMessages", command.parameter) then
+    if not CommandsUtils.CheckBooleanArgument(suppressMessages, false, CommandName, "suppressMessages",
+        command.parameter) then
         return
     end ---@cast suppressMessages boolean|nil
     if suppressMessages == nil then
@@ -146,12 +165,25 @@ MalfunctioningWeapon.MalfunctioningWeaponCommand = function(command)
 
     storage.malfunctioningWeapon.nextId = storage.malfunctioningWeapon.nextId + 1 ---@type uint # Needed for weird bug reason, maybe in Sumneko or maybe the plugin with its fake storage.
     ---@type MalfunctioningWeapon_ScheduledEventDetails
-    local scheduledEventDetails = { target = target, ammoCount = ammoCount, reloadTicks = reloadTicks, weaponPrototype = weaponPrototype, ammoPrototype = ammoPrototype, suppressMessages = suppressMessages }
+    local scheduledEventDetails = {
+        target = target,
+        ammoCount = ammoCount,
+        reloadTicks = reloadTicks,
+        weaponPrototype = weaponPrototype,
+        ammoPrototype = ammoPrototype,
+        suppressMessages = suppressMessages
+    }
     if scheduleTick ~= -1 then
-        EventScheduler.ScheduleEventOnce(scheduleTick, "MalfunctioningWeapon.ApplyToPlayer", storage.malfunctioningWeapon.nextId, scheduledEventDetails)
+        EventScheduler.ScheduleEventOnce(scheduleTick, "MalfunctioningWeapon.ApplyToPlayer",
+            storage.malfunctioningWeapon.nextId, scheduledEventDetails)
     else
         ---@type UtilityScheduledEvent_CallbackObject
-        local eventData = { tick = command.tick, name = "MalfunctioningWeapon.ApplyToPlayer", instanceId = storage.malfunctioningWeapon.nextId, data = scheduledEventDetails }
+        local eventData = {
+            tick = command.tick,
+            name = "MalfunctioningWeapon.ApplyToPlayer",
+            instanceId = storage.malfunctioningWeapon.nextId,
+            data = scheduledEventDetails
+        }
         MalfunctioningWeapon.ApplyToPlayer(eventData)
     end
 end
@@ -167,31 +199,40 @@ MalfunctioningWeapon.ApplyToPlayer = function(eventData)
     end
     local targetPlayer_index, targetPlayer_character = targetPlayer.index, targetPlayer.character
     if targetPlayer.controller_type ~= defines.controllers.character or targetPlayer_character == nil then
-        if not data.suppressMessages then game.print({ "message.muppet_streamer_v2_malfunctioning_weapon_not_character_controller", data.target }) end
+        if not data.suppressMessages then
+            game.print({"message.muppet_streamer_v2_malfunctioning_weapon_not_character_controller", data.target})
+        end
         return
     end
 
     -- Check the weapon and ammo are still valid (unchanged).
     if not data.weaponPrototype.valid then
-        CommandsUtils.LogPrintWarning(CommandName, nil, "The in-game weapon prototype has been changed/removed since the command was run.", nil)
+        CommandsUtils.LogPrintWarning(CommandName, nil,
+            "The in-game weapon prototype has been changed/removed since the command was run.", nil)
         return
     end
     if not data.ammoPrototype.valid then
-        CommandsUtils.LogPrintWarning(CommandName, nil, "The in-game ammo prototype has been changed/removed since the command was run.", nil)
+        CommandsUtils.LogPrintWarning(CommandName, nil,
+            "The in-game ammo prototype has been changed/removed since the command was run.", nil)
         return
     end
 
     -- If this player already has the effect active then terminate this new instance.
     if storage.malfunctioningWeapon.affectedPlayers[targetPlayer_index] ~= nil then
-        if not data.suppressMessages then game.print({ "message.muppet_streamer_v2_duplicate_command_ignored", "Malfunctioning Weapon", data.target }) end
+        if not data.suppressMessages then
+            game.print({"message.muppet_streamer_v2_duplicate_command_ignored", "Malfunctioning Weapon", data.target})
+        end
         return
     end
 
     targetPlayer.driving = false
-    local weaponGiven, removedWeaponDetails = PlayerWeapon.EnsureHasWeapon(targetPlayer, data.weaponPrototype.name, true, true, data.ammoPrototype.name) ---@cast removedWeaponDetails -nil # removedWeaponDetails is always populated in our use case as we are forcing the weapon to be equipped (not allowing it to go in to the player's inventory).
+    local weaponGiven, removedWeaponDetails = PlayerWeapon.EnsureHasWeapon(targetPlayer, data.weaponPrototype.name,
+        true, true, data.ammoPrototype.name) ---@cast removedWeaponDetails -nil # removedWeaponDetails is always populated in our use case as we are forcing the weapon to be equipped (not allowing it to go in to the player's inventory).
 
     if weaponGiven == nil then
-        CommandsUtils.LogPrintError(CommandName, nil, "target player can't be given the " .. data.weaponPrototype.name .. " for some odd reason: " .. data.target, nil)
+        CommandsUtils.LogPrintError(CommandName, nil,
+            "target player can't be given the " .. data.weaponPrototype.name .. " for some odd reason: " .. data.target,
+            nil)
         return
     end
 
@@ -201,39 +242,61 @@ MalfunctioningWeapon.ApplyToPlayer = function(eventData)
     if selectedAmmoItemStack.valid_for_read then
         -- There's a stack there and it will be the specified ammo from when we forced the weapon to the player.
         -- Just give the ammo to the player and it will auto assign it correctly.
-        local inserted = targetPlayer.insert({ name = data.ammoPrototype.name, count = data.ammoCount })
+        local inserted = targetPlayer.insert({
+            name = data.ammoPrototype.name,
+            count = data.ammoCount
+        })
         if inserted < data.ammoCount then
-            targetPlayer.surface.spill_item_stack(targetPlayer.position, { name = data.ammoPrototype.name, count = data.ammoCount - inserted }, true, nil, false)
+            targetPlayer.physical_surface.spill_item_stack(targetPlayer.physical_position, {
+                name = data.ammoPrototype.name,
+                count = data.ammoCount - inserted
+            }, true, nil, false)
         end
     else
         -- No current ammo in the slot. So just set our required one.
-        selectedAmmoItemStack.set_stack({ name = data.ammoPrototype.name, count = data.ammoCount })
+        selectedAmmoItemStack.set_stack({
+            name = data.ammoPrototype.name,
+            count = data.ammoCount
+        })
     end
 
     -- Check the player has the weapon equipped as expected. (same as checking logic as when it tries to fire the weapon).
     local selectedGunIndex = targetPlayer_character.selected_gun_index
     local selectedGunInventory = targetPlayer.get_inventory(defines.inventory.character_guns)[selectedGunIndex]
-    if selectedGunInventory == nil or (not selectedGunInventory.valid_for_read) or selectedGunInventory.name ~= data.weaponPrototype.name then
+    if selectedGunInventory == nil or (not selectedGunInventory.valid_for_read) or selectedGunInventory.name ~=
+        data.weaponPrototype.name then
         -- Weapon has been removed as active weapon by some script.
-        CommandsUtils.LogPrintError(CommandName, nil, "target player weapon state isn't right for some odd reason: " .. data.target, nil)
+        CommandsUtils.LogPrintError(CommandName, nil,
+            "target player weapon state isn't right for some odd reason: " .. data.target, nil)
         return
     end
     -- Check the player has the weapon's ammo equipped as expected. (same as checking logic as when it tries to fire the weapon).
     local selectedAmmoInventory = targetPlayer_characterAmmoInventory[selectedGunIndex]
-    if selectedAmmoInventory == nil or (not selectedAmmoInventory.valid_for_read) or selectedAmmoInventory.name ~= data.ammoPrototype.name then
+    if selectedAmmoInventory == nil or (not selectedAmmoInventory.valid_for_read) or selectedAmmoInventory.name ~=
+        data.ammoPrototype.name then
         -- Ammo has been removed by some script. As we wouldn't have reached this point in a managed loop as its beyond the last burst.
-        CommandsUtils.LogPrintError(CommandName, nil, "target player ammo state isn't right for some odd reason: " .. data.target, nil)
+        CommandsUtils.LogPrintError(CommandName, nil,
+            "target player ammo state isn't right for some odd reason: " .. data.target, nil)
         return
     end
 
     -- Get the starting ammo item and ammo counts. As they may already have had flamer ammo and we've added to it.
-    local startingAmmoItemStacksCount, startingAmmoItemStackAmmo = selectedAmmoItemStack.count, selectedAmmoItemStack.ammo
+    local startingAmmoItemStacksCount, startingAmmoItemStackAmmo = selectedAmmoItemStack.count,
+        selectedAmmoItemStack.ammo
 
     -- Store the players current permission group. Left as the previously stored group if an effect was already being applied to the player, or captured if no present effect affects them.
-    storage.originalPlayersPermissionGroup[targetPlayer_index] = storage.originalPlayersPermissionGroup[targetPlayer_index] or targetPlayer.permission_group
+    storage.originalPlayersPermissionGroup[targetPlayer_index] =
+        storage.originalPlayersPermissionGroup[targetPlayer_index] or targetPlayer.permission_group
 
     targetPlayer.permission_group = MalfunctioningWeapon.GetOrCreatePermissionGroup()
-    storage.malfunctioningWeapon.affectedPlayers[targetPlayer_index] = { weaponGiven = weaponGiven, burstsLeft = data.ammoCount, removedWeaponDetails = removedWeaponDetails, weaponPrototype = data.weaponPrototype, ammoPrototype = data.ammoPrototype, suppressMessages = data.suppressMessages }
+    storage.malfunctioningWeapon.affectedPlayers[targetPlayer_index] = {
+        weaponGiven = weaponGiven,
+        burstsLeft = data.ammoCount,
+        removedWeaponDetails = removedWeaponDetails,
+        weaponPrototype = data.weaponPrototype,
+        ammoPrototype = data.ammoPrototype,
+        suppressMessages = data.suppressMessages
+    }
 
     local startingAngle = math.random(0, 360)
 
@@ -243,12 +306,36 @@ MalfunctioningWeapon.ApplyToPlayer = function(eventData)
     local cooldownTicks = math.max(MathUtils.RoundNumberToDecimalPlaces(cooldown, 0), 1) --[[@as uint]]
     -- One or more ticks (rounded). Anything that fires quicker than once per tick will be slowed down as other code can't handle it.
 
-    if not data.suppressMessages then game.print({ "message.muppet_streamer_v2_malfunctioning_weapon_start", targetPlayer.name, data.weaponPrototype.localised_name }) end
+    if not data.suppressMessages then
+        game.print({"message.muppet_streamer_v2_malfunctioning_weapon_start", targetPlayer.name,
+                    data.weaponPrototype.localised_name})
+    end
 
     ---@type MalfunctioningWeapon_ShootWeaponDetails
-    local ShootWeaponDetails = { player = targetPlayer, angle = startingAngle, distance = startingDistance, currentBurstTicks = 0, burstsDone = 0, maxBursts = data.ammoCount, player_index = targetPlayer_index, usedSomeAmmo = false, startingAmmoItemStacksCount = startingAmmoItemStacksCount, startingAmmoItemStackAmmo = startingAmmoItemStackAmmo, weaponPrototype = data.weaponPrototype, ammoPrototype = data.ammoPrototype, minRange = minRange, maxRange = maxRange, cooldownTicks = cooldownTicks, reloadTicks = data.reloadTicks }
+    local ShootWeaponDetails = {
+        player = targetPlayer,
+        angle = startingAngle,
+        distance = startingDistance,
+        currentBurstTicks = 0,
+        burstsDone = 0,
+        maxBursts = data.ammoCount,
+        player_index = targetPlayer_index,
+        usedSomeAmmo = false,
+        startingAmmoItemStacksCount = startingAmmoItemStacksCount,
+        startingAmmoItemStackAmmo = startingAmmoItemStackAmmo,
+        weaponPrototype = data.weaponPrototype,
+        ammoPrototype = data.ammoPrototype,
+        minRange = minRange,
+        maxRange = maxRange,
+        cooldownTicks = cooldownTicks,
+        reloadTicks = data.reloadTicks
+    }
     ---@type UtilityScheduledEvent_CallbackObject
-    local ShootWeaponCallbackObject = { tick = eventData.tick, instanceId = targetPlayer_index, data = ShootWeaponDetails }
+    local ShootWeaponCallbackObject = {
+        tick = eventData.tick,
+        instanceId = targetPlayer_index,
+        data = ShootWeaponDetails
+    }
     MalfunctioningWeapon.ShootWeapon(ShootWeaponCallbackObject)
 end
 
@@ -268,18 +355,21 @@ MalfunctioningWeapon.ShootWeapon = function(eventData)
 
     -- Check the weapon and ammo are still valid (unchanged).
     if not data.weaponPrototype.valid then
-        CommandsUtils.LogPrintWarning(CommandName, nil, "The in-game weapon prototype has been changed/removed since the command was run.", nil)
+        CommandsUtils.LogPrintWarning(CommandName, nil,
+            "The in-game weapon prototype has been changed/removed since the command was run.", nil)
         return
     end
     if not data.ammoPrototype.valid then
-        CommandsUtils.LogPrintWarning(CommandName, nil, "The in-game ammo prototype has been changed/removed since the command was run.", nil)
+        CommandsUtils.LogPrintWarning(CommandName, nil,
+            "The in-game ammo prototype has been changed/removed since the command was run.", nil)
         return
     end
 
     -- Check the player has the weapon equipped as expected.
     local selectedGunIndex = player_character.selected_gun_index
     local selectedGunInventory = player.get_inventory(defines.inventory.character_guns)[selectedGunIndex]
-    if selectedGunInventory == nil or (not selectedGunInventory.valid_for_read) or selectedGunInventory.name ~= data.weaponPrototype.name then
+    if selectedGunInventory == nil or (not selectedGunInventory.valid_for_read) or selectedGunInventory.name ~=
+        data.weaponPrototype.name then
         -- Weapon has been removed as active weapon by some script.
         MalfunctioningWeapon.StopEffectOnPlayer(playerIndex, player, EffectEndStatus.invalid)
         return
@@ -287,7 +377,8 @@ MalfunctioningWeapon.ShootWeapon = function(eventData)
 
     -- Check the player has the weapon's ammo equipped as expected.
     local selectedAmmoInventory = player.get_inventory(defines.inventory.character_ammo)[selectedGunIndex]
-    if selectedAmmoInventory == nil or (not selectedAmmoInventory.valid_for_read) or selectedAmmoInventory.name ~= data.ammoPrototype.name then
+    if selectedAmmoInventory == nil or (not selectedAmmoInventory.valid_for_read) or selectedAmmoInventory.name ~=
+        data.ammoPrototype.name then
         -- Ammo has been removed by some script. As we wouldn't have reached this point in a managed loop as its beyond the last burst.
         MalfunctioningWeapon.StopEffectOnPlayer(playerIndex, player, EffectEndStatus.invalid)
         return
@@ -297,7 +388,8 @@ MalfunctioningWeapon.ShootWeapon = function(eventData)
     -- This will accept a scripted removal of ammo as being equivalent to the ammo started being fired, but this should be fine and we can't tell the difference, so meh.
     -- CODE NOTE: No way to read or set a player's gun cooldown, so this monitoring is the best option I can think of.
     if not data.usedSomeAmmo then
-        local currentAmmoItemStacksCount, currentAmmoItemStackAmmo = selectedAmmoInventory.count, selectedAmmoInventory.ammo
+        local currentAmmoItemStacksCount, currentAmmoItemStackAmmo = selectedAmmoInventory.count,
+            selectedAmmoInventory.ammo
         if currentAmmoItemStacksCount < data.startingAmmoItemStacksCount then
             -- Players shot some ammo and its finished an item off, so ignore the ammo property and assume all is good.
             data.usedSomeAmmo = true
@@ -327,8 +419,12 @@ MalfunctioningWeapon.ShootWeapon = function(eventData)
         -- End of shooting ticks. Ready for next shooting and take break.
         data.currentBurstTicks = 0
         data.burstsDone = data.burstsDone + 1
-        storage.malfunctioningWeapon.affectedPlayers[playerIndex].burstsLeft = storage.malfunctioningWeapon.affectedPlayers[playerIndex].burstsLeft - 1
-        player.shooting_state = { state = defines.shooting.not_shooting }
+        storage.malfunctioningWeapon.affectedPlayers[playerIndex].burstsLeft = storage.malfunctioningWeapon
+                                                                                   .affectedPlayers[playerIndex]
+                                                                                   .burstsLeft - 1
+        player.shooting_state = {
+            state = defines.shooting.not_shooting
+        }
 
         if data.burstsDone == data.maxBursts then
             MalfunctioningWeapon.StopEffectOnPlayer(playerIndex, player, EffectEndStatus.completed)
@@ -349,12 +445,17 @@ MalfunctioningWeapon.ShootWeapon = function(eventData)
             -- A projectile and beam weapon shoots for its distance so the angle needs to change much faster.
             data.angle = data.angle + (math.random(-50, 50))
         end
-        local targetPos = PositionUtils.GetPositionForAngledDistance(player.position, data.distance, data.angle)
-        player.shooting_state = { state = defines.shooting.shooting_selected, position = targetPos }
+        local targetPos =
+            PositionUtils.GetPositionForAngledDistance(player.physical_position, data.distance, data.angle)
+        player.shooting_state = {
+            state = defines.shooting.shooting_selected,
+            position = targetPos
+        }
         nextShootDelayTicks = data.cooldownTicks
     end
 
-    EventScheduler.ScheduleEventOnce(eventData.tick + nextShootDelayTicks, "MalfunctioningWeapon.ShootWeapon", playerIndex, data)
+    EventScheduler.ScheduleEventOnce(eventData.tick + nextShootDelayTicks, "MalfunctioningWeapon.ShootWeapon",
+        playerIndex, data)
 end
 
 --- Called when a player has died, but before their character is turned in to a corpse.
@@ -391,7 +492,8 @@ MalfunctioningWeapon.StopEffectOnPlayer = function(playerIndex, player, status)
 
     player = player or game.get_player(playerIndex)
     if player == nil then
-        CommandsUtils.LogPrintWarning(CommandName, nil, "Target player has been deleted while the effect was running.", nil)
+        CommandsUtils.LogPrintWarning(CommandName, nil, "Target player has been deleted while the effect was running.",
+            nil)
         return
     end
     local playerHasCharacter = player ~= nil and player.character ~= nil
@@ -403,7 +505,8 @@ MalfunctioningWeapon.StopEffectOnPlayer = function(playerIndex, player, status)
             PlayerWeapon.TakeItemFromPlayerOrGround(player, affectedPlayerDetails.weaponPrototype.name, 1)
         end
         if affectedPlayerDetails.burstsLeft > 0 and affectedPlayerDetails.ammoPrototype.valid then
-            PlayerWeapon.TakeItemFromPlayerOrGround(player, affectedPlayerDetails.ammoPrototype.name, affectedPlayerDetails.burstsLeft)
+            PlayerWeapon.TakeItemFromPlayerOrGround(player, affectedPlayerDetails.ammoPrototype.name,
+                affectedPlayerDetails.burstsLeft)
         end
     end
 
@@ -418,18 +521,23 @@ MalfunctioningWeapon.StopEffectOnPlayer = function(playerIndex, player, status)
     end
 
     -- Remove any shooting state set and maintained from previous ticks.
-    player.shooting_state = { state = defines.shooting.not_shooting }
+    player.shooting_state = {
+        state = defines.shooting.not_shooting
+    }
 
     -- Print a message based on ending status.
     if status == EffectEndStatus.completed then
-        if not affectedPlayerDetails.suppressMessages then game.print({ "message.muppet_streamer_v2_malfunctioning_weapon_stop", player.name }) end
+        if not affectedPlayerDetails.suppressMessages then
+            game.print({"message.muppet_streamer_v2_malfunctioning_weapon_stop", player.name})
+        end
     end
 end
 
 --- Gets the permission group for this feature. Will create it if needed.
 ---@return LuaPermissionGroup
 MalfunctioningWeapon.GetOrCreatePermissionGroup = function()
-    local group = game.permissions.get_group("MalfunctioningWeapon") or game.permissions.create_group("MalfunctioningWeapon") ---@cast group -nil # Script always has permission to create groups.
+    local group = game.permissions.get_group("MalfunctioningWeapon") or
+                      game.permissions.create_group("MalfunctioningWeapon") ---@cast group -nil # Script always has permission to create groups.
     group.set_allows_action(defines.input_action.select_next_valid_gun, false)
     group.set_allows_action(defines.input_action.toggle_driving, false)
     group.set_allows_action(defines.input_action.change_shooting_state, false)
