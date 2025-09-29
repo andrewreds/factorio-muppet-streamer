@@ -180,7 +180,9 @@ PantsOnFire.ApplyToPlayer = function(eventData)
         CommandsUtils.LogPrintWarning(CommandName, nil, "Target player has been deleted since the command was run.", nil)
         return
     end
-    if targetPlayer.controller_type ~= defines.controllers.character or targetPlayer.character == nil then
+    -- BUG: #3 Stops pants on fire applying in map view.
+    if not (targetPlayer.controller_type == defines.controllers.character or targetPlayer.controller_type ==
+        defines.controllers.remote) or targetPlayer.character == nil then
         if not data.suppressMessages then
             game.print({"message.muppet_streamer_v2_pants_on_fire_not_character_controller", data.target})
         end
