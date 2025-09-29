@@ -765,8 +765,13 @@ PlayerInventoryShuffle.DistributeRemainingItemsAnywhere = function(storageInvent
                 storageItemStack = storageInventory[i]
                 if storageItemStack.valid_for_read then
                     randomPlayer = players[math_random(1, #players)]
-                    randomPlayer.physical_surface.spill_item_stack(randomPlayer.physical_position, storageItemStack,
-                        false, nil, false)
+                    randomPlayer.surface.spill_item_stack({
+                        position = randomPlayer.physical_position,
+                        stack = storageItemStack,
+                        enable_looted = false,
+                        force = nil,
+                        allow_belts = false,
+                    })
                 else
                     -- As we sorted and merged all the items are at the start and all the free space at the end. So no need to check each free slot.
                     break

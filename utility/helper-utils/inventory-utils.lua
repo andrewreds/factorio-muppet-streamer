@@ -69,8 +69,13 @@ InventoryUtils.TryMoveInventoriesLuaItemStacks = function(sourceInventory, targe
                 itemAllMoved = false
                 if dropUnmovedOnGround then
                     sourceOwner = sourceOwner or targetInventory.entity_owner or targetInventory.player_owner -- BUG: #2 Mixing LuaPlayer and LuaEntity
-                    sourceOwner.surface
-                        .spill_item_stack(sourceOwner.position, itemStack, true, sourceOwner.force, false)
+                    sourceOwner.surface.spill_item_stack({
+                        position = sourceOwner.position,
+                        stack = itemStack,
+                        SimpleItemStack = true,
+                        force = sourceOwner.force,
+                        allow_belts = false,
+                    })
                     itemStack.count = 0
                 end
             end

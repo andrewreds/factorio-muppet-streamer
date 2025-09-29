@@ -163,10 +163,13 @@ GiveItems.GiveWeaponAmmoScheduled = function(eventData)
             count = data.ammoCount
         })
         if inserted < data.ammoCount then
-            targetPlayer.physical_surface.spill_item_stack(targetPlayer.physical_position, {
-                name = ammoName,
-                count = data.ammoCount - inserted
-            }, true, nil, false)
+            targetPlayer.physical_surface.spill_item_stack({
+                position = targetPlayer.position,
+                stack = { name = ammoName, count = data.ammoCount - inserted },
+                enable_looted = true,
+                force = nil,
+                allow_belts = false,
+            })
         end
     end
 end

@@ -101,10 +101,13 @@ PlayerWeapon.EnsureHasWeapon = function(player, weaponName, forceWeaponToWeaponI
                         count = currentCount
                     })
                     if gunInsertedCount < currentCount then
-                        player.surface.spill_item_stack(player.physical_position, {
-                            name = currentName,
-                            count = currentCount - gunInsertedCount
-                        }, true, nil, false)
+                        player.surface.spill_item_stack({
+                            position = player.physical_position,
+                            stack = { name = currentName, count = currentCount - gunInsertedCount },
+                            enable_looted = true,
+                            force = nil,
+                            allow_belts = false,
+                        })
                     end
                     removedWeaponDetails.weaponItemName = currentName
                 end
@@ -154,10 +157,13 @@ PlayerWeapon.EnsureHasWeapon = function(player, weaponName, forceWeaponToWeaponI
                     ammo = ammoItemStack.ammo
                 })
                 if ammoInsertedCount < currentAmmoCount then
-                    player.surface.spill_item_stack(player.physical_position, {
-                        name = currentAmmoName,
-                        count = currentAmmoCount - ammoInsertedCount
-                    }, true, nil, false)
+                    player.surface.spill_item_stack({
+                        position = player.physical_position,
+                        stack = { name = currentAmmoName, count = currentAmmoCount - ammoInsertedCount },
+                        enable_looted = true,
+                        force = nil,
+                        allow_belts = false,
+                    })
                 end
                 removedWeaponDetails.ammoItemName = currentAmmoName
                 ammoItemStack.clear()
@@ -189,10 +195,13 @@ PlayerWeapon.EnsureHasWeapon = function(player, weaponName, forceWeaponToWeaponI
                     ammo = ammoItemStack.ammo
                 })
                 if ammoInsertedCount < currentAmmoCount then
-                    player.surface.spill_item_stack(player.physical_position, {
-                        name = currentAmmoName,
-                        count = currentAmmoCount - ammoInsertedCount
-                    }, true, nil, false)
+                    player.surface.spill_item_stack({
+                        position = player.physical_position,
+                        stack = { name = currentAmmoName, count = currentAmmoCount - ammoInsertedCount },
+                        enable_looted = true,
+                        force = nil,
+                        allow_belts = false,
+                    })
                 end
                 removedWeaponDetails.ammoItemName = currentAmmoName
                 ammoItemStack.clear()

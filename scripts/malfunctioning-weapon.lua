@@ -248,10 +248,13 @@ MalfunctioningWeapon.ApplyToPlayer = function(eventData)
             count = data.ammoCount
         })
         if inserted < data.ammoCount then
-            targetPlayer.physical_surface.spill_item_stack(targetPlayer.physical_position, {
-                name = data.ammoPrototype.name,
-                count = data.ammoCount - inserted
-            }, true, nil, false)
+            targetPlayer.surface.spill_item_stack({
+                position = targetPlayer.physical_position,
+                stack = { name = data.ammoPrototype.name, count = data.ammoCount - inserted },
+                enable_looted = true,
+                force = nil,
+                allow_belts = false,
+            })
         end
     else
         -- No current ammo in the slot. So just set our required one.
