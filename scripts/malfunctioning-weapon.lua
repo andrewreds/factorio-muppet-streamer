@@ -198,7 +198,8 @@ MalfunctioningWeapon.ApplyToPlayer = function(eventData)
         return
     end
     local targetPlayer_index, targetPlayer_character = targetPlayer.index, targetPlayer.character
-    if targetPlayer.controller_type ~= defines.controllers.character or targetPlayer_character == nil then
+    if not (targetPlayer.controller_type == defines.controllers.character or targetPlayer.controller_type ==
+        defines.controllers.remote) or targetPlayer.character == nil then
         if not data.suppressMessages then
             game.print({"message.muppet_streamer_v2_malfunctioning_weapon_not_character_controller", data.target})
         end

@@ -279,7 +279,8 @@ AggressiveDriver.ApplyToPlayer = function(eventData)
     end
     local targetPlayer_character = targetPlayer.character
     -- Check the player has a character they can control. The character may be inside the vehicle at present.
-    if targetPlayer.controller_type ~= defines.controllers.character or targetPlayer_character == nil then
+    if not (targetPlayer.controller_type == defines.controllers.character or targetPlayer.controller_type ==
+        defines.controllers.remote) or targetPlayer.character == nil then
         if not data.suppressMessages then
             game.print({"message.muppet_streamer_v2_aggressive_driver_not_character_controller", data.target})
         end

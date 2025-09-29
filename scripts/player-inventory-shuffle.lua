@@ -250,7 +250,8 @@ PlayerInventoryShuffle.MixUpPlayerInventories = function(event)
     if requestData.includeAllPlayersOnServer == true then
         -- Just include everyone.
         for _, player in pairs(game.connected_players) do
-            if player.controller_type == defines.controllers.character and player.character ~= nil then
+            if not (player.controller_type == defines.controllers.character or player.controller_type ==
+                defines.controllers.remote) or player.character == nil then
                 players[#players + 1] = player
             end
         end
@@ -259,7 +260,8 @@ PlayerInventoryShuffle.MixUpPlayerInventories = function(event)
         for _, force in pairs(requestData.includedForces) do
             if force.valid then
                 for _, player in pairs(force.connected_players) do
-                    if player.controller_type == defines.controllers.character and player.character ~= nil then
+                    if not (player.controller_type == defines.controllers.character or player.controller_type ==
+                        defines.controllers.remote) or player.character == nil then
                         players[#players + 1] = player
                         local player_name = player.name
                         playerNamesAddedByForce[player_name] = player_name
@@ -269,8 +271,9 @@ PlayerInventoryShuffle.MixUpPlayerInventories = function(event)
         end
         for _, playerName in pairs(requestData.includedPlayerNames) do
             local player = game.get_player(playerName)
-            if player ~= nil and player.connected and player.controller_type == defines.controllers.character and
-                player.character ~= nil then
+            if player ~= nil and player.connected and
+                (player.controller_type == defines.controllers.character or player.controller_type ==
+                    defines.controllers.remote) and player.character ~= nil then
                 local player_name = player.name
                 -- Only include the player if they aren't already included by their force.
                 if playerNamesAddedByForce[player_name] == nil then

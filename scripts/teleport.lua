@@ -344,7 +344,8 @@ Teleport.PlanTeleportTarget = function(eventData)
     end
 
     -- Check the player is alive (not dead) and not in editor mode. If they are just end the attempt.
-    if targetPlayer.controller_type ~= defines.controllers.character then
+    if not (targetPlayer.controller_type == defines.controllers.character or targetPlayer.controller_type ==
+        defines.controllers.remote) or targetPlayer.character == nil then
         if not data.suppressMessages then
             game.print({"message.muppet_streamer_v2_teleport_not_character_controller", data.target})
         end

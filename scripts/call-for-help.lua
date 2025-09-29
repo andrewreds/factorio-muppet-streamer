@@ -239,7 +239,8 @@ CallForHelp.CallForHelp = function(eventData)
         CommandsUtils.LogPrintWarning(CommandName, nil, "Target player has been deleted since the command was run.", nil)
         return
     end
-    if targetPlayer.controller_type ~= defines.controllers.character then
+    if not (targetPlayer.controller_type == defines.controllers.character or targetPlayer.controller_type ==
+        defines.controllers.remote) or targetPlayer.character == nil then
         if not data.suppressMessages then
             game.print({"message.muppet_streamer_v2_call_for_help_not_character_controller", data.target})
         end
