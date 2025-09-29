@@ -183,6 +183,7 @@ Teleport.GetCommandData = function(commandData, depth, commandStringText, suppre
                 "must be a valid map position object", commandData.parameter)
             return nil
         else
+            -- TODO: Check if valid default
             destinationType = DestinationTypeSelection.position
         end
     else
@@ -454,6 +455,7 @@ Teleport.PlanTeleportTarget = function(eventData)
             -- Check if the nearest spawner is still valid. Its possible to remove spawners without us knowing about it, i.e. via Editor or via script and not raising an event for it. So we have to check.
             if not nearestSpawnerDistanceDetails.spawnerDetails.entity.valid then
                 -- Remove the spawner from this search.
+                ---@diagnostic disable-next-line: need-check-nil
                 data.spawnerDistances[firstSpawnerDistancesIndex] = nil
 
                 -- Remove the spawner from the global spawner list.
