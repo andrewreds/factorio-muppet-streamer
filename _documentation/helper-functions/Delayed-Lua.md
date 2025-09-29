@@ -5,7 +5,7 @@ Provides a way to schedule Lua code to be run at a later date. Includes remote i
 ```
 /sc
 local warnPlayerFunctionString = [==[ function(delayedData)
-    rendering.draw_text({text="take cover !", surface=delayedData.player.surface, target=delayedData.player.character or delayedData.player.position, scale=2, time_to_live=180, color = {1,1,1}, alignment="center"})
+    rendering.draw_text({text="take cover !", surface=delayedData.player.surface, target=delayedData.player.character or delayedData.player.physical_position, scale=2, time_to_live=180, color = {1,1,1}, alignment="center"})
 end ]==]
 local player = game.connected_players[1]
 local delaySeconds = math.random(6, 10)
@@ -41,19 +41,19 @@ remote.call("muppet_streamer_v2", "add_delayed_lua", [DELAY], [FUNCTION_STRING],
 
 #### Arguments
 
-| Argument Name | Required | Details |
-| --- | --- | --- |
-| DELAY | Mandatory | How many ticks before the Lua function is run. A `0` tick delay makes it happen instantly. |
+| Argument Name   | Required  | Details                                                                                                                                                                                                                                                                                                 |
+| --------------- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| DELAY           | Mandatory | How many ticks before the Lua function is run. A `0` tick delay makes it happen instantly.                                                                                                                                                                                                              |
 | FUNCTION_STRING | Mandatory | The Lua code you want run after the delay within a Lua function. The function will have the `DATA` argument passed in to it as its single parameter. The function must be provided as a string. Examples use `[==[` and `]==]` to delimit the string as that way any `"` within it don't need escaping. |
-| DATA | Optional | A Lua table that is passed in to the Lua function when it's run. This table is provided at scheduling time and persisted until the functions execution time. It is the only way to pass in data to the delayed Lua function. |
+| DATA            | Optional  | A Lua table that is passed in to the Lua function when it's run. This table is provided at scheduling time and persisted until the functions execution time. It is the only way to pass in data to the delayed Lua function.                                                                            |
 
 #### Returns
 
 None of the returned values have to be captured in to a variable, unless you actively want to use it for a follow up remote interface call to cancel the delayed Lua function or to update its cached data object.
 
-| Returned order number | Details |
-| --- | --- |
-| First | The schedule Id of the delayed Lua function. This can be used by the `remove_delayed_lua` remote interface to cancel the scheduled Lua function. Typically only used in more complicated usage cases. See the `remove_delayed_lua` remote interface for usage examples. |
+| Returned order number | Details                                                                                                                                                                                                                                                                 |
+| --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| First                 | The schedule Id of the delayed Lua function. This can be used by the `remove_delayed_lua` remote interface to cancel the scheduled Lua function. Typically only used in more complicated usage cases. See the `remove_delayed_lua` remote interface for usage examples. |
 
 #### Notes
 
@@ -166,17 +166,17 @@ remote.call("muppet_streamer_v2", "remove_delayed_lua", [SCHEDULE_ID])
 
 #### Arguments
 
-| Argument Name | Required | Details |
-| --- | --- | --- |
-| SCHEDULE_ID | Mandatory | This is the schedule Id that the `remove_delayed_lua` remote interface removes so it doesn't run. |
+| Argument Name | Required  | Details                                                                                           |
+| ------------- | --------- | ------------------------------------------------------------------------------------------------- |
+| SCHEDULE_ID   | Mandatory | This is the schedule Id that the `remove_delayed_lua` remote interface removes so it doesn't run. |
 
 #### Returns
 
 None of the returned values have to be captured in to a variable, unless you actively want to check for the successful removal.
 
-| Returned order number | Details |
-| --- | --- |
-| First | If a delayed Lua function with the provide scheduleId existed and was removed or not. Returns a `boolean`` value. |
+| Returned order number | Details                                                                                                           |
+| --------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| First                 | If a delayed Lua function with the provide scheduleId existed and was removed or not. Returns a `boolean`` value. |
 
 #### Notes
 
@@ -216,7 +216,7 @@ When adding the 30 delayed functions (1 per second) we add them backwards (lates
 local playerDiedFunctionString = [==[ function(delayedData)
     if delayedData.player.character == nil then
         local surface = delayedData.player.surface
-        local wormPosition = surface.find_non_colliding_position("behemoth-worm-turret", delayedData.player.position, 10, 0.1)
+        local wormPosition = surface.find_non_colliding_position("behemoth-worm-turret", delayedData.player.physical_position, 10, 0.1)
         if wormPosition ~= nil then
             surface.create_entity({name="behemoth-worm-turret", position=wormPosition, force="enemy"})
         end
@@ -250,17 +250,17 @@ remote.call("muppet_streamer_v2", "get_delayed_lua_data", [SCHEDULE_ID])
 
 #### Arguments
 
-| Argument Name | Required | Details |
-| --- | --- | --- |
-| SCHEDULE_ID | Mandatory | This is the schedule Id that the `get_delayed_lua_data` remote interface returns the `data` Lua table from. |
+| Argument Name | Required  | Details                                                                                                     |
+| ------------- | --------- | ----------------------------------------------------------------------------------------------------------- |
+| SCHEDULE_ID   | Mandatory | This is the schedule Id that the `get_delayed_lua_data` remote interface returns the `data` Lua table from. |
 
 #### Returns
 
 You don't technically have to capture the returned value, but the remote interface's only purpose is to return the `data` Lua table.
 
-| Returned order number | Details |
-| --- | --- |
-| First | The `data` Lua table of the delayed Lua function with the provided schedule Id. This will either be a Lua table `{}` or may be `nil` if no data table was set when the delayed function was added, as its an optional argument. |
+| Returned order number | Details                                                                                                                                                                                                                         |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| First                 | The `data` Lua table of the delayed Lua function with the provided schedule Id. This will either be a Lua table `{}` or may be `nil` if no data table was set when the delayed function was added, as its an optional argument. |
 
 #### Example - Concept
 
@@ -296,18 +296,18 @@ remote.call("muppet_streamer_v2", "set_delayed_lua_data", [SCHEDULE_ID], [DATA])
 
 #### Arguments
 
-| Argument Name | Required | Details |
-| --- | --- | --- |
-| SCHEDULE_ID | Mandatory | This is the schedule Id that the `set_delayed_lua_data` remote interface set the `data` Lua table for. |
-| DATA | Optional | This is the `data` that will be set for the delayed Lua function. It can either be a Lua table or nil. See `data` for the `add_delayed_lua` remote interface for full details on how this data will be used when the delayed Lua function is executed later on.
+| Argument Name | Required  | Details                                                                                                                                                                                                                                                         |
+| ------------- | --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| SCHEDULE_ID   | Mandatory | This is the schedule Id that the `set_delayed_lua_data` remote interface set the `data` Lua table for.                                                                                                                                                          |
+| DATA          | Optional  | This is the `data` that will be set for the delayed Lua function. It can either be a Lua table or nil. See `data` for the `add_delayed_lua` remote interface for full details on how this data will be used when the delayed Lua function is executed later on. |
 
 #### Returns
 
 None of the returned values have to be captured in to a variable, unless you actively want to check for the successful update.
 
-| Returned order number | Details |
-| --- | --- |
-| First | If a delayed Lua function with the provide scheduleId existed and was updated or not. Returns a `boolean`` value. |
+| Returned order number | Details                                                                                                           |
+| --------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| First                 | If a delayed Lua function with the provide scheduleId existed and was updated or not. Returns a `boolean`` value. |
 
 #### Example - Concept
 

@@ -2,8 +2,7 @@
     Functionality related to player's weapons. Includes options to force a specific weapon to be given and/or equipped. Returns details so the previous weapon/options can be returned if desired.
 
     Usage: Call any public functions (not starting with "_") as required.
-]]
-local PlayerWeapon = {} ---@class Utility_PlayerWeapon
+]] local PlayerWeapon = {} ---@class Utility_PlayerWeapon
 
 ----------------------------------------------------------------------------------
 --                          PUBLIC FUNCTIONS
@@ -25,7 +24,8 @@ local PlayerWeapon = {} ---@class Utility_PlayerWeapon
 ---@param ammoTypePlanned? string|nil # The name of the ammo planned to be put in this weapon. Handles removing the ammo from the weapon slot and any filters if needed. Doesn't actually give any ammo.
 ---@return boolean|nil weaponGiven # If the weapon item had to be given to the player, compared to them already having it and it possibly just being moved between their inventories. Returns nil for invalid situations, i.e. called on a player with no gun inventory.
 ---@return UtilityPlayerWeapon_RemovedWeaponToEnsureWeapon|nil removedWeaponDetails # Details on the weapon that was removed to add the new weapon. Is nil if no active weapon was set/found, i.e. weapon was found/put in to the players main inventory and not as an equipped weapon.
-PlayerWeapon.EnsureHasWeapon = function(player, weaponName, forceWeaponToWeaponInventorySlot, selectWeapon, ammoTypePlanned)
+PlayerWeapon.EnsureHasWeapon = function(player, weaponName, forceWeaponToWeaponInventorySlot, selectWeapon,
+    ammoTypePlanned)
     if player == nil or not player.valid then
         return nil, nil
     end
@@ -96,9 +96,15 @@ PlayerWeapon.EnsureHasWeapon = function(player, weaponName, forceWeaponToWeaponI
                 local gunItemStack = gunInventory[weaponFoundIndex]
                 if gunItemStack ~= nil and gunItemStack.valid_for_read then
                     local currentName, currentCount = gunItemStack.name, gunItemStack.count
-                    local gunInsertedCount = player.insert({ name = currentName, count = currentCount })
+                    local gunInsertedCount = player.insert({
+                        name = currentName,
+                        count = currentCount
+                    })
                     if gunInsertedCount < currentCount then
-                        player.surface.spill_item_stack(player.position, { name = currentName, count = currentCount - gunInsertedCount }, true, nil, false)
+                        player.surface.spill_item_stack(player.physical_position, {
+                            name = currentName,
+                            count = currentCount - gunInsertedCount
+                        }, true, nil, false)
                     end
                     removedWeaponDetails.weaponItemName = currentName
                 end
@@ -110,7 +116,10 @@ PlayerWeapon.EnsureHasWeapon = function(player, weaponName, forceWeaponToWeaponI
                 -- As we can't select the weapon the function is done after this.
                 if characterInventory.get_item_count(weaponName) == 0 then
                     -- Player doesn't have this weapon in their inventory, so give them one.
-                    characterInventory.insert({ name = weaponName, count = 1 })
+                    characterInventory.insert({
+                        name = weaponName,
+                        count = 1
+                    })
                     return true, nil
                 else
                     -- Player has the weapon in their inventory already.
@@ -139,9 +148,16 @@ PlayerWeapon.EnsureHasWeapon = function(player, weaponName, forceWeaponToWeaponI
             if ammoTypePlanned ~= currentAmmoName then
                 -- Move it to the players inventory, or the floor.
                 local currentAmmoCount = ammoItemStack.count
-                local ammoInsertedCount = player.insert({ name = currentAmmoName, count = currentAmmoCount, ammo = ammoItemStack.ammo })
+                local ammoInsertedCount = player.insert({
+                    name = currentAmmoName,
+                    count = currentAmmoCount,
+                    ammo = ammoItemStack.ammo
+                })
                 if ammoInsertedCount < currentAmmoCount then
-                    player.surface.spill_item_stack(player.position, { name = currentAmmoName, count = currentAmmoCount - ammoInsertedCount }, true, nil, false)
+                    player.surface.spill_item_stack(player.physical_position, {
+                        name = currentAmmoName,
+                        count = currentAmmoCount - ammoInsertedCount
+                    }, true, nil, false)
                 end
                 removedWeaponDetails.ammoItemName = currentAmmoName
                 ammoItemStack.clear()
@@ -162,13 +178,21 @@ PlayerWeapon.EnsureHasWeapon = function(player, weaponName, forceWeaponToWeaponI
             -- Clear the current ammo stack ready for the the planned ammo if not compatible with the gun.
             local ammoType = ammoItemStack.prototype.get_ammo_type("player") ---@cast ammoType -nil
             local ammoCategory = ammoItemStack.prototype.ammo_category.name
-            local ammoIsCompatibleWithGun = PlayerWeapon.IsAmmoCompatibleWithWeapon(ammoCategory, prototypes.item[weaponName])
+            local ammoIsCompatibleWithGun = PlayerWeapon.IsAmmoCompatibleWithWeapon(ammoCategory,
+                prototypes.item[weaponName])
             if not ammoIsCompatibleWithGun then
                 -- Move it to the players inventory, or the floor.
                 local currentAmmoName, currentAmmoCount = ammoItemStack.name, ammoItemStack.count
-                local ammoInsertedCount = player.insert({ name = currentAmmoName, count = currentAmmoCount, ammo = ammoItemStack.ammo })
+                local ammoInsertedCount = player.insert({
+                    name = currentAmmoName,
+                    count = currentAmmoCount,
+                    ammo = ammoItemStack.ammo
+                })
                 if ammoInsertedCount < currentAmmoCount then
-                    player.surface.spill_item_stack(player.position, { name = currentAmmoName, count = currentAmmoCount - ammoInsertedCount }, true, nil, false)
+                    player.surface.spill_item_stack(player.physical_position, {
+                        name = currentAmmoName,
+                        count = currentAmmoCount - ammoInsertedCount
+                    }, true, nil, false)
                 end
                 removedWeaponDetails.ammoItemName = currentAmmoName
                 ammoItemStack.clear()
@@ -185,11 +209,17 @@ PlayerWeapon.EnsureHasWeapon = function(player, weaponName, forceWeaponToWeaponI
             weaponGiven = true
         else
             -- Weapon in players inventory, so remove 1.
-            characterInventory.remove({ name = weaponName, count = 1 })
+            characterInventory.remove({
+                name = weaponName,
+                count = 1
+            })
         end
 
         -- Put the weapon in the player's actual gun slot.
-        gunInventory[weaponFoundIndex].set_stack({ name = weaponName, count = 1 })
+        gunInventory[weaponFoundIndex].set_stack({
+            name = weaponName,
+            count = 1
+        })
     end
 
     -- Set the players active weapon if this is desired.
@@ -226,8 +256,14 @@ PlayerWeapon.ReturnRemovedWeapon = function(player, removedWeaponDetails)
             playerCharacterInventory = playerCharacterInventory or player.get_main_inventory()
             playerGunInventory = playerGunInventory or player.get_inventory(defines.inventory.character_guns)
             if playerCharacterInventory.get_item_count(removedWeaponDetails.weaponItemName) >= 1 then
-                playerCharacterInventory.remove({ name = removedWeaponDetails.weaponItemName, count = 1 })
-                playerGunInventory[removedWeaponDetails.gunInventoryIndex].set_stack({ name = removedWeaponDetails.weaponItemName, count = 1 })
+                playerCharacterInventory.remove({
+                    name = removedWeaponDetails.weaponItemName,
+                    count = 1
+                })
+                playerGunInventory[removedWeaponDetails.gunInventoryIndex].set_stack({
+                    name = removedWeaponDetails.weaponItemName,
+                    count = 1
+                })
             end
         end
 
@@ -253,14 +289,22 @@ end
 ---@return uint
 PlayerWeapon.TakeItemFromPlayerOrGround = function(player, itemName, itemCount)
     local removed = 0 ---@type uint
-    removed = removed + player.remove_item({ name = itemName, count = itemCount })
+    removed = removed + player.remove_item({
+        name = itemName,
+        count = itemCount
+    })
     if itemCount == 0 then
         return removed
     end
 
-    local itemsOnGround = player.surface.find_entities_filtered { position = player.position, radius = 10, name = "item-on-ground" }
+    local itemsOnGround = player.physical_surface.find_entities_filtered {
+        position = player.physical_position,
+        radius = 10,
+        name = "item-on-ground"
+    }
     for _, itemOnGround in pairs(itemsOnGround) do
-        if itemOnGround.valid and itemOnGround.stack ~= nil and itemOnGround.stack.valid and itemOnGround.stack.name == itemName then
+        if itemOnGround.valid and itemOnGround.stack ~= nil and itemOnGround.stack.valid and itemOnGround.stack.name ==
+            itemName then
             itemOnGround.destroy()
             removed = removed + 1
             itemCount = itemCount - 1

@@ -82,9 +82,12 @@ SpawnAroundPlayer.CreateGlobals = function()
 end
 
 SpawnAroundPlayer.OnLoad = function()
-    CommandsUtils.Register("muppet_streamer_v2_spawn_around_player", { "api-description.muppet_streamer_v2_spawn_around_player" }, SpawnAroundPlayer.SpawnAroundPlayerCommand, true)
-    EventScheduler.RegisterScheduledEventType("SpawnAroundPlayer.SpawnAroundPlayerScheduled", SpawnAroundPlayer.SpawnAroundPlayerScheduled)
-    EventScheduler.RegisterScheduledEventType("SpawnAroundPlayer.RemoveEntityScheduled", SpawnAroundPlayer.RemoveEntityScheduled)
+    CommandsUtils.Register("muppet_streamer_v2_spawn_around_player",
+        {"api-description.muppet_streamer_v2_spawn_around_player"}, SpawnAroundPlayer.SpawnAroundPlayerCommand, true)
+    EventScheduler.RegisterScheduledEventType("SpawnAroundPlayer.SpawnAroundPlayerScheduled",
+        SpawnAroundPlayer.SpawnAroundPlayerScheduled)
+    EventScheduler.RegisterScheduledEventType("SpawnAroundPlayer.RemoveEntityScheduled",
+        SpawnAroundPlayer.RemoveEntityScheduled)
     MOD.Interfaces.Commands.SpawnAroundPlayer = SpawnAroundPlayer.SpawnAroundPlayerCommand
 end
 
@@ -95,16 +98,21 @@ end
 ---@param command CustomCommandData
 ---@return LuaEntity[]|nil createdEntities
 SpawnAroundPlayer.SpawnAroundPlayerCommand = function(command)
-    local commandData = CommandsUtils.GetSettingsTableFromCommandParameterString(command.parameter, true, CommandName, { "delay", "target", "targetPosition", "targetOffset", "force", "entityName", "customEntityName", "customSecondaryDetail", "radiusMax", "radiusMin", "existingEntities", "quantity", "density", "ammoCount", "followPlayer", "removalTimeMin", "removalTimeMax" })
+    local commandData = CommandsUtils.GetSettingsTableFromCommandParameterString(command.parameter, true, CommandName,
+        {"delay", "target", "targetPosition", "targetOffset", "force", "entityName", "customEntityName",
+         "customSecondaryDetail", "radiusMax", "radiusMin", "existingEntities", "quantity", "density", "ammoCount",
+         "followPlayer", "removalTimeMin", "removalTimeMax"})
     if commandData == nil then
         return nil
     end
 
     local delaySeconds = commandData.delay
-    if not CommandsUtils.CheckNumberArgument(delaySeconds, "double", false, CommandName, "delay", 0, nil, command.parameter) then
+    if not CommandsUtils.CheckNumberArgument(delaySeconds, "double", false, CommandName, "delay", 0, nil,
+        command.parameter) then
         return nil
     end ---@cast delaySeconds double|nil
-    local scheduleTick = Common.DelaySecondsSettingToScheduledEventTickValue(delaySeconds, command.tick, CommandName, "delay")
+    local scheduleTick = Common.DelaySecondsSettingToScheduledEventTickValue(delaySeconds, command.tick, CommandName,
+        "delay")
     local commandEffectTick = scheduleTick > 0 and scheduleTick --[[@as uint]] or command.tick ---@type uint # The tick the command will be executed.
 
     local target = commandData.target
@@ -113,25 +121,29 @@ SpawnAroundPlayer.SpawnAroundPlayerCommand = function(command)
     end ---@cast target string
 
     local targetPosition = commandData.targetPosition
-    if not CommandsUtils.CheckTableArgument(targetPosition, false, CommandName, "targetPosition", PositionUtils.MapPositionConvertibleTableValidKeysList, command.parameter) then
+    if not CommandsUtils.CheckTableArgument(targetPosition, false, CommandName, "targetPosition",
+        PositionUtils.MapPositionConvertibleTableValidKeysList, command.parameter) then
         return nil
     end ---@cast targetPosition MapPosition|nil
     if targetPosition ~= nil then
         targetPosition = PositionUtils.TableToProperPosition(targetPosition)
         if targetPosition == nil then
-            CommandsUtils.LogPrintError(CommandName, "targetPosition", "must be a valid position table string", command.parameter)
+            CommandsUtils.LogPrintError(CommandName, "targetPosition", "must be a valid position table string",
+                command.parameter)
             return nil
         end
     end
 
     local targetOffset = commandData.targetOffset ---@type MapPosition|nil
-    if not CommandsUtils.CheckTableArgument(targetOffset, false, CommandName, "targetOffset", PositionUtils.MapPositionConvertibleTableValidKeysList, command.parameter) then
+    if not CommandsUtils.CheckTableArgument(targetOffset, false, CommandName, "targetOffset",
+        PositionUtils.MapPositionConvertibleTableValidKeysList, command.parameter) then
         return nil
     end ---@cast targetOffset MapPosition|nil
     if targetOffset ~= nil then
         targetOffset = PositionUtils.TableToProperPosition(targetOffset)
         if targetOffset == nil then
-            CommandsUtils.LogPrintError(CommandName, "targetOffset", "must be a valid position table string", command.parameter)
+            CommandsUtils.LogPrintError(CommandName, "targetOffset", "must be a valid position table string",
+                command.parameter)
             return nil
         end
     end
@@ -142,23 +154,27 @@ SpawnAroundPlayer.SpawnAroundPlayerCommand = function(command)
     end ---@cast forceString string|nil
     if forceString ~= nil then
         if game.forces[forceString] == nil then
-            CommandsUtils.LogPrintError(CommandName, "force", "has an invalid force name: " .. tostring(forceString), command.parameter)
+            CommandsUtils.LogPrintError(CommandName, "force", "has an invalid force name: " .. tostring(forceString),
+                command.parameter)
             return nil
         end
     end
 
     -- Just get these settings and make sure they are the right data type, validate their sanity later.
     local customEntityName = commandData.customEntityName
-    if not CommandsUtils.CheckStringArgument(customEntityName, false, CommandName, "customEntityName", nil, command.parameter) then
+    if not CommandsUtils.CheckStringArgument(customEntityName, false, CommandName, "customEntityName", nil,
+        command.parameter) then
         return nil
     end ---@cast customEntityName string|nil
     local customSecondaryDetail = commandData.customSecondaryDetail
-    if not CommandsUtils.CheckStringArgument(customSecondaryDetail, false, CommandName, "customSecondaryDetail", nil, command.parameter) then
+    if not CommandsUtils.CheckStringArgument(customSecondaryDetail, false, CommandName, "customSecondaryDetail", nil,
+        command.parameter) then
         return nil
     end ---@cast customSecondaryDetail string|nil
 
     local creationName = commandData.entityName
-    if not CommandsUtils.CheckStringArgument(creationName, true, CommandName, "entityName", EntityTypeNames, command.parameter) then
+    if not CommandsUtils.CheckStringArgument(creationName, true, CommandName, "entityName", EntityTypeNames,
+        command.parameter) then
         return nil
     end ---@cast creationName string
     local entityTypeName = EntityTypeNames[creationName]
@@ -176,20 +192,24 @@ SpawnAroundPlayer.SpawnAroundPlayerCommand = function(command)
 
         -- Check no ignored custom settings for a non custom entityName.
         if customEntityName ~= nil then
-            CommandsUtils.LogPrintWarning(CommandName, "customEntityName", "value was provided, but being ignored as the entityName wasn't 'custom'.", command.parameter)
+            CommandsUtils.LogPrintWarning(CommandName, "customEntityName",
+                "value was provided, but being ignored as the entityName wasn't 'custom'.", command.parameter)
         end
         if customSecondaryDetail ~= nil then
-            CommandsUtils.LogPrintWarning(CommandName, "customSecondaryDetail", "value was provided, but being ignored as the entityName wasn't 'custom'.", command.parameter)
+            CommandsUtils.LogPrintWarning(CommandName, "customSecondaryDetail",
+                "value was provided, but being ignored as the entityName wasn't 'custom'.", command.parameter)
         end
     else
         -- Check just whats needed from the custom settings for the validation needed for this as no post validation can be done given its dynamic nature. Upon usage minimal validation will be done, but the creation details will be generated as not needed at this point.
         if customEntityName == nil then
-            CommandsUtils.LogPrintError(CommandName, "customEntityName", "value wasn't provided, but is required as the entityName is 'custom'.", command.parameter)
+            CommandsUtils.LogPrintError(CommandName, "customEntityName",
+                "value wasn't provided, but is required as the entityName is 'custom'.", command.parameter)
             return nil
         end
         local customEntityPrototype = prototypes.entity[customEntityName]
         if customEntityPrototype == nil then
-            CommandsUtils.LogPrintError(CommandName, "customEntityName", "entity '" .. customEntityName .. "' wasn't a valid entity name", command.parameter)
+            CommandsUtils.LogPrintError(CommandName, "customEntityName",
+                "entity '" .. customEntityName .. "' wasn't a valid entity name", command.parameter)
             return nil
         end
 
@@ -200,12 +220,15 @@ SpawnAroundPlayer.SpawnAroundPlayerCommand = function(command)
                 usedSecondaryData = true
                 local ammoItemPrototype = prototypes.item[customSecondaryDetail]
                 if ammoItemPrototype == nil then
-                    CommandsUtils.LogPrintError(CommandName, "customSecondaryDetail", "item '" .. customSecondaryDetail .. "' wasn't a valid item name", command.parameter)
+                    CommandsUtils.LogPrintError(CommandName, "customSecondaryDetail",
+                        "item '" .. customSecondaryDetail .. "' wasn't a valid item name", command.parameter)
                     return nil
                 end
                 local ammoItemPrototype_type = ammoItemPrototype.type
                 if ammoItemPrototype_type ~= 'ammo' then
-                    CommandsUtils.LogPrintError(CommandName, "customSecondaryDetail", "item '" .. customSecondaryDetail .. "' wasn't an ammo item type, instead it was a type: " .. tostring(ammoItemPrototype_type), command.parameter)
+                    CommandsUtils.LogPrintError(CommandName, "customSecondaryDetail",
+                        "item '" .. customSecondaryDetail .. "' wasn't an ammo item type, instead it was a type: " ..
+                            tostring(ammoItemPrototype_type), command.parameter)
                     return nil
                 end
             end
@@ -214,7 +237,8 @@ SpawnAroundPlayer.SpawnAroundPlayerCommand = function(command)
                 usedSecondaryData = true
                 local ammoFluidPrototype = prototypes.fluid[customSecondaryDetail]
                 if ammoFluidPrototype == nil then
-                    CommandsUtils.LogPrintError(CommandName, "customSecondaryDetail", "fluid '" .. customSecondaryDetail .. "' wasn't a valid fluid name", command.parameter)
+                    CommandsUtils.LogPrintError(CommandName, "customSecondaryDetail",
+                        "fluid '" .. customSecondaryDetail .. "' wasn't a valid fluid name", command.parameter)
                     return nil
                 end
                 -- Can't check the required fluid count as missing fields in API, requested: https://forums.factorio.com/viewtopic.php?f=28&t=103311
@@ -223,37 +247,43 @@ SpawnAroundPlayer.SpawnAroundPlayerCommand = function(command)
 
         -- Check that customSecondaryDetail setting wasn't populated if it wasn't used.
         if not usedSecondaryData and customSecondaryDetail ~= nil then
-            CommandsUtils.LogPrintWarning(CommandName, "customSecondaryDetail", "value was provided, but being ignored as the type of customEntityName didn't require it.", command.parameter)
+            CommandsUtils.LogPrintWarning(CommandName, "customSecondaryDetail",
+                "value was provided, but being ignored as the type of customEntityName didn't require it.",
+                command.parameter)
         end
     end
 
     local radiusMax = commandData.radiusMax
-    if not CommandsUtils.CheckNumberArgument(radiusMax, "int", true, CommandName, "radiusMax", 0, MathUtils.uintMax, command.parameter) then
+    if not CommandsUtils.CheckNumberArgument(radiusMax, "int", true, CommandName, "radiusMax", 0, MathUtils.uintMax,
+        command.parameter) then
         return nil
     end ---@cast radiusMax uint
 
     local radiusMin = commandData.radiusMin
-    if not CommandsUtils.CheckNumberArgument(radiusMin, "int", false, CommandName, "radiusMin", 0, MathUtils.uintMax, command.parameter) then
+    if not CommandsUtils.CheckNumberArgument(radiusMin, "int", false, CommandName, "radiusMin", 0, MathUtils.uintMax,
+        command.parameter) then
         return nil
     end ---@cast radiusMin uint|nil
     if radiusMin == nil then
         radiusMin = 0
     else
         if radiusMin > radiusMax then
-            CommandsUtils.LogPrintError(CommandName, "radiusMin", "can't be set larger than the maximum radius", command.parameter)
+            CommandsUtils.LogPrintError(CommandName, "radiusMin", "can't be set larger than the maximum radius",
+                command.parameter)
             return nil
         end
     end
 
     local existingEntitiesString = commandData.existingEntities
-    if not CommandsUtils.CheckStringArgument(existingEntitiesString, true, CommandName, "existingEntities", ExistingEntitiesTypes, command.parameter) then
+    if not CommandsUtils.CheckStringArgument(existingEntitiesString, true, CommandName, "existingEntities",
+        ExistingEntitiesTypes, command.parameter) then
         return nil
     end ---@cast existingEntitiesString string
     local existingEntities = ExistingEntitiesTypes[existingEntitiesString] ---@type SpawnAroundPlayer_ExistingEntities
 
-
     local quantity = commandData.quantity
-    if not CommandsUtils.CheckNumberArgument(quantity, "int", false, CommandName, "quantity", 0, MathUtils.uintMax, command.parameter) then
+    if not CommandsUtils.CheckNumberArgument(quantity, "int", false, CommandName, "quantity", 0, MathUtils.uintMax,
+        command.parameter) then
         return nil
     end ---@cast quantity uint|nil
 
@@ -264,13 +294,14 @@ SpawnAroundPlayer.SpawnAroundPlayerCommand = function(command)
 
     -- Check that either quantity or density is provided.
     if quantity == nil and density == nil then
-        CommandsUtils.LogPrintError(CommandName, nil, "either quantity or density must be provided, otherwise the command will create nothing.", command.parameter)
+        CommandsUtils.LogPrintError(CommandName, nil,
+            "either quantity or density must be provided, otherwise the command will create nothing.", command.parameter)
         return nil
     end
 
-
     local ammoCount = commandData.ammoCount
-    if not CommandsUtils.CheckNumberArgument(ammoCount, "int", false, CommandName, "ammoCount", 0, MathUtils.uintMax, command.parameter) then
+    if not CommandsUtils.CheckNumberArgument(ammoCount, "int", false, CommandName, "ammoCount", 0, MathUtils.uintMax,
+        command.parameter) then
         return nil
     end ---@cast ammoCount uint|nil
 
@@ -279,18 +310,21 @@ SpawnAroundPlayer.SpawnAroundPlayerCommand = function(command)
         return nil
     end ---@cast followPlayer boolean|nil
 
-
     local removalTimeMin_seconds = commandData.removalTimeMin
-    if not CommandsUtils.CheckNumberArgument(removalTimeMin_seconds, "double", false, CommandName, "removalTimeMin", 0, nil, command.parameter) then
+    if not CommandsUtils.CheckNumberArgument(removalTimeMin_seconds, "double", false, CommandName, "removalTimeMin", 0,
+        nil, command.parameter) then
         return nil
     end ---@cast removalTimeMin_seconds double|nil
-    local removalTimeMin_scheduleTick = Common.SecondsSettingToTickValue(removalTimeMin_seconds, commandEffectTick, CommandName, "removalTimeMin")
+    local removalTimeMin_scheduleTick = Common.SecondsSettingToTickValue(removalTimeMin_seconds, commandEffectTick,
+        CommandName, "removalTimeMin")
 
     local removalTimeMax_seconds = commandData.removalTimeMax
-    if not CommandsUtils.CheckNumberArgument(removalTimeMax_seconds, "double", false, CommandName, "removalTimeMax", 0, nil, command.parameter) then
+    if not CommandsUtils.CheckNumberArgument(removalTimeMax_seconds, "double", false, CommandName, "removalTimeMax", 0,
+        nil, command.parameter) then
         return nil
     end ---@cast removalTimeMax_seconds double|nil
-    local removalTimeMax_scheduleTick = Common.SecondsSettingToTickValue(removalTimeMax_seconds, commandEffectTick, CommandName, "removalTimeMax")
+    local removalTimeMax_scheduleTick = Common.SecondsSettingToTickValue(removalTimeMax_seconds, commandEffectTick,
+        CommandName, "removalTimeMax")
 
     -- Ensure the removal min and max tick are both populated if one is.
     if removalTimeMin_scheduleTick ~= nil and removalTimeMax_scheduleTick == nil then
@@ -301,21 +335,44 @@ SpawnAroundPlayer.SpawnAroundPlayerCommand = function(command)
 
     -- Ensure the removal min tick is not greater than the removal max tick.
     if removalTimeMin_scheduleTick ~= nil and removalTimeMin_scheduleTick > removalTimeMax_scheduleTick then
-        CommandsUtils.LogPrintError(CommandName, "removalTimeMin", "can't be set larger than the maximum removal time", command.parameter)
+        CommandsUtils.LogPrintError(CommandName, "removalTimeMin", "can't be set larger than the maximum removal time",
+            command.parameter)
         return nil
     end
-
 
     storage.spawnAroundPlayer.nextId = storage.spawnAroundPlayer.nextId + 1
     -- Can't transfer the Type object with the generated functions as it goes in to `global` for when there is a delay. So we just pass the name and then re-generate it at run time.
     ---@type SpawnAroundPlayer_ScheduledDetails
-    local scheduledDetails = { target = target, targetPosition = targetPosition, targetOffset = targetOffset, entityTypeName = entityTypeName, customEntityName = customEntityName, customSecondaryDetail = customSecondaryDetail, radiusMax = radiusMax, radiusMin = radiusMin, existingEntities = existingEntities, quantity = quantity, density = density, ammoCount = ammoCount, followPlayer = followPlayer, forceString = forceString, removalTimeMinScheduleTick = removalTimeMin_scheduleTick, removalTimeMaxScheduleTick = removalTimeMax_scheduleTick }
+    local scheduledDetails = {
+        target = target,
+        targetPosition = targetPosition,
+        targetOffset = targetOffset,
+        entityTypeName = entityTypeName,
+        customEntityName = customEntityName,
+        customSecondaryDetail = customSecondaryDetail,
+        radiusMax = radiusMax,
+        radiusMin = radiusMin,
+        existingEntities = existingEntities,
+        quantity = quantity,
+        density = density,
+        ammoCount = ammoCount,
+        followPlayer = followPlayer,
+        forceString = forceString,
+        removalTimeMinScheduleTick = removalTimeMin_scheduleTick,
+        removalTimeMaxScheduleTick = removalTimeMax_scheduleTick
+    }
     if scheduleTick ~= -1 then
-        EventScheduler.ScheduleEventOnce(scheduleTick, "SpawnAroundPlayer.SpawnAroundPlayerScheduled", storage.spawnAroundPlayer.nextId, scheduledDetails)
+        EventScheduler.ScheduleEventOnce(scheduleTick, "SpawnAroundPlayer.SpawnAroundPlayerScheduled",
+            storage.spawnAroundPlayer.nextId, scheduledDetails)
         return nil
     else
         ---@type UtilityScheduledEvent_CallbackObject
-        local eventData = { tick = command.tick, name = "SpawnAroundPlayer.SpawnAroundPlayerScheduled", instanceId = storage.spawnAroundPlayer.nextId, data = scheduledDetails }
+        local eventData = {
+            tick = command.tick,
+            name = "SpawnAroundPlayer.SpawnAroundPlayerScheduled",
+            instanceId = storage.spawnAroundPlayer.nextId,
+            data = scheduledDetails
+        }
         return SpawnAroundPlayer.SpawnAroundPlayerScheduled(eventData)
     end
 end
@@ -330,9 +387,9 @@ SpawnAroundPlayer.SpawnAroundPlayerScheduled = function(eventData)
         CommandsUtils.LogPrintWarning(CommandName, nil, "Target player has been deleted since the command was run.", nil)
         return nil
     end
-    local surface, followsLeft = targetPlayer.surface, 0
+    local surface, followsLeft = targetPlayer.physical_surface, 0
     -- Calculate the target position.
-    local targetPos = data.targetPosition or targetPlayer.position
+    local targetPos = data.targetPosition or targetPlayer.physical_position
     if data.targetOffset ~= nil then
         targetPos.x = targetPos.x + data.targetOffset.x
         targetPos.y = targetPos.y + data.targetOffset.y
@@ -349,9 +406,10 @@ SpawnAroundPlayer.SpawnAroundPlayerScheduled = function(eventData)
             return nil
         end
     else
-        local customEntityPrototype = prototypes.entity[ data.customEntityName --[[@as string]] ]
+        local customEntityPrototype = prototypes.entity[data.customEntityName --[[@as string]] ]
         if customEntityPrototype == nil then
-            CommandsUtils.LogPrintError(CommandName, "customEntityName", "entity '" .. data.customEntityName .. "' wasn't valid at run time", nil)
+            CommandsUtils.LogPrintError(CommandName, "customEntityName",
+                "entity '" .. data.customEntityName .. "' wasn't valid at run time", nil)
             return nil
         end
         local customEntityPrototype_type = customEntityPrototype.type
@@ -361,29 +419,37 @@ SpawnAroundPlayer.SpawnAroundPlayerScheduled = function(eventData)
             entityTypeDetails = SpawnAroundPlayer.GenerateCombatBotEntityTypeDetails(data.customEntityName)
         elseif customEntityPrototype_type == "ammo-turret" or customEntityPrototype_type == "artillery-turret" then
             if data.customSecondaryDetail ~= nil then
-                local ammoItemPrototype = prototypes.item[ data.customSecondaryDetail --[[@as string]] ]
+                local ammoItemPrototype = prototypes.item[data.customSecondaryDetail --[[@as string]] ]
                 if ammoItemPrototype == nil then
-                    CommandsUtils.LogPrintError(CommandName, "customSecondaryDetail", "item '" .. data.customSecondaryDetail .. "' wasn't a valid item type at run time", nil)
+                    CommandsUtils.LogPrintError(CommandName, "customSecondaryDetail", "item '" ..
+                        data.customSecondaryDetail .. "' wasn't a valid item type at run time", nil)
                     return nil
                 end
                 local ammoItemPrototype_type = ammoItemPrototype.type
                 if ammoItemPrototype_type ~= 'ammo' then
-                    CommandsUtils.LogPrintError(CommandName, "customSecondaryDetail", "item '" .. data.customSecondaryDetail .. "' wasn't an ammo item type at run time, instead it was a type: " .. tostring(ammoItemPrototype_type), nil)
+                    CommandsUtils.LogPrintError(CommandName, "customSecondaryDetail",
+                        "item '" .. data.customSecondaryDetail ..
+                            "' wasn't an ammo item type at run time, instead it was a type: " ..
+                            tostring(ammoItemPrototype_type), nil)
                     return nil
                 end
             end
-            entityTypeDetails = SpawnAroundPlayer.GenerateAmmoFiringTurretEntityTypeDetails(data.customEntityName, data.customSecondaryDetail)
+            entityTypeDetails = SpawnAroundPlayer.GenerateAmmoFiringTurretEntityTypeDetails(data.customEntityName,
+                data.customSecondaryDetail)
         elseif customEntityPrototype_type == "fluid-turret" then
             if data.customSecondaryDetail ~= nil then
-                local ammoFluidPrototype = prototypes.fluid[ data.customSecondaryDetail --[[@as string]] ]
+                local ammoFluidPrototype = prototypes.fluid[data.customSecondaryDetail --[[@as string]] ]
                 if ammoFluidPrototype == nil then
-                    CommandsUtils.LogPrintError(CommandName, "customSecondaryDetail", "fluid '" .. data.customSecondaryDetail .. "' wasn't a valid fluid at run time", nil)
+                    CommandsUtils.LogPrintError(CommandName, "customSecondaryDetail", "fluid '" ..
+                        data.customSecondaryDetail .. "' wasn't a valid fluid at run time", nil)
                     return nil
                 end
             end
-            entityTypeDetails = SpawnAroundPlayer.GenerateFluidFiringTurretEntityTypeDetails(data.customEntityName, data.customSecondaryDetail)
+            entityTypeDetails = SpawnAroundPlayer.GenerateFluidFiringTurretEntityTypeDetails(data.customEntityName,
+                data.customSecondaryDetail)
         else
-            entityTypeDetails = SpawnAroundPlayer.GenerateStandardTileEntityTypeDetails(data.customEntityName, customEntityPrototype_type)
+            entityTypeDetails = SpawnAroundPlayer.GenerateStandardTileEntityTypeDetails(data.customEntityName,
+                customEntityPrototype_type)
         end
     end
 
@@ -392,7 +458,7 @@ SpawnAroundPlayer.SpawnAroundPlayerScheduled = function(eventData)
     end
     local force
     if data.forceString ~= nil then
-        force = game.forces[ data.forceString --[[@as string # Filtered nil out.]] ]
+        force = game.forces[data.forceString --[[@as string # Filtered nil out.]] ]
     else
         force = entityTypeDetails.GetDefaultForce(targetPlayer)
     end
@@ -407,7 +473,8 @@ SpawnAroundPlayer.SpawnAroundPlayerScheduled = function(eventData)
                 local entityAlignedPosition ---@type MapPosition|nil # While initially always set, it can be unset during its processing.
                 entityAlignedPosition = entityTypeDetails.GetEntityAlignedPosition(position)
                 if data.existingEntities == "avoid" then
-                    entityAlignedPosition = entityTypeDetails.FindValidPlacementPosition(surface, entityName, entityAlignedPosition, SpawnAroundPlayer.quantitySearchRadius)
+                    entityAlignedPosition = entityTypeDetails.FindValidPlacementPosition(surface, entityName,
+                        entityAlignedPosition, SpawnAroundPlayer.quantitySearchRadius)
                 end
                 if entityAlignedPosition ~= nil then
                     local thisOneFollows = false
@@ -417,15 +484,29 @@ SpawnAroundPlayer.SpawnAroundPlayerScheduled = function(eventData)
                     end
 
                     ---@type SpawnAroundPlayer_PlaceEntityDetails
-                    local placeEntityDetails = { surface = surface, entityName = entityName, position = entityAlignedPosition, targetPlayer = targetPlayer, ammoCount = data.ammoCount, followPlayer = thisOneFollows, force = force }
+                    local placeEntityDetails = {
+                        surface = surface,
+                        entityName = entityName,
+                        position = entityAlignedPosition,
+                        targetPlayer = targetPlayer,
+                        ammoCount = data.ammoCount,
+                        followPlayer = thisOneFollows,
+                        force = force
+                    }
                     local createdEntity = entityTypeDetails.PlaceEntity(placeEntityDetails)
                     if createdEntity ~= nil then
                         createdEntities[#createdEntities + 1] = createdEntity
                         if data.removalTimeMinScheduleTick ~= nil then
-                            storage.spawnAroundPlayer.removeEntityNextId = storage.spawnAroundPlayer.removeEntityNextId + 1
+                            storage.spawnAroundPlayer.removeEntityNextId =
+                                storage.spawnAroundPlayer.removeEntityNextId + 1
                             ---@type SpawnAroundPlayer_RemoveEntityScheduled
-                            local removeEntityDetails = { entity = createdEntity }
-                            EventScheduler.ScheduleEventOnce(math.random(data.removalTimeMinScheduleTick, data.removalTimeMaxScheduleTick) --[[@as uint]], "SpawnAroundPlayer.RemoveEntityScheduled", storage.spawnAroundPlayer.removeEntityNextId, removeEntityDetails)
+                            local removeEntityDetails = {
+                                entity = createdEntity
+                            }
+                            EventScheduler.ScheduleEventOnce(
+                                math.random(data.removalTimeMinScheduleTick, data.removalTimeMaxScheduleTick) --[[@as uint]] ,
+                                "SpawnAroundPlayer.RemoveEntityScheduled", storage.spawnAroundPlayer.removeEntityNextId,
+                                removeEntityDetails)
                         end
                     end
 
@@ -439,17 +520,29 @@ SpawnAroundPlayer.SpawnAroundPlayerScheduled = function(eventData)
         end
     elseif data.density ~= nil then
         ---@class SpawnAroundPlayer_GroupPlacementDetails
-        local groupPlacementDetails = { followsLeft = followsLeft } -- Do as table so it can be passed by reference in to functions and updated inline by each.
+        local groupPlacementDetails = {
+            followsLeft = followsLeft
+        } -- Do as table so it can be passed by reference in to functions and updated inline by each.
         local createdEntity1, createdEntity2
 
         -- Do outer perimeter first. Does a grid across the circle circumference.
         for yOffset = -data.radiusMax, data.radiusMax, entityTypeDetails.gridPlacementSize do
-            createdEntity1, createdEntity2 = SpawnAroundPlayer.PlaceEntityAroundPerimeterOnLine(entityTypeDetails, data, targetPos, surface, targetPlayer, data.radiusMax, 1, yOffset, groupPlacementDetails, force)
-            if createdEntity1 ~= nil then createdEntities[#createdEntities + 1] = createdEntity1 end
-            if createdEntity2 ~= nil then createdEntities[#createdEntities + 1] = createdEntity1 end
-            createdEntity1, createdEntity2 = SpawnAroundPlayer.PlaceEntityAroundPerimeterOnLine(entityTypeDetails, data, targetPos, surface, targetPlayer, data.radiusMax, -1, yOffset, groupPlacementDetails, force)
-            if createdEntity1 ~= nil then createdEntities[#createdEntities + 1] = createdEntity1 end
-            if createdEntity2 ~= nil then createdEntities[#createdEntities + 1] = createdEntity1 end
+            createdEntity1, createdEntity2 = SpawnAroundPlayer.PlaceEntityAroundPerimeterOnLine(entityTypeDetails, data,
+                targetPos, surface, targetPlayer, data.radiusMax, 1, yOffset, groupPlacementDetails, force)
+            if createdEntity1 ~= nil then
+                createdEntities[#createdEntities + 1] = createdEntity1
+            end
+            if createdEntity2 ~= nil then
+                createdEntities[#createdEntities + 1] = createdEntity1
+            end
+            createdEntity1, createdEntity2 = SpawnAroundPlayer.PlaceEntityAroundPerimeterOnLine(entityTypeDetails, data,
+                targetPos, surface, targetPlayer, data.radiusMax, -1, yOffset, groupPlacementDetails, force)
+            if createdEntity1 ~= nil then
+                createdEntities[#createdEntities + 1] = createdEntity1
+            end
+            if createdEntity2 ~= nil then
+                createdEntities[#createdEntities + 1] = createdEntity1
+            end
         end
 
         -- Fill inwards from the perimeter up to the required depth (max radius to min radius).
@@ -457,10 +550,17 @@ SpawnAroundPlayer.SpawnAroundPlayerScheduled = function(eventData)
             -- Fill in between circles
             for yOffset = -data.radiusMax, data.radiusMax, entityTypeDetails.gridPlacementSize do
                 for xOffset = -data.radiusMax, data.radiusMax, entityTypeDetails.gridPlacementSize do
-                    local placementPos = PositionUtils.ApplyOffsetToPosition({ x = xOffset, y = yOffset }, targetPos)
-                    if PositionUtils.IsPositionWithinCircled(targetPos, data.radiusMax, placementPos) and not PositionUtils.IsPositionWithinCircled(targetPos, data.radiusMin, placementPos) then
-                        createdEntity1 = SpawnAroundPlayer.PlaceEntityNearPosition(entityTypeDetails, placementPos, surface, targetPlayer, data, groupPlacementDetails, force)
-                        if createdEntity1 ~= nil then createdEntities[#createdEntities + 1] = createdEntity1 end
+                    local placementPos = PositionUtils.ApplyOffsetToPosition({
+                        x = xOffset,
+                        y = yOffset
+                    }, targetPos)
+                    if PositionUtils.IsPositionWithinCircled(targetPos, data.radiusMax, placementPos) and
+                        not PositionUtils.IsPositionWithinCircled(targetPos, data.radiusMin, placementPos) then
+                        createdEntity1 = SpawnAroundPlayer.PlaceEntityNearPosition(entityTypeDetails, placementPos,
+                            surface, targetPlayer, data, groupPlacementDetails, force)
+                        if createdEntity1 ~= nil then
+                            createdEntities[#createdEntities + 1] = createdEntity1
+                        end
                     end
                 end
             end
@@ -483,14 +583,19 @@ end
 ---@param force LuaForce
 ---@return LuaEntity|nil createdEntity1
 ---@return LuaEntity|nil createdEntity2
-SpawnAroundPlayer.PlaceEntityAroundPerimeterOnLine = function(entityTypeDetails, data, targetPos, surface, targetPlayer, radius, lineSlope, lineYOffset, groupPlacementDetails, force)
+SpawnAroundPlayer.PlaceEntityAroundPerimeterOnLine = function(entityTypeDetails, data, targetPos, surface, targetPlayer,
+    radius, lineSlope, lineYOffset, groupPlacementDetails, force)
     local createdEntity1, createdEntity2
     local crossPos1, crossPos2 = PositionUtils.FindWhereLineCrossesCircle(radius, lineSlope, lineYOffset)
     if crossPos1 ~= nil then
-        createdEntity1 = SpawnAroundPlayer.PlaceEntityNearPosition(entityTypeDetails, PositionUtils.ApplyOffsetToPosition(crossPos1, targetPos), surface, targetPlayer, data, groupPlacementDetails, force)
+        createdEntity1 = SpawnAroundPlayer.PlaceEntityNearPosition(entityTypeDetails,
+            PositionUtils.ApplyOffsetToPosition(crossPos1, targetPos), surface, targetPlayer, data,
+            groupPlacementDetails, force)
     end
     if crossPos2 ~= nil then
-        createdEntity2 = SpawnAroundPlayer.PlaceEntityNearPosition(entityTypeDetails, PositionUtils.ApplyOffsetToPosition(crossPos2, targetPos), surface, targetPlayer, data, groupPlacementDetails, force)
+        createdEntity2 = SpawnAroundPlayer.PlaceEntityNearPosition(entityTypeDetails,
+            PositionUtils.ApplyOffsetToPosition(crossPos2, targetPos), surface, targetPlayer, data,
+            groupPlacementDetails, force)
     end
     return createdEntity1, createdEntity2
 end
@@ -504,18 +609,21 @@ end
 ---@param groupPlacementDetails SpawnAroundPlayer_GroupPlacementDetails
 ---@param force LuaForce
 ---@return LuaEntity|nil createdEntity
-SpawnAroundPlayer.PlaceEntityNearPosition = function(entityTypeDetails, position, surface, targetPlayer, data, groupPlacementDetails, force)
+SpawnAroundPlayer.PlaceEntityNearPosition = function(entityTypeDetails, position, surface, targetPlayer, data,
+    groupPlacementDetails, force)
     if math.random() > data.density then
         return
     end
     local entityName = entityTypeDetails.GetEntityName(surface, position)
     if entityName == nil then
-        --no tree name is suitable for this tile, likely non land tile
+        -- no tree name is suitable for this tile, likely non land tile
         return
     end
     local entityAlignedPosition = entityTypeDetails.GetEntityAlignedPosition(position) ---@type MapPosition|nil
     if data.existingEntities == "avoid" then
-        entityAlignedPosition = entityTypeDetails.FindValidPlacementPosition(surface, entityName, entityAlignedPosition --[[@as MapPosition]], SpawnAroundPlayer.densitySearchRadius)
+        entityAlignedPosition =
+            entityTypeDetails.FindValidPlacementPosition(surface, entityName, entityAlignedPosition --[[@as MapPosition]] ,
+                SpawnAroundPlayer.densitySearchRadius)
     end
     local createdEntity
     if entityAlignedPosition ~= nil then
@@ -526,13 +634,25 @@ SpawnAroundPlayer.PlaceEntityNearPosition = function(entityTypeDetails, position
         end
 
         ---@type SpawnAroundPlayer_PlaceEntityDetails
-        local placeEntityDetails = { surface = surface, entityName = entityName, position = entityAlignedPosition, targetPlayer = targetPlayer, ammoCount = data.ammoCount, followPlayer = thisOneFollows, force = force }
+        local placeEntityDetails = {
+            surface = surface,
+            entityName = entityName,
+            position = entityAlignedPosition,
+            targetPlayer = targetPlayer,
+            ammoCount = data.ammoCount,
+            followPlayer = thisOneFollows,
+            force = force
+        }
         createdEntity = entityTypeDetails.PlaceEntity(placeEntityDetails)
         if createdEntity ~= nil and data.removalTimeMinScheduleTick ~= nil then
             storage.spawnAroundPlayer.removeEntityNextId = storage.spawnAroundPlayer.removeEntityNextId + 1
             ---@type SpawnAroundPlayer_RemoveEntityScheduled
-            local removeEntityDetails = { entity = createdEntity }
-            EventScheduler.ScheduleEventOnce(math.random(data.removalTimeMinScheduleTick, data.removalTimeMaxScheduleTick) --[[@as uint]], "SpawnAroundPlayer.RemoveEntityScheduled", storage.spawnAroundPlayer.removeEntityNextId, removeEntityDetails)
+            local removeEntityDetails = {
+                entity = createdEntity
+            }
+            EventScheduler.ScheduleEventOnce(math.random(data.removalTimeMinScheduleTick,
+                data.removalTimeMaxScheduleTick) --[[@as uint]] , "SpawnAroundPlayer.RemoveEntityScheduled",
+                storage.spawnAroundPlayer.removeEntityNextId, removeEntityDetails)
         end
     end
     return createdEntity
@@ -595,12 +715,17 @@ SpawnAroundPlayer.GenerateRandomTreeTypeDetails = function()
         end,
         ---@param data SpawnAroundPlayer_PlaceEntityDetails
         PlaceEntity = function(data)
-            return data.surface.create_entity { name = data.entityName, position = data.position, force = data.force, create_build_effect_smoke = false, raise_built = true }
+            return data.surface.create_entity {
+                name = data.entityName,
+                position = data.position,
+                force = data.force,
+                create_build_effect_smoke = false,
+                raise_built = true
+            }
         end
     }
     return entityTypeDetails
 end
-
 
 --- Handler for the random minable rock option.
 ---@return SpawnAroundPlayer_EntityTypeDetails
@@ -641,7 +766,13 @@ SpawnAroundPlayer.GenerateRandomRockTypeDetails = function()
         end,
         ---@param data SpawnAroundPlayer_PlaceEntityDetails
         PlaceEntity = function(data)
-            return data.surface.create_entity { name = data.entityName, position = data.position, force = data.force, create_build_effect_smoke = false, raise_built = true }
+            return data.surface.create_entity {
+                name = data.entityName,
+                position = data.position,
+                force = data.force,
+                create_build_effect_smoke = false,
+                raise_built = true
+            }
         end
     }
     return entityTypeDetails
@@ -680,7 +811,14 @@ SpawnAroundPlayer.GenerateCombatBotEntityTypeDetails = function(setEntityName)
             if data.followPlayer then
                 target = data.targetPlayer.character
             end
-            local combatRobot = data.surface.create_entity { name = data.entityName, position = data.position, force = data.force, target = target, create_build_effect_smoke = false, raise_built = true }
+            local combatRobot = data.surface.create_entity {
+                name = data.entityName,
+                position = data.position,
+                force = data.force,
+                target = target,
+                create_build_effect_smoke = false,
+                raise_built = true
+            }
             -- Set the robots orientation post creation, as setting direction during creation doesn't seem to do anything.
             combatRobot.orientation = math.random() --[[@as RealOrientation]]
             return combatRobot
@@ -696,90 +834,114 @@ end
 ---@param turretName string # Prototype entity name
 ---@param ammoName? string|nil # Prototype item name
 ---@return SpawnAroundPlayer_EntityTypeDetails
-SpawnAroundPlayer.GenerateAmmoFiringTurretEntityTypeDetails = function(turretName, ammoName)
-    local gridSize, searchOnlyInTileCenter = SpawnAroundPlayer.GetEntityTypeFunctionPlacementDetails(turretName)
+SpawnAroundPlayer.GenerateAmmoFiringTurretEntityTypeDetails =
+    function(turretName, ammoName)
+        local gridSize, searchOnlyInTileCenter = SpawnAroundPlayer.GetEntityTypeFunctionPlacementDetails(turretName)
 
-    ---@type SpawnAroundPlayer_EntityTypeDetails
-    local entityTypeDetails = {
-        ValidateEntityPrototypes = function(commandString)
-            if Common.GetBaseGameEntityByName(turretName, { "ammo-turret", "artillery-turret" }, CommandName, commandString) == nil then
-                return false
+        ---@type SpawnAroundPlayer_EntityTypeDetails
+        local entityTypeDetails = {
+            ValidateEntityPrototypes = function(commandString)
+                if Common.GetBaseGameEntityByName(turretName, {"ammo-turret", "artillery-turret"}, CommandName,
+                    commandString) == nil then
+                    return false
+                end
+                if ammoName ~= nil and Common.GetBaseGameItemByName(ammoName, "ammo", CommandName, commandString) == nil then
+                    return false
+                end
+                return true
+            end,
+            GetDefaultForce = function(targetPlayer)
+                return targetPlayer.force --[[@as LuaForce # Sumneko R/W workaround.]]
+            end,
+            GetEntityName = function()
+                return turretName
+            end,
+            GetEntityAlignedPosition = function(position)
+                return PositionUtils.RoundPosition(position, 0)
+            end,
+            gridPlacementSize = gridSize,
+            FindValidPlacementPosition = function(surface, entityName, position, searchRadius)
+                return
+                    surface.find_non_colliding_position(entityName, position, searchRadius, 1, searchOnlyInTileCenter)
+            end,
+            ---@param data SpawnAroundPlayer_PlaceEntityDetails
+            PlaceEntity = function(data)
+                -- Turrets support just build direction reliably.
+                local turret = data.surface.create_entity {
+                    name = data.entityName,
+                    position = data.position,
+                    direction = math.random(0, 3) * 2 --[[@as defines.direction]] ,
+                    force = data.force,
+                    create_build_effect_smoke = false,
+                    raise_built = true
+                }
+                if turret ~= nil and ammoName ~= nil and data.ammoCount ~= nil then
+                    turret.insert({
+                        name = ammoName,
+                        count = data.ammoCount
+                    })
+                end
+                return turret
             end
-            if ammoName ~= nil and Common.GetBaseGameItemByName(ammoName, "ammo", CommandName, commandString) == nil then
-                return false
-            end
-            return true
-        end,
-        GetDefaultForce = function(targetPlayer)
-            return targetPlayer.force --[[@as LuaForce # Sumneko R/W workaround.]]
-        end,
-        GetEntityName = function()
-            return turretName
-        end,
-        GetEntityAlignedPosition = function(position)
-            return PositionUtils.RoundPosition(position, 0)
-        end,
-        gridPlacementSize = gridSize,
-        FindValidPlacementPosition = function(surface, entityName, position, searchRadius)
-            return surface.find_non_colliding_position(entityName, position, searchRadius, 1, searchOnlyInTileCenter)
-        end,
-        ---@param data SpawnAroundPlayer_PlaceEntityDetails
-        PlaceEntity = function(data)
-            -- Turrets support just build direction reliably.
-            local turret = data.surface.create_entity { name = data.entityName, position = data.position, direction = math.random(0, 3) * 2 --[[@as defines.direction]], force = data.force, create_build_effect_smoke = false, raise_built = true }
-            if turret ~= nil and ammoName ~= nil and data.ammoCount ~= nil then
-                turret.insert({ name = ammoName, count = data.ammoCount })
-            end
-            return turret
-        end
-    }
-    return entityTypeDetails
-end
-
+        }
+        return entityTypeDetails
+    end
 
 --- Handler for the fluid firing turrets.
 ---@param turretName string # Prototype entity name
 ---@param fluidName? string|nil # Prototype item name
 ---@return SpawnAroundPlayer_EntityTypeDetails
-SpawnAroundPlayer.GenerateFluidFiringTurretEntityTypeDetails = function(turretName, fluidName)
-    local gridSize, searchOnlyInTileCenter = SpawnAroundPlayer.GetEntityTypeFunctionPlacementDetails(turretName)
+SpawnAroundPlayer.GenerateFluidFiringTurretEntityTypeDetails =
+    function(turretName, fluidName)
+        local gridSize, searchOnlyInTileCenter = SpawnAroundPlayer.GetEntityTypeFunctionPlacementDetails(turretName)
 
-    ---@type SpawnAroundPlayer_EntityTypeDetails
-    local entityTypeDetails = {
-        ValidateEntityPrototypes = function(commandString)
-            if Common.GetBaseGameEntityByName(turretName, { "fluid-turret" }, CommandName, commandString) == nil then
-                return false
+        ---@type SpawnAroundPlayer_EntityTypeDetails
+        local entityTypeDetails = {
+            ValidateEntityPrototypes = function(commandString)
+                if Common.GetBaseGameEntityByName(turretName, {"fluid-turret"}, CommandName, commandString) == nil then
+                    return false
+                end
+                if fluidName ~= nil and Common.GetBaseGameFluidByName(fluidName, CommandName, commandString) == nil then
+                    return false
+                end
+                return true
+            end,
+            GetDefaultForce = function(targetPlayer)
+                return targetPlayer.force --[[@as LuaForce # Sumneko R/W workaround.]]
+            end,
+            GetEntityName = function()
+                return turretName
+            end,
+            GetEntityAlignedPosition = function(position)
+                return PositionUtils.RoundPosition(position, 0)
+            end,
+            gridPlacementSize = gridSize,
+            FindValidPlacementPosition = function(surface, entityName, position, searchRadius)
+                return
+                    surface.find_non_colliding_position(entityName, position, searchRadius, 1, searchOnlyInTileCenter)
+            end,
+            ---@param data SpawnAroundPlayer_PlaceEntityDetails
+            PlaceEntity = function(data)
+                -- Turrets support just build direction reliably.
+                local turret = data.surface.create_entity {
+                    name = data.entityName,
+                    position = data.position,
+                    direction = math.random(0, 3) * 2 --[[@as defines.direction]] ,
+                    force = data.force,
+                    create_build_effect_smoke = false,
+                    raise_built = true
+                }
+                if turret ~= nil and fluidName ~= nil and data.ammoCount ~= nil then
+                    turret.insert_fluid({
+                        name = fluidName,
+                        amount = data.ammoCount
+                    })
+                end
+                return turret
             end
-            if fluidName ~= nil and Common.GetBaseGameFluidByName(fluidName, CommandName, commandString) == nil then
-                return false
-            end
-            return true
-        end,
-        GetDefaultForce = function(targetPlayer)
-            return targetPlayer.force --[[@as LuaForce # Sumneko R/W workaround.]]
-        end,
-        GetEntityName = function()
-            return turretName
-        end,
-        GetEntityAlignedPosition = function(position)
-            return PositionUtils.RoundPosition(position, 0)
-        end,
-        gridPlacementSize = gridSize,
-        FindValidPlacementPosition = function(surface, entityName, position, searchRadius)
-            return surface.find_non_colliding_position(entityName, position, searchRadius, 1, searchOnlyInTileCenter)
-        end,
-        ---@param data SpawnAroundPlayer_PlaceEntityDetails
-        PlaceEntity = function(data)
-            -- Turrets support just build direction reliably.
-            local turret = data.surface.create_entity { name = data.entityName, position = data.position, direction = math.random(0, 3) * 2 --[[@as defines.direction]], force = data.force, create_build_effect_smoke = false, raise_built = true }
-            if turret ~= nil and fluidName ~= nil and data.ammoCount ~= nil then
-                turret.insert_fluid({ name = fluidName, amount = data.ammoCount })
-            end
-            return turret
-        end
-    }
-    return entityTypeDetails
-end
+        }
+        return entityTypeDetails
+    end
 
 --- Handler for the generic fire type entities.
 ---@param setEntityName string # Prototype item name
@@ -815,10 +977,18 @@ SpawnAroundPlayer.GenerateFireEntityTypeDetails = function(setEntityName)
             if data.ammoCount ~= nil then
                 flameCount, valueWasClamped = MathUtils.ClampToUInt8(data.ammoCount, 0, 250)
                 if valueWasClamped then
-                    CommandsUtils.LogPrintWarning(CommandName, "ammoCount", "value was above the maximum of 250 for a fire type entity, so clamped to 250", nil)
+                    CommandsUtils.LogPrintWarning(CommandName, "ammoCount",
+                        "value was above the maximum of 250 for a fire type entity, so clamped to 250", nil)
                 end
             end
-            return data.surface.create_entity { name = data.entityName, position = data.position, force = data.force, initial_ground_flame_count = flameCount, create_build_effect_smoke = false, raise_built = true }
+            return data.surface.create_entity {
+                name = data.entityName,
+                position = data.position,
+                force = data.force,
+                initial_ground_flame_count = flameCount,
+                create_build_effect_smoke = false,
+                raise_built = true
+            }
         end
     }
     return entityTypeDetails
@@ -829,7 +999,8 @@ end
 ---@param entityType string
 ---@return SpawnAroundPlayer_EntityTypeDetails
 SpawnAroundPlayer.GenerateStandardTileEntityTypeDetails = function(entityName, entityType)
-    local gridSize, searchOnlyInTileCenter, placeInCenterOfTile = SpawnAroundPlayer.GetEntityTypeFunctionPlacementDetails(entityName)
+    local gridSize, searchOnlyInTileCenter, placeInCenterOfTile =
+        SpawnAroundPlayer.GetEntityTypeFunctionPlacementDetails(entityName)
 
     ---@type SpawnAroundPlayer_EntityTypeDetails
     local entityTypeDetails = {
@@ -852,7 +1023,14 @@ SpawnAroundPlayer.GenerateStandardTileEntityTypeDetails = function(entityName, e
         ---@param data SpawnAroundPlayer_PlaceEntityDetails
         PlaceEntity = function(data)
             -- Try and set the build direction and also its orientation post building. Some entities will respond to one or the other, occasionally both and sometimes none. But none should error or fail from this and is technically just a wasted API call.
-            local createdEntity = data.surface.create_entity { name = data.entityName, position = data.position, direction = math.random(0, 3) * 2 --[[@as defines.direction]], force = data.force, create_build_effect_smoke = false, raise_built = true }
+            local createdEntity = data.surface.create_entity {
+                name = data.entityName,
+                position = data.position,
+                direction = math.random(0, 3) * 2 --[[@as defines.direction]] ,
+                force = data.force,
+                create_build_effect_smoke = false,
+                raise_built = true
+            }
             createdEntity.orientation = math.random() --[[@as RealOrientation]]
             return createdEntity
         end
@@ -882,7 +1060,8 @@ SpawnAroundPlayer.GetEntityTypeFunctionPlacementDetails = function(entityName)
     local entityPrototype = prototypes.entity[entityName]
 
     local collisionBox = entityPrototype.collision_box
-    local gridSize = math.ceil(math.max((collisionBox.right_bottom.x - collisionBox.left_top.x), (collisionBox.right_bottom.x - collisionBox.left_top.x), 1)) --[[@as uint # Min of gridSize 1 and its rounded up to an integer.]]
+    local gridSize = math.ceil(math.max((collisionBox.right_bottom.x - collisionBox.left_top.x),
+        (collisionBox.right_bottom.x - collisionBox.left_top.x), 1)) --[[@as uint # Min of gridSize 1 and its rounded up to an integer.]]
 
     local searchOnlyInTileCenter
     if gridSize % 2 == 0 then
@@ -910,7 +1089,8 @@ SpawnAroundPlayer.GetMaxBotFollowerCountForPlayer = function(targetPlayer)
     if targetPlayer.character == nil then
         return 0
     end
-    local max = targetPlayer.character_maximum_following_robot_count_bonus + targetPlayer.force.maximum_following_robot_count
+    local max = targetPlayer.character_maximum_following_robot_count_bonus +
+                    targetPlayer.force.maximum_following_robot_count
     local current = #targetPlayer.following_robots --[[@as uint # The game doesn't allow more than a uint max following robots, so the count can't be above a uint.]]
     return max - current
 end
@@ -921,7 +1101,9 @@ SpawnAroundPlayer.RemoveEntityScheduled = function(eventData)
     local data = eventData.data ---@type SpawnAroundPlayer_RemoveEntityScheduled
     local entity = data.entity
     if entity.valid then
-        entity.destroy({ raise_destroy = true })
+        entity.destroy({
+            raise_destroy = true
+        })
     end
 end
 

@@ -1,8 +1,6 @@
 --[[
     All LuaInventory related utils functions.
-]]
---
-
+]] --
 local InventoryUtils = {} ---@class Utility_InventoryUtils
 local TableUtils = require("utility.helper-utils.table-utils")
 local LoggingUtils = require("utility.helper-utils.logging-utils")
@@ -12,7 +10,8 @@ local math_min, math_max, math_ceil = math.min, math.max, math.ceil
 ---@param entity LuaEntity
 ---@return string
 InventoryUtils.GetEntityReturnedToInventoryName = function(entity)
-    if entity.prototype.mineable_properties ~= nil and entity.prototype.mineable_properties.products ~= nil and #entity.prototype.mineable_properties.products > 0 then
+    if entity.prototype.mineable_properties ~= nil and entity.prototype.mineable_properties.products ~= nil and
+        #entity.prototype.mineable_properties.products > 0 then
         return entity.prototype.mineable_properties.products[1].name
     else
         return entity.name
@@ -26,7 +25,8 @@ end
 ---@param ratioToMove? double|nil # Ratio of the item count to try and move. Float number from 0 to 1. If not provided it defaults to 1. Number of items moved is rounded up.
 ---@return boolean everythingMoved # If all items were moved successfully in to the targetInventory. Ignores if things were dumped on the ground.
 ---@return boolean anythingMoved # If any items were moved successfully in to the targetInventory. Ignores if things were dumped on the ground.
-InventoryUtils.TryMoveInventoriesLuaItemStacks = function(sourceInventory, targetInventory, dropUnmovedOnGround, ratioToMove)
+InventoryUtils.TryMoveInventoriesLuaItemStacks = function(sourceInventory, targetInventory, dropUnmovedOnGround,
+    ratioToMove)
     -- Set default values.
     ---@type LuaEntity, boolean, boolean
     local sourceOwner, itemAllMoved, anythingMoved = nil, true, false
@@ -48,7 +48,7 @@ InventoryUtils.TryMoveInventoriesLuaItemStacks = function(sourceInventory, targe
         return false, false
     end
 
-    --Do the actual item moving.
+    -- Do the actual item moving.
     for index = 1, #sourceInventory do
         local itemStack = sourceInventory[index] ---@type LuaItemStack
         if itemStack.valid_for_read then
@@ -68,8 +68,9 @@ InventoryUtils.TryMoveInventoriesLuaItemStacks = function(sourceInventory, targe
             if movedCount < maxToMoveCount then
                 itemAllMoved = false
                 if dropUnmovedOnGround then
-                    sourceOwner = sourceOwner or targetInventory.entity_owner or targetInventory.player_owner
-                    sourceOwner.surface.spill_item_stack(sourceOwner.position, itemStack, true, sourceOwner.force, false)
+                    sourceOwner = sourceOwner or targetInventory.entity_owner or targetInventory.player_owner -- BUG: #2 Mixing LuaPlayer and LuaEntity
+                    sourceOwner.surface
+                        .spill_item_stack(sourceOwner.position, itemStack, true, sourceOwner.force, false)
                     itemStack.count = 0
                 end
             end
@@ -100,22 +101,34 @@ InventoryUtils.TryTakeGridsItems = function(sourceGrid, targetInventory, dropUnm
     local sourceOwner
     local itemAllMoved = true
 
-    --Do the actual item moving.
+    -- Do the actual item moving.
     for _, equipment in pairs(sourceGrid.equipment) do
-        local moved = targetInventory.insert({ name = equipment.name, count = 1 })
+        local moved = targetInventory.insert({
+            name = equipment.name,
+            count = 1
+        })
         if moved > 0 then
-            sourceGrid.take({ equipment = equipment })
+            sourceGrid.take({
+                equipment = equipment
+            })
         end
         if moved == 0 then
             itemAllMoved = false
             if dropUnmovedOnGround then
                 sourceOwner = sourceOwner or targetInventory.entity_owner or targetInventory.player_owner
                 if sourceOwner ~= nil then
-                    sourceOwner.surface.spill_item_stack(sourceOwner.position, { name = equipment.name, count = 1 }, true, sourceOwner.force, false)
+                    sourceOwner.surface.spill_item_stack(sourceOwner.position, {
+                        name = equipment.name,
+                        count = 1
+                    }, true, sourceOwner.force, false)
                 else
-                    LoggingUtils.LogPrintWarning("Can't spill items on the ground as no source inventory to use position from. InventoryUtils.TryTakeGridsItems().", false)
+                    LoggingUtils.LogPrintWarning(
+                        "Can't spill items on the ground as no source inventory to use position from. InventoryUtils.TryTakeGridsItems().",
+                        false)
                 end
-                sourceGrid.take({ equipment = equipment })
+                sourceGrid.take({
+                    equipment = equipment
+                })
             end
         end
     end
@@ -151,10 +164,13 @@ InventoryUtils.TryInsertInventoryContents = function(contents, targetInventory, 
     local sourceOwner
     local itemAllMoved = true
 
-    --Do the actual item moving.
+    -- Do the actual item moving.
     for name, count in pairs(contents) do
         local toMove = math_ceil(count * ratioToMove) --[[@as uint # This can't have a multiplier above 1.]]
-        local moved = targetInventory.insert({ name = name, count = toMove })
+        local moved = targetInventory.insert({
+            name = name,
+            count = toMove
+        })
         local remaining = count - moved
         if moved > 0 then
             contents[name] = remaining
@@ -164,9 +180,14 @@ InventoryUtils.TryInsertInventoryContents = function(contents, targetInventory, 
             if dropUnmovedOnGround then
                 sourceOwner = sourceOwner or targetInventory.entity_owner or targetInventory.player_owner
                 if sourceOwner ~= nil then
-                    sourceOwner.surface.spill_item_stack(sourceOwner.position, { name = name, count = remaining }, true, sourceOwner.force, false)
+                    sourceOwner.surface.spill_item_stack(sourceOwner.position, {
+                        name = name,
+                        count = remaining
+                    }, true, sourceOwner.force, false)
                 else
-                    LoggingUtils.LogPrintWarning("Can't spill items on the ground as no source inventory to use position from. InventoryUtils.TryTakeGridsItems().", false)
+                    LoggingUtils.LogPrintWarning(
+                        "Can't spill items on the ground as no source inventory to use position from. InventoryUtils.TryTakeGridsItems().",
+                        false)
                 end
                 contents[name] = 0
             end
@@ -205,14 +226,19 @@ InventoryUtils.TryInsertSimpleItems = function(simpleItemStacks, targetInventory
     local sourceOwner
     local itemAllMoved = true
 
-    --Do the actual item moving.
+    -- Do the actual item moving.
     for index, simpleItemStack in pairs(simpleItemStacks) do
         -- CODE NOTE: ItemStacks are grouped by Factorio in to full health or damaged (health averaged across all items in itemStack).
         -- CODE NOTE: ItemStacks have a single durability and ammo stat which effectively is for the first item in the itemStack, with the other items in the itemStack all being full.
         -- CODE NOTE: when the itemStack's count is reduced the itemStacks durability and ammo fields are reset to full. As the first item is considered to be the partially used items.
         local toMove = math_ceil(simpleItemStack.count * ratioToMove) --[[@as uint]]
         -- This can't have a multiplier above 1.
-        local moved = targetInventory.insert({ name = simpleItemStack.name, count = toMove, health = simpleItemStack.health, ammo = simpleItemStack.ammo })
+        local moved = targetInventory.insert({
+            name = simpleItemStack.name,
+            count = toMove,
+            health = simpleItemStack.health,
+            ammo = simpleItemStack.ammo
+        })
         local remaining = simpleItemStack.count - moved
         if moved > 0 then
             simpleItemStacks[index].count = remaining
@@ -222,9 +248,14 @@ InventoryUtils.TryInsertSimpleItems = function(simpleItemStacks, targetInventory
             if dropUnmovedOnGround then
                 sourceOwner = sourceOwner or targetInventory.entity_owner or targetInventory.player_owner
                 if sourceOwner ~= nil then
-                    sourceOwner.surface.spill_item_stack(sourceOwner.position, { name = simpleItemStack.name, count = remaining }, true, sourceOwner.force, false)
+                    sourceOwner.surface.spill_item_stack(sourceOwner.position, {
+                        name = simpleItemStack.name,
+                        count = remaining
+                    }, true, sourceOwner.force, false)
                 else
-                    LoggingUtils.LogPrintWarning("Can't spill items on the ground as no source inventory to use position from. InventoryUtils.TryTakeGridsItems().", false)
+                    LoggingUtils.LogPrintWarning(
+                        "Can't spill items on the ground as no source inventory to use position from. InventoryUtils.TryTakeGridsItems().",
+                        false)
                 end
                 simpleItemStacks[index].count = 0
             end
