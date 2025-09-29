@@ -296,7 +296,7 @@ CallForHelp.CallForHelp = function(eventData)
     for _, helpPlayer in pairs(availablePlayers) do
         if SinglePlayerTesting or helpPlayer ~= targetPlayer then
             if (not data.sameTeamOnly) or helpPlayer.force == targetPlayerForce then
-                helpPlayer_surface = helpPlayer.surface
+                helpPlayer_surface = helpPlayer.physical_surface
                 if (not data.sameSurfaceOnly or helpPlayer_surface == targetPlayerSurface) and
                     helpPlayer.controller_type == defines.controllers.character and helpPlayer.character ~= nil then
                     if helpPlayer_surface ~= targetPlayerSurface then
@@ -448,7 +448,7 @@ CallForHelp.PlanTeleportHelpPlayer = function(helpPlayer, arrivalRadius, targetP
     -- Make the teleport request to near by the target identified.
     local teleportResponse = PlayerTeleport.RequestTeleportToNearPosition(helpPlayer, targetPlayerSurface,
         targetPlayerPosition, arrivalRadius, MaxRandomPositionsAroundTargetToTry, MaxDistancePositionAroundTarget,
-        helpPlayer.surface == targetPlayerSurface and targetPlayerPosition or nil)
+        helpPlayer.physical_surface == targetPlayerSurface and targetPlayerPosition or nil)
 
     -- Handle the teleport response.
     local pathRequestId = teleportResponse.pathRequestId -- Variables existence is a workaround for Sumneko missing object field nil detection.
@@ -466,7 +466,7 @@ CallForHelp.PlanTeleportHelpPlayer = function(helpPlayer, arrivalRadius, targetP
             helpPlayer = helpPlayer,
             helpPlayerPlacementEntity = teleportResponse.targetPlayerTeleportEntity,
             helpPlayerForce = helpPlayer.force --[[@as LuaForce # read/write work around]] ,
-            helpPlayerSurface = helpPlayer.surface,
+            helpPlayerSurface = helpPlayer.physical_surface,
             targetPlayer = targetPlayer,
             targetPlayerPosition = targetPlayerPosition,
             targetPlayerEntity = targetPlayerEntity,
@@ -554,7 +554,7 @@ CallForHelp.OnScriptPathRequestFinished = function(event)
         end
 
         -- Check the helping player's surface hasn't changed and if it has that this doesn't make them invalid for selection due to sameSurface option being enabled.
-        if helpPlayer.surface ~= pathRequest.helpPlayerSurface then
+        if helpPlayer.physical_surface ~= pathRequest.helpPlayerSurface then
             if pathRequest.sameSurfaceOnly then
                 -- They must have been same surface before, but now aren't so abandon the teleport.
                 CallForHelp.CheckIfCallForHelpCompleted(pathRequest)
